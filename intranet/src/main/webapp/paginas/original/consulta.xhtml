@@ -1,0 +1,561 @@
+<ui:composition template="/WEB-INF/templates/template.xhtml" xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui">
+
+	<ui:define name="html-head">
+		<h:outputScript library="js" name="jquery.price_format.1.3.js" />
+		<h:outputScript library="js" name="jquery.pesquisa-unidade.js" />
+	</ui:define>
+	
+	<!-- Alias para o controller -->
+	<ui:param name="modal" value="#{documentoOriginalController}" />
+
+	<ui:param name="breadcrumbs" value="#{bundle['geral.breadcrumb.requisicao']},#{bundle['documentoOriginal.consulta.tituloPagina']}" />
+
+	<ui:define name="content-main-page">
+	
+		<o:form id="formConsulta" style="width: 100%">
+
+			<p:messages id="messages" showDetail="false" />
+
+			<h3 class="titlePage">#{bundle['documentoOriginal.consulta.tituloPagina.descricao']}</h3>
+
+			<fieldset class="filtro">
+
+				<h:panelGroup id="modalPainelCad06">
+					<!-- begin-of: filtros -->
+					<h:panelGroup id="pnlGrid">
+						<!-- begin-of: 1º linha -->
+						<h:panelGrid columns="6">
+
+							<!-- begin-of: nº requisição -->
+							<h:outputLabel styleClass="label-button" value="#{bundle['requisicao.label.codigoRequisicao']}" title="#{bundle['MH009']}">
+								<br />
+								<p:inputText id="numeroRequisicoes" value="#{documentoOriginalController.filtroDocOriginal.numeroRequisicoes}" maxlength="100" style="width:90px;"
+									onchange="overSomenteNumerosSeparadosPorVirgula(this);" onkeypress="return somenteNumerosSeparadosPorVirgula(event);">
+								</p:inputText>
+							</h:outputLabel>
+							<!-- end-of: nº requisição -->
+
+							<!-- begin-of: matricula usuário -->
+							<h:outputLabel styleClass="label-button" value="#{bundle['geral.label.usuario']}" title="#{bundle['requisicao.consulta.filtro.usuario.hint']}">
+								<br />
+								<p:inputMask id="matriculaUsuario" styleClass="filtro-opcional" value="#{documentoOriginalController.filtroDocOriginal.matriculaUsuario}"
+									disabled="#{documentoOriginalController.isPerfilGeral()}" mask="a999999" maxlength="7" style="width:50px;">
+								</p:inputMask>
+							</h:outputLabel>
+							<!-- end-of: matricula usuário -->
+
+							<!-- begin-of: data início -->
+							<h:outputLabel styleClass="label-button" value="#{bundle['geral.label.dataInicio']}" title="#{bundle['requisicao.consulta.filtro.dataInicio.hint']}">
+								<h:outputText styleClass="pesquisaDireta" />
+								<br />
+								<p:calendar id="dataInicio" styleClass="filtro-opcional" value="#{documentoOriginalController.filtroDocOriginal.dataInicio}"
+									requiredMessage="#{bundle['requisicao.consulta.data.obrigatorio']}" pattern="dd/MM/yyyy" size="8" maxlength="10"
+									onkeyup="maskIt(this, event, '##/##/#####', false, false)" validator="dateValidator">
+									<f:attribute name="field" value="#{bundle['geral.label.dataInicio']}" />
+									<f:converter converterId="br.gov.caixa.gitecsa.DateConverter" />
+								</p:calendar>
+							</h:outputLabel>
+							<!-- end-of: data início -->
+
+							<!-- begin-of: data fim -->
+							<h:outputLabel styleClass="label-button" value="#{bundle['geral.label.dataFim']}" title="#{bundle['requisicao.consulta.filtro.dataFim.hint']}">
+								<br />
+								<p:calendar id="dataFim" styleClass="filtro-opcional" value="#{documentoOriginalController.filtroDocOriginal.dataFim}" pattern="dd/MM/yyyy"
+									locale="pt_BR" size="8" maxlength="10" onkeyup="maskIt(this, event, '##/##/#####', false, false)" validator="dateValidator">
+									<f:attribute name="field" value="#{bundle['geral.label.dataFim']}" />
+									<f:converter converterId="br.gov.caixa.gitecsa.DateConverter" />
+								</p:calendar>
+							</h:outputLabel>
+							<!-- end-of: data fim -->
+
+							<!-- begin-of: unidade solicitante -->
+							<h:outputLabel styleClass="label-button" value="#{bundle['geral.label.unidadeSolicitante']}" title="#{bundle['MH096']}">
+								<br />
+								<h:inputText id="cgcUnidade" styleClass="filtro-opcional input-cgc-unidade"
+									value="#{documentoOriginalController.filtroDocOriginal.unidadeSolicitante.id}" maxlength="4" style="width:30px; margin-right: 3px;"
+									onkeypress="return somenteNumero(event)" onchange="overSomenteNumeros(this);">
+									<f:converter converterId="javax.faces.Long" />
+									<p:ajax event="blur" listener="#{documentoOriginalController.pesquisarUnidadeSolicitante()}" update="nomeUnidade messages" process="cgcUnidade" />
+								</h:inputText>
+
+								<h:inputText id="nomeUnidade" value="#{documentoOriginalController.filtroDocOriginal.unidadeSolicitante.nome}"
+									styleClass="input-disabled input-readonly filtro-opcional" maxlength="100" style="width:245px;" disabled="true">
+								</h:inputText>
+							</h:outputLabel>
+							<!-- end-of: unidade solicitante -->
+							
+							<!-- begin-of: situação -->
+							<h:outputLabel styleClass="label-button" value="#{bundle['geral.label.situacao']}" title="#{bundle['requisicao.consulta.filtro.situacao.hint']}">
+								<br />
+								<h:selectOneMenu styleClass="filtro-opcional filtro-situacao" 
+									value="#{documentoOriginalController.filtroDocOriginal.situacaoDocOriginal}" style="min-width:100px"
+									converter="omnifaces.SelectItemsConverter">
+									<f:selectItem itemLabel="#{bundle['geral.select.label.todas'].toUpperCase()}" noSelectionOption="true" />
+									<f:selectItems value="#{documentoOriginalController.listSituacao}" var="item" itemValue="#{item}" itemLabel="#{item.label}" />
+								</h:selectOneMenu>
+							</h:outputLabel>
+							<!-- end-of: situação -->
+
+						</h:panelGrid>
+						<!-- end-of: 1º linha -->
+
+						<!-- begin-of: 2º linha -->
+						<h:panelGrid columns="1">
+
+							<!-- begin-of: base -->
+							<p:outputPanel rendered="#{documentoOriginalController.isPermitidoAlterarBaseUnidade()}">
+								<h:outputLabel styleClass="label-button" value="#{bundle['base.label.base']}" title="#{bundle['requisicao.consulta.filtro.base.hint']}">
+									<br />
+									<h:selectOneMenu styleClass="filtro-opcional" value="#{documentoOriginalController.filtroDocOriginal.base}" style="min-width:90px"
+										converter="omnifaces.SelectItemsConverter">
+										<f:selectItem itemLabel="#{bundle['geral.select.label.todas'].toUpperCase()}" noSelectionOption="true" />
+										<f:selectItems value="#{documentoOriginalController.listBase}" var="item" itemValue="#{item}" itemLabel="#{item.nome}" />
+									</h:selectOneMenu>
+								</h:outputLabel>
+							</p:outputPanel>
+							<!-- end-of: base -->
+
+						</h:panelGrid>
+						<!-- end-of: 2º linha -->
+					</h:panelGroup>
+					<!-- end-of: filtro -->
+				</h:panelGroup>
+
+				<p:outputPanel id="pnlBotoes">
+
+					<!-- begin-of: botão consultar -->
+					<p:commandLink title="#{bundle['MH008']}" styleClass="btnAzul marginTop buttonSelected btn-dep-cgc-unidade" update="messages,pnlGrid,pnlBotoes"
+						process="@form" actionListener="#{documentoOriginalController.localizar()}" oncomplete="applyStylesResultsDataTable();">
+						<span>#{bundle['geral.button.consultar']}</span>
+					</p:commandLink>
+					<!-- end-of: botão consultar -->
+
+					<!-- begin-of: botão limpar -->
+					<p:commandLink title="#{bundle['MH012']}" styleClass="btnLaranja marginTopField" update="@form" process="@form"
+						actionListener="#{documentoOriginalController.limparCamposFiltros()}">
+						<span>#{bundle['geral.button.limpar']}</span>
+					</p:commandLink>
+					<!-- end-of: botão limpar -->
+
+					<!-- begin-of: botão exportar -->
+					<p:commandLink id="btnExportar" title="#{bundle['MH010']}" styleClass="btnLaranja marginTop buttonSelected btn-dep-cgc-unidade" process="@form"
+						ajax="false" onclick="PrimeFaces.monitorDownload(showStatus, hideStatus);"
+						disabled="#{documentoOriginalController.listDocOriginalModel == null or (documentoOriginalController.listDocOriginalModel.rowCount == 0)}">
+						<p:fileDownload value="#{documentoOriginalController.exportar()}" />
+						<span>#{bundle['geral.button.exportar']}</span>
+					</p:commandLink>
+					<!-- end-of: botão exportar -->
+
+				</p:outputPanel>
+			</fieldset>
+
+			<p:outputPanel id="pnlResultados">
+
+				<p:outputPanel>
+
+					<!-- begin-of: resultados -->
+					<p:dataTable id="tabela" value="#{documentoOriginalController.listDocOriginalModel}"
+						rendered="#{documentoOriginalController.listDocOriginalModel ne null}" lazy="true" varStatus="size" var="docOriginal" type="unordered" itemType="none"
+						paginator="true" rows="10" paginatorPosition="bottom"
+						paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+						currentPageReportTemplate="#{bundle['geral.crud.exibindo']} {startRecord} #{bundle['geral.crud.ate']} {endRecord}  #{bundle['geral.crud.de']} {totalRecords}  #{bundle['geral.crud.registros']} "
+						rowsPerPageTemplate="5,10,25,50" emptyMessage="#{bundle['MA010']}">
+
+						<!-- COD. REQUISIÇÃO -->
+						<p:column style="width:85px">
+							<f:facet name="header">
+								<h:outputText value="COD. REQUISIÇÃO" />
+							</f:facet>
+							<strong>
+								<p:commandLink title="Clique aqui para acessar a Requisição" styleClass="image-link info-link"
+									actionListener="#{documentoOriginalController.visualizarRequisicao(docOriginal)}" 
+									update=":modalInfoId" value="#{docOriginal.requisicao.codigoRequisicao}">
+								</p:commandLink>
+							</strong>
+						</p:column>
+						
+						<!-- UNIDADE SOLICITANTE -->
+						<p:column style="width:163px">
+							<f:facet name="header">
+								<h:outputText value="UNID. SOLICITANTE" />
+							</f:facet>
+							<h:outputText value="#{docOriginal.requisicao.unidadeSolicitante.descricaoCompleta}" />
+						</p:column>
+
+						<!-- DATA DE ENVIO UNIDADE -->
+						<p:column style="width:79px">
+							<f:facet name="header">
+								<h:outputText value="DT. ENVIO UNIDADE" />
+							</f:facet>
+							<h:outputText value="#{documentoOriginalController.getDataEnvioDocumentoOriginal(docOriginal)}">
+								<f:convertDateTime dateStyle="long" pattern="dd/MM/yyyy HH:mm" locale="pt_BR" />
+							</h:outputText>
+						</p:column>
+
+						<!-- DOCUMENTO -->
+						<p:column style="width:160px">
+							<f:facet name="header">
+								<h:outputText value="DOCUMENTO" />
+							</f:facet>
+							<h:outputText value="#{docOriginal.requisicao.documento.nome}" />
+						</p:column>
+						
+						<!-- SITUAÇÃO -->
+						<p:column style="width:102px">
+							<f:facet name="header">
+								<h:outputText value="SITUAÇÃO" />
+							</f:facet>
+							<h:outputText value="#{docOriginal.tramiteDocOriginalAtual.situacaoDocOriginal.nome}" />
+						</p:column>
+
+						<!-- AÇÕES -->
+						<p:column style="width:95px; white-space:nowrap;">
+							<f:facet name="header">
+								<h:outputText value="AÇÕES" />
+							</f:facet>
+
+							<!-- begin-of: devolver documento original -->
+							<p:commandLink title="Clique aqui para devolver a requisição com documento original" styleClass="image-link"
+								actionListener="#{documentoOriginalController.confirmarDevolucao(docOriginal)}"
+								rendered="#{documentoOriginalController.hasBotaoDevolver(docOriginal)}"
+								update=":modalDevolverId">
+								<img class="icon-devolver" src="#{request.contextPath}/resources/imagens/img_trans.gif" width="1" height="1" />
+							</p:commandLink>
+							<!-- end-of: devolver documento original -->
+
+							<!-- begin-of: recepcionar documento original -->
+							<p:commandLink title="Clique aqui para recepcionar a requisição" styleClass="image-link"
+								actionListener="#{documentoOriginalController.confirmarRecebimento(docOriginal)}"
+								rendered="#{documentoOriginalController.hasBotaoReceber(docOriginal)}"
+								update=":modalRecepcionarId">
+								<img class="icon-recepcionar" src="#{request.contextPath}/resources/imagens/img_trans.gif" width="1" height="1" />
+							</p:commandLink>
+							<!-- end-of: recepcionar documento original -->
+							
+							<!-- begin-of: extravio documento original -->
+							<p:commandLink title="Clique aqui para extraviar a requisição" styleClass="image-link"
+								actionListener="#{documentoOriginalController.confirmarExtravio(docOriginal)}"
+								rendered="#{documentoOriginalController.hasBotaoExtraviado(docOriginal)}"
+								update=":modalExtravioId">
+								<img class="icon-extravio" src="#{request.contextPath}/resources/imagens/img_trans.gif" width="1" height="1" />
+							</p:commandLink>
+							<!-- end-of: extravio documento original -->
+							
+							<!-- begin-of: histórico -->
+							<p:commandLink title="#{bundle['MH007']}" styleClass="image-link"
+								actionListener="#{documentoOriginalController.visualizarHistoricoTramite(docOriginal)}" update=":modalHistoricoId">
+								<img class="icon-informacoes" src="#{request.contextPath}/resources/imagens/img_trans.gif" width="1" height="1" />
+							</p:commandLink>
+							<!-- end-of: histórico -->
+
+						</p:column>
+
+					</p:dataTable>
+					<!-- end-of: resultados -->
+
+				</p:outputPanel>
+			</p:outputPanel>
+		</o:form>
+
+		<!-- begin-of: modals -->
+
+		<!-- Foram modificadas apenas as chamadas dos métodos do bean. Definições de interface  -->
+		<!-- continuam as mesmas do legado conforme proposta da OS. Necessário refatorar para elimitar problemas de apresentação. -->
+
+		<!-- begin-of: modal período -->
+		<p:dialog id="dataNaoInformada" widgetVar="mdlDtNaoInformada" styleClass="ui-dialog-background" modal="true" header="Atenção" width="500px" draggable="true"
+			resizable="false" position="center">
+			<h:form id="confirmarForm">
+				<span class="atencao2" style="margin-top: -2px !important;" />
+				<h:outputLabel style="margin-left: 40px; max-width: 60px; font-weight: bold !important;" value="#{bundle['MA013']}">
+				</h:outputLabel>
+				<br></br>
+				<p:commandLink id="btnConfirmar" styleClass="btnLaranja marginTop buttonSelected" update=":formConsulta" oncomplete="mdlDtNaoInformada.hide()"
+					actionListener="#{documentoOriginalController.localizarPorPeriodoPadrao()}">
+					<span><h:outputText style="width: 1; height: 1;" value="Sim" /></span>
+				</p:commandLink>
+				<p:commandLink id="btnNaoConfirmar" styleClass="btnAzul marginTop buttonSelected"
+					actionListener="#{documentoOriginalController.informarDataInicioObrigatoria()}" oncomplete="mdlDtNaoInformada.hide()">
+					<span><h:outputText style="width: 1; height: 1;" value="Não" /></span>
+				</p:commandLink>
+				<p:spacer height="30px" />
+			</h:form>
+		</p:dialog>
+		<!-- end-of: modal período -->
+		
+		<o:importConstants type="br.gov.caixa.gitecsa.sired.enumerator.SituacaoDocumentoOriginalEnum" />
+				
+		<!-- begin-of: modal recepcionar -->
+		<p:dialog id="modalDevolverId" widgetVar="mdlDevolver" styleClass="ui-dialog-background" header="Confirma a devolução do item?" 
+			width="500" closable="true" modal="true" resizable="false" position="center">
+			<h:form id="formDevolver">
+				
+				<h:panelGrid columns="1" style="width:100%">
+					
+					<h:outputLabel styleClass="label-button" value="Usuário">
+						<br/>
+						<h:inputText value="#{documentoOriginalController.usuarioAutenticado.nuMatricula}" styleClass="input-disabled input-readonly" disabled="true" />
+					</h:outputLabel>
+					
+					<h:outputLabel styleClass="label-button" value="Observação">
+						<br/>
+						<h:inputTextarea maxlength="100" styleClass="obsDocOriginal" value="#{documentoOriginalController.observacaoTramite}" />
+					</h:outputLabel>
+					
+				</h:panelGrid>
+				<div class="wrap">
+					
+						<p:commandLink
+							title="Clique aqui para confirmar a devolução do documento."
+							styleClass="btnAzul marginTop" update=":formConsulta:messages :formConsulta:pnlResultados"
+							action="#{documentoOriginalController.registrarTramite(SituacaoDocumentoOriginalEnum.DEVOLVIDO)}">
+							<span>Sim</span>
+						</p:commandLink>
+						
+						<p:commandLink
+							title="Clique aqui para voltar." 
+							styleClass="btnLaranja marginTop"
+							onclick="mdlDevolver.hide()">
+							<span>Não</span>
+						</p:commandLink>
+					</div>
+			</h:form>
+		</p:dialog>
+		<!-- end-of: modal devolver -->
+		
+		<!-- begin-of: modal recepcionar -->
+		<p:dialog id="modalRecepcionarId" widgetVar="mdlRecepcionar" styleClass="ui-dialog-background" header="Confirma a recepção do item?" 
+			width="500" closable="true" modal="true" resizable="false" position="center">
+			<h:form>
+				
+				<h:panelGrid columns="1" style="width:100%">
+					
+					<h:outputLabel styleClass="label-button" value="Usuário">
+						<br/>
+						<h:inputText value="#{documentoOriginalController.usuarioAutenticado.nuMatricula}" styleClass="input-disabled input-readonly" disabled="true" />
+					</h:outputLabel>
+					
+					<h:outputLabel styleClass="label-button" value="Observação">
+						<br/>
+						<h:inputTextarea maxlength="100" styleClass="obsDocOriginal" value="#{documentoOriginalController.observacaoTramite}" />
+					</h:outputLabel>
+					
+				</h:panelGrid>
+				<div class="wrap">
+					
+						<p:commandLink
+							title="Clique aqui para receber o documento."
+							styleClass="btnAzul marginTop" update=":formConsulta:messages :formConsulta:pnlResultados"
+							action="#{documentoOriginalController.registrarTramite(SituacaoDocumentoOriginalEnum.RECEPCIONADO_UNIDADE)}">
+							<span>Sim</span>
+						</p:commandLink>
+						
+						<p:commandLink
+							title="Clique aqui para voltar." 
+							styleClass="btnLaranja marginTop"
+							onclick="mdlRecepcionar.hide()">
+							<span>Não</span>
+						</p:commandLink>
+					</div>
+			</h:form>
+		</p:dialog>
+		<!-- end-of: modal recepcionar -->
+		
+		<!-- begin-of: modal extravio -->
+		<p:dialog id="modalExtravioId" widgetVar="mdlExtravio" styleClass="ui-dialog-background" header="Confirma o extravio do item?" 
+			width="500" closable="true" modal="true" resizable="false" position="center">
+			<h:form>
+			
+				<h:panelGrid columns="1" style="width:100%">
+					
+					<h:outputLabel styleClass="label-button" value="Usuário">
+						<br/>
+						<h:inputText value="#{documentoOriginalController.usuarioAutenticado.nuMatricula}" styleClass="input-disabled input-readonly" disabled="true" />
+					</h:outputLabel>
+					
+					<h:outputLabel styleClass="label-button" value="Observação">
+						<br/>
+						<h:inputTextarea maxlength="100" styleClass="obsDocOriginal" value="#{documentoOriginalController.observacaoTramite}" />
+					</h:outputLabel>
+					
+				</h:panelGrid>
+				<div class="wrap">
+					
+						<p:commandLink
+							title="Clique aqui para confirmar o extravio do documento."
+							styleClass="btnAzul marginTop" update=":formConsulta:messages :formConsulta:pnlResultados"
+							action="#{documentoOriginalController.registrarTramite(SituacaoDocumentoOriginalEnum.EXTRAVIADO)}">
+							<span>Sim</span>
+						</p:commandLink>
+						
+						<p:commandLink
+							title="Clique aqui para voltar." 
+							styleClass="btnLaranja marginTop"
+							onclick="mdlExtravio.hide()">
+							<span>Não</span>
+						</p:commandLink>
+					</div>
+			</h:form>
+		</p:dialog>
+		<!-- end-of: modal extravio -->
+
+		<!-- begin-of: modal histórico -->
+		<p:dialog header="#{bundle['requisicao.consulta.title.titloHistorico']} #{documentoOriginalController.docOriginalSelecionado.requisicao.codigoRequisicao} "
+			closable="true" id="modalHistoricoId" widgetVar="mdlHistorico" width="800" styleClass="ui-dialog-background" modal="true" resizable="false" position="center"
+			onHide="document.formHistorico.reset();">
+			<h:form id="formHistorico">
+				<h:panelGrid id="gridDataTable" columns="1" width="100%">
+					<p:dataTable id="dataTable" var="obj" widgetVar="historicoRequiscao" value="#{documentoOriginalController.listTramiteDocOriginal}"
+						paginatorPosition="bottom" styleClass="estilo-border-dotted zebr" rowSelectMode="single" rowIndexVar="rowIx" emptyMessage="#{bundle['MA010']}"
+						paginator="true" rows="10" paginatorAlwaysVisible="true"
+						paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+						currentPageReportTemplate="Exibindo {startRecord} até {endRecord} de {totalRecords} registros "
+						rowStyleClass="#{empty rowIx or rowIx mod 2 ne 0 ? 'even-row' : 'odd-row'}">
+
+						<p:column sortBy="#{obj.situacaoDocOriginal.nome}" filterBy="#{obj.situacaoDocOriginal.nome}" filterStyle="display:none; visibility:hidden;"
+							style="text-align:left; white-space:nowrap" styleClass="noBackGroundImage" width="25%">
+							<f:facet name="header">
+								<h:outputText value="#{bundle['requisicao.consulta.historico.title.evento']}" />
+							</f:facet>
+							<h:outputText value="#{obj.situacaoDocOriginal.nome}" />
+						</p:column>
+						
+						<p:column sortBy="#{obj.dataHora}" filterBy="#{obj.dataHora}" filterStyle="display:none; visibility:hidden;" 
+							style="text-align:left; white-space:nowrap" styleClass="noBackGroundImage" width="20%">
+							<f:facet name="header">
+								<h:outputText value="#{bundle['geral.label.dataHora.maiusculas']}" />
+							</f:facet>
+							<h:outputText value="#{obj.dataHora}">
+								<f:convertDateTime dateStyle="long" pattern="dd/MM/yyyy HH:mm" locale="pt_BR" />
+							</h:outputText>
+						</p:column>
+						
+						<p:column sortBy="#{obj.codigoUsuario}" filterBy="#{obj.codigoUsuario}" filterStyle="display:none; visibility:hidden;"
+							style="text-align:left;" styleClass="noBackGroundImage" width="15%">
+							<f:facet name="header">
+								<h:outputText value="#{bundle['geral.label.usuario.maiusculas']}" />
+							</f:facet>
+							<h:outputText value="#{obj.codigoUsuario}">
+							</h:outputText>
+						</p:column>
+						
+						<p:column filterStyle="display:none; visibility:hidden;"
+							style="text-align:center;" styleClass="noBackGroundImage" width="40%">
+							<f:facet name="header">
+								<h:outputText value="OBSERVAÇÃO" />
+							</f:facet>
+							<h:outputText value="#{empty obj.observacao ? '-' : obj.observacao}"/>
+						</p:column>
+					</p:dataTable>
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+		<!-- end-of: modal histórico -->
+
+		<!-- begin-of: modal info -->
+		<ui:include src="/includes/modalInfoRequisicao.xhtml" />
+		<!-- end-of: modal info -->
+
+		<!-- begin-of: modal alerta unidade -->
+		<p:dialog id="alertaUnidade" widgetVar="mdlAlertaUnidade" styleClass="ui-dialog-background" header="Atenção" modal="true" width="480" resizable="false"
+			draggable="true">
+			<p:ajax event="close" listener="#{documentoOriginalController.limparNotificacaoUnidade()}" />
+			<h:form>
+				<table>
+					<tr>
+						<td class="icon-atencao" style="padding-right: 10px;"></td>
+						<td><b>#{documentoOriginalController.notificaoUnidadeNaoPermitida}</b></td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							<div class="wrap" align="center">
+								<p:commandLink id="btnConfirmar" styleClass="btnAzul marginTop buttonSelected" onclick="mdlAlertaUnidade.hide(); return false;">
+									<span><h:outputText style="width: 1; height: 1;" value="Ok" /></span>
+								</p:commandLink>
+								<p:spacer height="30px" />
+							</div>
+						</td>
+					</tr>
+				</table>
+			</h:form>
+
+		</p:dialog>
+		<!-- end-of: modal alerta unidade -->
+		
+		<!-- end-of: modals -->
+
+		<p:ajaxStatus oncomplete="applyStylesResultsDataTable();toggleEditable($('#formConsulta\\:numeroRequisicoes'));" />
+		
+		<script type="text/javascript">
+			/**
+			 * Habilita/desabilita os filtros de acordo com o preenchimento do campo nº requisição
+			 */
+			$(document).on('keyup', '#formConsulta\\:numeroRequisicoes',
+					function() {
+						// Chamado sempre que um número de requisição for informado. Ao utilizar $(documento).on(...), 
+						// os eventos do jQuery não são perdidos ao realizar update em um componente JSF, ao contrário do $(document).ready().
+						toggleEditable($(this));
+			}).ready(function(e) {
+				// Utilizado para a tela "Minhas Requisições" que já deve iniciar com os campos desabilitados. 
+				toggleEditable($('#formConsulta\\:numeroRequisicoes'));
+				applyStylesResultsDataTable();
+				$('.filtro-situacao option:eq(0)').prop('selected', true);
+			});
+
+			var toggleEditable = function(component) {
+
+				var state = (!component.val()) ? false : true;
+
+				// InputText
+				$('input.filtro-opcional:not(.input-readonly)').prop(
+						'disabled', state);
+				toggleEditableClass(
+						$('input.filtro-opcional:not(.input-readonly)'),
+						'input-disabled');
+
+				// Calendar
+				$('span.filtro-opcional input').prop('disabled', state);
+				toggleEditableClass($('span.filtro-opcional input'),
+						'input-disabled');
+
+				// SelectOneMenu
+				$('select.filtro-opcional').prop('disabled', state);
+				toggleEditableClass($('select.filtro-opcional'),
+						'select-disabled');
+			};
+
+			var toggleEditableClass = function(component, className) {
+
+				if (component.prop('disabled')) {
+					component.addClass(className);
+				} else {
+					component.removeClass(className);
+				}
+			};
+
+			var applyStylesResultsDataTable = function() {
+
+				$('#formConsulta\\:tabela table[role=grid]').prop('class',
+						'zebra gridPesquisar').css('border',
+						'1px dotted rgb(102, 102, 102)');
+
+				$('#formConsulta\\:tabela_head tr th[role=columnheader]').prop(
+						'class', 'borderLeft marginLeft center').first()
+						.removeClass('borderLeft');
+
+				$('#formConsulta\\:tabela_data tr td[role=gridcell]')
+						.prop('class',
+								'borderLeft marginLeft center btnInsDocumento')
+						.first().removeClass('borderLeft');
+
+				$(
+						'#formConsulta\\:tabela_data tr.ui-datatable-empty-message td')
+						.attr('style',
+								'color: #F00 !important; font-size: 12px !important; font-weight: bold;');
+			}
+		</script>
+
+	</ui:define>
+</ui:composition>

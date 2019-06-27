@@ -1,0 +1,117 @@
+.text-nowrap {
+	white-space: nowrap;
+}
+
+.gridDocumento2 {
+	background-color: #cacaca !important;
+}
+
+table.gridTree {
+	clear: both;
+	width: 100%;
+	border-collapse: collapse;
+}
+
+table.gridTree thead {
+	background: #d5d5d5;
+}
+
+table.gridTree td.cinza {
+	background: #e9e9e9;
+	font-weight: bold;
+	border-bottom: 1px dotted #666;
+}
+
+table.gridTree thead tr th {
+	text-align: left;
+	color: #333;
+}
+
+table.gridTree tr td, table.gridTree tr th {
+	padding: 8px;
+	font-size: 0.9em;
+}
+
+table.gridTree .left {
+	text-align: left;
+}
+
+table.gridTree .right {
+	text-align: right;
+}
+
+table.gridTree .center {
+	text-align: center;
+}
+
+table.gridTree tfoot {
+	background: #d5d5d5;
+	color: #333;
+}
+
+table.gridTree tfoot tr {
+	cursor: auto;
+}
+
+table.gridTree .impar {
+	background: #F4FCFE;
+}
+
+table.gridTree .par {
+	background: #d9e1f4;
+}
+
+table.gridTree .borderBottom {
+	border-bottom: 1px dotted #666 !important;
+}
+
+table.gridTree .borderLeft {
+	border-left: 1px dotted #666;
+}
+
+table.gridTree .borderRight {
+	border-right: 1px dotted #666;
+}
+
+table.gridTree input.checkbox {
+	border: none;
+	background: none;
+}
+
+.tabelaFoot {
+	height: 30px;
+}
+
+table.gridTree tbody tr.dois:hover, table.gridTree tbody tr.um:hover {
+	background-color: #ffcc99;
+	cursor: default;
+}
+
+table.gridTree .um {
+	background: #F4FCFE;
+}
+
+table.gridTree .dois {
+	background: #d9e1f4;
+}
+
+.theadTree1 {
+	background-color: #d5d5d5 !important;
+}
+
+.theadTree2 {
+	background-color: #d5d5d5 !important;
+}
+
+.clearMov {
+	clear: both;
+	min-height: 10px;
+}
+
+.dtHeaderPrime {
+	text-align: center;
+	padding-top: 8px !important;
+	padding-bottom: 8px !important;
+	padding-left: 0px !important;
+	padding-right: 0px !important;
+}

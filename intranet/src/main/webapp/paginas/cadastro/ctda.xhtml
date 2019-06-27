@@ -1,0 +1,347 @@
+<ui:composition template="/WEB-INF/templates/template.xhtml" xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+	<ui:define name="html-head">
+		<h:outputScript library="js" name="jquery.price_format.1.3.js" />
+		<h:outputScript library="js" name="duaListConfig.js" />
+	</ui:define>
+
+	<ui:param name="breadcrumbs" value="#{bundle['geral.breadcrumb.cadastro']},#{bundle['ctda.consulta.tituloPagina']}" />
+
+	<ui:define name="content-main-page">
+
+		<h:form id="formConsulta">
+			<p:focus id="focusConsulta" for="formConsulta" />
+			<p:messages id="messages" showDetail="false" />
+			<h3 class="titlePage">#{bundle['ctda.consulta.cadastro']}</h3>
+
+			<!-- BOTÔES -->
+			<h:panelGroup>
+
+				<p:commandLink title="#{bundle['MH032']}" styleClass="btnLaranja marginTop buttonSelected" actionListener="#{CTDAController.novo()}"
+					onclick="guardarIdComponenteController(this); jQuery('#modalCadastroId .ui-dialog-title').text('#{bundle['ctda.label.novo']}');"
+					oncomplete="modalCadastro.show();" update=":cadastrarForm messages" id="btnCadastro" disabled="#{CTDAController.perfilConsulta}">
+					<span>#{bundle['ctda.label.novo']}</span>
+				</p:commandLink>
+
+				<p:commandLink styleClass="btnAzul marginTop buttonSelected" onclick="PrimeFaces.monitorDownload(showStatus, hideStatus)"
+					title="#{bundle['MH010']}" ajax="false" disabled="#{CTDAController.listaFiltro.size()==0}" id="btnExportar">
+					<span>#{bundle['geral.button.exportar']}</span>
+					<p:dataExporter type="xls" target="dataTableCrud" fileName="#{bundle['ctda.label.nome.relatorio']}" postProcessor="#{CTDAController.preExportar}" />
+				</p:commandLink>
+
+			</h:panelGroup>
+
+			<p:spacer height="30px" />
+
+			<!-- GRID DE CONSULTA -->
+			<p:outputPanel id="pnlListaResultados">
+				<p:dataTable value="#{CTDAController.lista}" var="ctda" widgetVar="ctdas" id="dataTableCrud" rows="10" emptyMessage="#{bundle['MA010']}"
+					paginator="true" filteredValue="#{CTDAController.listaFiltro}" sortBy="nome" rowStyleClass="#{empty rowIx or rowIx mod 2 ne 0 ? 'even-row' : 'odd-row'}"
+					rowIndexVar="rowIx" styleClass="estilo-border-dotted zebr" paginatorPosition="bottom"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					currentPageReportTemplate="#{bundle['geral.crud.exibindo']} {startRecord} #{bundle['geral.crud.ate']} {endRecord}  #{bundle['geral.crud.de']} {totalRecords}  #{bundle['geral.crud.registros']} "
+					rowsPerPageTemplate="5,10,25,50">
+
+
+					<f:facet name="header">
+						<p:outputPanel style="text-align:right; margin-right:-10px" styleClass="ui-widget-auxiliar">
+							<h:outputText value="#{bundle['geral.label.pesquisar']}" escape="false" />
+							<h:inputText id="globalFilter" styleClass="semClear" onkeyup="ctdas.filter();" style="width:150px;" maxlength="255">
+								<p:ajax event="keyup" update=":#{p:component('btnExportar')}" global="false" />
+							</h:inputText>
+						</p:outputPanel>
+					</f:facet>
+					
+					<p:column sortBy="base.nome" sortFunction="#{CTDAController.sortByString}" filterStyle="display:none; visibility:hidden;" filterBy="base.nome"
+						style="width:20%" styleClass="gri-alfanumericos noBackGroundImage">
+						<h:outputText value="#{ctda.base.nome}" />
+						<f:facet name="header">
+							<h:outputText value="#{bundle['base.label.base']}" />
+						</f:facet>
+					</p:column>
+
+					<!-- INÍCIO COLUNAS QUE SÃO EXPORTADAS PARA O RELATÓRIO MAS NÃO SÃO VISÍVEIS NA TABELA -->
+					<p:column sortFunction="#{CTDAController.sortByString}" style=" display:none; visibility:hidden;" styleClass="gri-alfanumericos noBackGroundImage">
+						<h:outputText value="#{ctda.id}" />
+						<f:facet name="header">
+							<h:outputText value="#{bundle['geral.label.codigoDaCtda']}" />
+						</f:facet>
+					</p:column>
+					<!-- FIM COLUNAS QUE SÃO EXPORTADAS PARA O RELATÓRIO MAS NÃO SÃO VISÍVEIS NA TABELA -->
+					
+					<p:column sortBy="nome" sortFunction="#{CTDAController.sortByString}" filterStyle="display:none; visibility:hidden;" filterBy="nome" style="width:20%"
+						styleClass="gri-alfanumericos noBackGroundImage">
+						<h:outputText value="#{ctda.nome}" />
+						<f:facet name="header">
+							<h:outputText value="#{bundle['ctda.label.ctda']}" />
+						</f:facet>
+					</p:column>
+
+					<p:column sortBy="UFAsString" sortFunction="#{CTDAController.sortByString}" filterStyle="display:none; visibility:hidden;" filterBy="UFAsString"
+						style="width:50%" styleClass="gri-alfanumericos noBackGroundImage">
+						<h:outputText value="#{ctda.UFAsString}" />
+						<f:facet name="header">
+							<h:outputText value="#{bundle['label.abrangencia']}" />
+						</f:facet>
+					</p:column>
+
+
+					<!-- AÇÕES -->
+
+					<p:column headerText="#{bundle['geral.label.acoes']}" styleClass="noBackGroundImage" style="width:10%" exportable="false">
+						<p:commandLink title="#{bundle['MH028']}" actionListener="#{CTDAController.edita(ctda)}" styleClass="editar buttonSelected"
+							oncomplete="modalCadastro.show();guardarIdComponenteController(this); jQuery('#modalCadastroId .ui-dialog-title').text('#{bundle['ctda.consulta.tituloPagina']}');"
+							update=":cadastrarForm">
+						</p:commandLink>
+						<p:commandLink id="btnExcluir" styleClass="excluir buttonSelected" onclick="modalExcluir.show(); guardarIdComponenteController(this);"
+							title="#{bundle['MH031']}" style="margin-left: 30px;" disabled="#{CTDAController.perfilConsulta}">
+							<f:setPropertyActionListener target="#{CTDAController.instanceExcluir}" value="#{ctda}" />
+						</p:commandLink>
+					</p:column>
+				</p:dataTable>
+			</p:outputPanel>
+			<h:outputText id="existeRestricao" style="font-size: 12px; color: red; " value="#{bundle['MA058']}" />
+			<BR />
+		</h:form>
+		<!-- DIALOG CADASTRAR -->
+		<p:dialog header="Cadastro/Alteração" id="modalCadastroId" widgetVar="modalCadastro" styleClass="ui-dialog-background" modal="true" dynamic="true"
+			width="750px" height="530px" resizable="false" position="center" onShow="giveFocus('cadastrarForm')" onHide="giveFocusRemote();">
+			<p:ajax event="close" listener="#{CTDAController.reset()}" />
+			<h:form id="cadastrarForm">
+				<p:focus id="focusCadastro" context="cadastrarForm" />
+				<p:messages id="messagesCadastro" escape="false" showDetail="false" />
+				<fieldset class="filtro">
+					<h:panelGrid columns="3" id="modalPainelCad01">
+
+						<h:outputLabel style="margin-right: 8px;" value="#{bundle['ctda.label.nomeCtda']}" styleClass="label-button">
+							<h:outputText value="" styleClass="pesquisaDireta" />
+						</h:outputLabel>
+
+						<h:outputLabel style="margin-right: 8px;" value="#{bundle['base.label.base']}" styleClass="label-button">
+							<h:outputText value="" styleClass="pesquisaDireta" />
+						</h:outputLabel>
+
+						<h:outputLabel value="#{bundle['ctda.label.municipioCtda']}" styleClass="label-button">
+							<h:outputText value="" styleClass="pesquisaDireta" />
+						</h:outputLabel>
+
+						<h:inputText value="#{CTDAController.instance.nome}" style="margin-right:8px;" maxlength="50" size="50" id="textNome" required="true"
+							requiredMessage="#{CTDAController.getRequiredMessage('ctda.label.nomeCtda')}" immediate="true" onkeypress="return removeEspacoInicio(event, this);" />
+
+						<h:selectOneMenu id="selectBase" style="margin-right:8px;  width: 166px" value="#{CTDAController.instance.base}"
+							converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{CTDAController.getRequiredMessage('base.label.base')}"
+							binding="#{CTDAController.selectBase}" immediate="true">
+							<p:ajax event="change" update="selectMunicipio messagesCadastro" process="@this" listener="#{CTDAController.preencheListaMunicpios}" immediate="true" />
+							<f:selectItem itemLabel="Selecione" noSelectionOption="true" />
+							<f:selectItems value="#{CTDAController.listaBase}" var="base" itemValue="#{base}" itemLabel="#{base.nome}" />
+						</h:selectOneMenu>
+
+						<h:selectOneMenu id="selectMunicipio" style="margin-right:8px;  width: 155px" value="#{CTDAController.instance.municipio}"
+							converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{CTDAController.getRequiredMessage('ctda.label.municipioCtda')}"
+							immediate="true">
+							<c:if test="#{CTDAController.listaMunicipio.size() > 0 &amp;&amp; CTDAController.instance.municipio == null }">
+								<f:selectItem itemLabel="Selecione" noSelectionOption="true" />
+							</c:if>
+							<c:if test="#{CTDAController.listaMunicipio.size() == 0   }">
+								<f:selectItem itemLabel="Selecione a Base" noSelectionOption="true" />
+							</c:if>
+							<f:selectItems value="#{CTDAController.listaMunicipio}" var="municipio" itemValue="#{municipio}" itemLabel="#{municipio.nome}" />
+						</h:selectOneMenu>
+
+					</h:panelGrid>
+
+					<h:panelGrid columns="1" id="modalPainelAssi03">
+						<p:pickList id="pickList" styleClass="caixa-pick-list dualist" removeLabel="#{bundle['MH026']}"
+							removeAllLabel="#{bundle['MH027']}" addLabel="#{bundle['MH024']}"
+							addAllLabel="#{bundle['MH025']}" value="#{CTDAController.dualList}" var="uf" itemValue="#{uf}" itemLabel="#{uf.descricao}"
+							converter="UFConverter">
+
+							<f:facet name="sourceCaption">#{bundle['ctda.label.dual.uf.naoAssociados']}</f:facet>
+							<f:facet name="targetCaption">#{bundle['ctda.label.dual.uf.associados']}</f:facet>
+							<p:ajax event="transfer" listener="#{CTDAController.tranferirItem}" update="selectUFRestricao" global="false" />
+						</p:pickList>
+					</h:panelGrid>
+
+					<h:panelGrid columns="4" id="panielRestricaoForm">
+
+						<h:outputLabel value="#{bundle['ctda.label.uf']}" styleClass="label-button">
+							<h:outputText value="" styleClass="pesquisaDireta" />
+						</h:outputLabel>
+
+						<h:outputLabel value="#{bundle['geral.label.codigoUnidade']}" styleClass="label-button" style="margin-left: 72px">
+							<h:outputText value="" styleClass="pesquisaDireta" />
+						</h:outputLabel>
+
+						<h:outputLabel value="#{bundle['ctda.label.nomeUnidade']}" styleClass="label-button">
+							<h:outputText value="" styleClass="pesquisaDireta" />
+						</h:outputLabel>
+
+						<h:outputLabel value="#{bundle['ctda.label.acao']}" styleClass="label-button" style="margin-left: 72px">
+							<h:outputText value="" styleClass="pesquisaDireta" />
+						</h:outputLabel>
+
+					</h:panelGrid>
+
+					<h:panelGrid columns="5" id="panielRestricaoForm2">
+
+						<h:selectOneMenu id="selectUFRestricao" style="margin-right:8px;  width: 95px" value="#{CTDAController.UFRestricao}"
+							converter="omnifaces.SelectItemsConverter" immediate="true">
+							<f:selectItem itemLabel="Selecione" noSelectionOption="true" />
+							<f:selectItems value="#{CTDAController.listaUFRestricao}" var="uf" itemValue="#{uf}" itemLabel="#{uf.id}" />
+						</h:selectOneMenu>
+
+						<h:inputText maxlength="4" size="16" value="#{CTDAController.codigoUnidadeFiltro}" id="codigoUnidadeFiltro" style="margin-right: 8px; "
+							onkeypress="return somenteNumero(event)">
+							<p:ajax event="keyup" listener="#{CTDAController.modificarCodigoPesquisaUnidade}" update="nomeUnidadeFiltro" global="false" />
+							<p:ajax event="blur" listener="#{CTDAController.pesquisaUnidade}" update="nomeUnidadeFiltro messagesCadastro"
+								process="codigoUnidadeFiltro selectUFRestricao" />
+						</h:inputText>
+
+						<h:inputText maxlength="4" size="25" id="nomeUnidadeFiltro" value="#{CTDAController.nomeUnidadeFiltro}" style="margin-right: 8px; " disabled="true"
+							styleClass="select-disabled" />
+
+						<h:selectOneMenu id="selectTipoResticao" style="margin-right: 8px; width: 95px;" styleClass="''" value="#{CTDAController.tipoRestricao}"
+							converter="omnifaces.SelectItemsConverter">
+							<f:selectItem itemLabel="Selecione" noSelectionOption="true" />
+							<f:selectItems value="#{CTDAController.listaTiposRestricaoEnum}" var="tipoRestricao" itemValue="#{tipoRestricao}" itemLabel="#{tipoRestricao.descricao}">
+							</f:selectItems>
+						</h:selectOneMenu>
+
+						<p:commandLink title="#{bundle['MH034']}" styleClass="btnLaranja buttonSelected" id="btnNovaUnidade"
+							style="margin-top:0px !important;" actionListener="#{CTDAController.incluirRestricao}"
+							update="messagesCadastro panielRestricaoForm2 modalPainelListaRestrioes dataTableCrudRestricao nomeUnidadeFiltro"
+							disabled="#{CTDAController.perfilConsulta}" process="@form">
+							<span>#{bundle['ctda.button.novaUnidade']}</span>
+						</p:commandLink>
+					</h:panelGrid>
+
+					<p:spacer height="5px" />
+					<h:panelGrid columns="1" id="modalPainelListaRestrioes">
+
+						<p:dataTable value="#{CTDAController.listaCtdaUFRestricao}" var="restricao" widgetVar="restricoes" id="dataTableCrudRestricao" rows="5"
+							style=" width: 101%;" emptyMessage="#{bundle['MA010']}" paginator="true" sortBy="ctdaUF.uf.id" tableStyleClass="tablefixa"
+							rowStyleClass="#{empty rowIx or rowIx mod 2 ne 0 ? 'even-row' : 'odd-row'}" rowIndexVar="rowIx" styleClass="estilo-border-dotted zebr"
+							paginatorPosition="bottom"
+							paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+							currentPageReportTemplate="#{bundle['geral.crud.exibindo']} {startRecord} #{bundle['geral.crud.ate']} {endRecord}  #{bundle['geral.crud.de']} {totalRecords}  #{bundle['geral.crud.registros']} "
+							rowsPerPageTemplate="2,5,8,10">
+
+							<p:column sortBy="ctdaUF.uf.id" sortFunction="#{CTDAController.sortByString}" filterStyle="display:none; visibility:hidden;" filterBy="descricao"
+								style="width:20%;" styleClass="gri-alfanumericos noBackGroundImage">
+								<h:outputText value="#{restricao.ctdaUF.uf.id}" />
+								<f:facet name="header">
+									<h:outputText value="#{bundle['ctda.label.uf']}" />
+								</f:facet>
+							</p:column>
+
+							<p:column sortBy="unidade.descricaoCompleta" sortFunction="#{CTDAController.sortByString}" filterStyle="display:none; visibility:hidden;"
+								filterBy="descricao" style="width:50%;" styleClass="gri-alfanumericos noBackGroundImage">
+								<h:outputText value="#{restricao.unidade.descricaoCompleta}" />
+								<f:facet name="header">
+									<h:outputText value="#{bundle['geral.label.unidade']}" />
+								</f:facet>
+							</p:column>
+
+							<p:column sortBy="tipoResticao.descricao" sortFunction="#{CTDAController.sortByString}" filterStyle="display:none; visibility:hidden;"
+								filterBy="descricao" style="width:20%;" styleClass="gri-alfanumericos noBackGroundImage">
+								<h:outputText value="#{restricao.tipoResticao.descricao}" />
+								<f:facet name="header">
+									<h:outputText value="#{bundle['ctda.label.acao']}" />
+								</f:facet>
+							</p:column>
+
+							<p:column headerText="#{bundle['geral.label.acoes']}" styleClass="noBackGroundImage" style="width:10%" exportable="false">
+								<p:commandLink id="btnExcluir" styleClass="excluir buttonSelected" onclick="modalExcluirRestricao.show(); guardarIdComponenteController(this);"
+									title="#{bundle['MH023']}" disabled="#{CTDAController.perfilConsulta}" immediate="true" global="false">
+									<f:setPropertyActionListener target="#{CTDAController.ctdaUFRestricaoExcluir}" value="#{restricao}" />
+								</p:commandLink>
+							</p:column>
+
+
+
+						</p:dataTable>
+
+
+
+					</h:panelGrid>
+
+
+
+					<!-- GRAVAR CANCELAR -->
+					<h:panelGroup id="modalPainelAcoes">
+
+						<p:commandLink title="#{bundle['MH011']}" actionListener="#{CTDAController.salvar}" styleClass="btnLaranja buttonSelected"
+							update=":#{p:component('cadastrarForm')} :#{p:component('btnExportar')}" id="btnGravarAssociacao" disabled="#{CTDAController.perfilConsulta}"
+							rendered="#{!CTDAController.faseEditar}">
+							<span>#{bundle['geral.button.gravar']}</span>
+						</p:commandLink>
+
+						<p:commandLink title="#{bundle['MH028']}" styleClass="btnLaranja marginTop buttonSelected" actionListener="#{CTDAController.salvar}"
+							update=":#{p:component('messagesCadastro')} :#{p:component('focusCadastro')}" rendered="#{CTDAController.faseEditar}"
+							disabled="#{CTDAController.perfilConsulta}">
+							<span>#{bundle['geral.button.alterar']}</span>
+						</p:commandLink>
+
+						<p:commandLink title="#{bundle['MH013']}" styleClass="btnAzul marginTop buttonSelected" onclick="modalCadastro.hide();"
+							process="@this" update=":#{p:component('messages')}">
+							<span>#{bundle['MI010']}</span>
+							<p:resetInput target=":cadastrarForm" />
+						</p:commandLink>
+					</h:panelGroup>
+				</fieldset>
+			</h:form>
+		</p:dialog>
+
+
+
+
+		<!-- CONFIRMA EXCLUSAO  -->
+		<p:dialog header="#{bundle['ctda.header.exclusao']}" id="modalExcluirId" widgetVar="modalExcluir" styleClass="ui-dialog-background" modal="true"
+			dynamic="true" resizable="false" position="center" onShow="giveFocus('excluirForm:btnExcluir')" onHide="giveFocusRemote();">
+			<h:form id="excluirForm">
+				<span id="atencaoId" class="atencao2" style="margin-top: -2px !important;" />
+
+				<h:outputFormat style="margin-left: 40px; font-weight: bold !important;" value="#{bundle['MA022']}">
+					<f:param value="#{bundle['ctda.consulta.tituloPagina']}" />
+				</h:outputFormat>
+				<br></br>
+				<p:commandLink id="btnExcluir" styleClass="btnLaranja marginTop buttonSelected" action="#{CTDAController.excluir()}"
+					update=":#{p:component('messages')} :#{p:component('btnExportar')}" oncomplete="modalExcluir.hide()">
+					<span><h:outputText style="width: 1; height: 1;" title="Sim" value="Sim" /></span>
+				</p:commandLink>
+				<p:commandLink id="btnNaoExcluir" styleClass="btnAzul marginTop buttonSelected" oncomplete="modalExcluir.hide()" update=":#{p:component('messages')}">
+					<span><h:outputText style="width: 1; height: 1;" title="Não" value="Não" /></span>
+				</p:commandLink>
+				<p:spacer height="30px" />
+			</h:form>
+		</p:dialog>
+
+		<!-- CONFIRMA EXCLUSAO  -->
+		<p:dialog header="#{bundle['ctda.header.exclusao.restricao']}" id="modalExcluirRestricaoId" widgetVar="modalExcluirRestricao"
+			styleClass="ui-dialog-background" modal="true" dynamic="true" resizable="false" position="center"
+			onShow="giveFocus('excluirRestricaoForm:btnExcluirRestricao')" onHide="giveFocusRemote();">
+			<h:form id="excluirRestricaoForm">
+				<span id="atencaoId" class="atencao2" style="margin-top: -2px !important;" />
+
+				<h:outputFormat style="margin-left: 40px; font-weight: bold !important;" value="#{bundle['MA022']}">
+					<f:param value="Restrição" />
+				</h:outputFormat>
+				<br></br>
+				<p:commandLink id="btnExcluir" styleClass="btnLaranja marginTop buttonSelected" action="#{CTDAController.excluirRestricao}"
+					update=":#{p:component('messagesCadastro')} :#{p:component('dataTableCrudRestricao')}" oncomplete="modalExcluirRestricao.hide()">
+					<span><h:outputText style="width: 1; height: 1;" title="Sim" value="Sim" /></span>
+				</p:commandLink>
+				<p:commandLink id="btnNaoExcluir" styleClass="btnAzul marginTop buttonSelected" oncomplete="modalExcluirRestricao.hide()"
+					update=":#{p:component('messagesCadastro')}">
+					<span><h:outputText style="width: 1; height: 1;" title="Não" value="Não" /></span>
+				</p:commandLink>
+				<p:spacer height="30px" />
+			</h:form>
+		</p:dialog>
+
+
+
+	</ui:define>
+</ui:composition>

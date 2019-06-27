@@ -1,0 +1,304 @@
+<ui:composition template="/WEB-INF/templates/template.xhtml" xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+	<ui:define name="html-head">
+		<h:outputScript library="js" name="jquery.price_format.1.3.js" />
+	</ui:define>
+
+	<ui:param name="breadcrumbs" value="#{bundle['geral.breadcrumb.remessa']},#{editaRemessaController.breadcrumbPagina}" />
+
+	<ui:define name="content-main-page">
+
+		<h:form id="formRemessa">
+			<p:focus id="focusCadastro" context="focusCadastro" />
+			<p:messages id="messages" showDetail="false" />
+			<h3 class="titlePage">#{editaRemessaController.tituloPagina}</h3>
+			<h2>
+				<h:outputLabel value="Documento: " />
+				<h:outputLabel style="text-decoration: underline" value="#{editaRemessaController.documento.nome}" />
+			</h2>
+
+			<!-- BOTÕES -->
+			<h:panelGroup id="groupBotoes">
+
+				<!-- INCLUIR ITEM -->
+				<p:commandLink id="idIncluir" styleClass="btnAzulCab" actionListener="#{editaRemessaController.incluirRemessaDocumento(editaRemessaController.remessa)}">
+					<span><h:outputText title="#{bundle['MH102']}" value="#{bundle['geral.button.remessa.incluirItem']}" /></span>
+				</p:commandLink>
+
+				<!-- CONCLUIR REMESSA -->
+				<p:commandLink id="idConcluir" styleClass="btnAzulCab" oncomplete="modalConfirmar.show()" rendered="#{editaRemessaController.exibirBotaoConcluirRemessa()}"
+					onfocus="$(this).addClass('btnSelected');" onblur="$(this).removeClass('btnSelected');">
+					<span><h:outputText title="#{bundle['MH040']}" value="#{bundle['geral.button.remessa.concluir']}" /></span>
+				</p:commandLink>
+
+				<!-- CONCLUIR CORREÇÃO -->
+				<p:commandLink id="idConcluirCorrecao" styleClass="btnAzulCab" oncomplete="modalConcluirCorrecao.show()"
+					rendered="#{editaRemessaController.exibirBotaoConcluirCorrecao()}" onfocus="$(this).addClass('btnSelected');" onblur="$(this).removeClass('btnSelected');">
+					<span><h:outputText title="#{bundle['MH101']}" value="#{bundle['geral.button.remessa.concluirCorrecao']}" /></span>
+				</p:commandLink>
+			</h:panelGroup>
+			<br />
+			<p:spacer />
+
+
+			<h:panelGrid id="pnlAccordion" style="width: 100%">
+				<f:facet name="header">
+					<table class="header-table-accordion-requisicao" width="100%"
+						style="border-right: 1px dotted #666; border-left: 1px dotted #666; border-top: 1px dotted #666;">
+						<tr>
+							<!-- NUMERO DA REMESSA -->
+							<td width="85px" style="border-right: 1px dotted #666; min-width: 85px; width: 85px;"><h:outputText
+									value="#{bundle['remessa.mantemremessa.acordion.numRemessa']}" /></td>
+							<!-- UNIDADE SOLICITANTE -->
+							<td width="130px" style="border-right: 1px dotted #666; width: 130px; min-width: 130px;"><h:outputText
+									value="#{bundle['geral.label.unidadeSolicitante.maiusculas']}" /></td>
+							<!-- DATA DE ABERTURA -->
+							<td width="90px" style="border-right: 1px dotted #666; min-width: 90px; width: 90px;"><h:outputText
+									value="#{bundle['remessa.mantemremessa.acordion.abertura']}" /></td>
+							<!-- DOCUMENTO -->
+							<td style="border-right: 1px dotted #666; min-width: 120px !important; max-width: 120px !important; width: 120px !important;"><h:outputText
+									value="#{bundle['geral.label.documento.maiusculas']}" /></td>
+							<!-- SITUAÇÃO DA REMESSA -->
+							<td width="90px" style="border-right: 1px dotted #666; min-width: 90px; width: 90px"><h:outputText
+									value="#{bundle['remessa.mantemremessa.acordion.situacao']}" /></td>
+							<!-- TERMO DA REMESSA -->
+							<td style="border-right: 0px dotted #666; width: 74px; min-width: 74px;"><h:outputText value="#{bundle['remessa.mantemremessa.acordion.termo']}" />
+							</td>
+						</tr>
+					</table>
+				</f:facet>
+				<h:column>
+					<div class="accordion" id="accordion1">
+						<p:row>
+							<div class="accordion-group">
+								<div class="accordion-heading" style="top: 0px; border-right: 1px dotted #666; border-left: 1px dotted #666;">
+									<table width="100%">
+										<tr>
+											<!-- NUMERO DA REMESSA -->
+											<td width="85px" align="left" style="border-right: 1px dotted #666; min-width: 85px; word-wrap: break-word;"><a title="#{bundle['MH018']}"
+												class="accordion-toggle tabAcordionSelected" id="a-collapse" data-toggle="collapse" data-parent="#accordion1" href="#collapse1">
+													<div style="min-height: 44px;">
+														<div style="padding-top: 12px;">
+															<span> <h:outputText style="margin-left:5px; border-right: 1px dotted #666;" styleClass="icon-expand" />
+															</span>
+															<h:outputLabel value="#{remessa.id}" styleClass="label-accordion" style="margin-left:25px; font-weight: bold !important;" />
+														</div>
+													</div>
+											</a></td>
+											<!-- UNIDADE SOLICITANTE -->
+											<td width="130px" align="center"
+												style="border-right: 1px dotted #666; width: 130px; min-width: 130px; max-width: 130px; min-height: 34px; word-wrap: break-word;">
+												<div align="left">
+													<h:outputLabel value="#{remessa.unidadeSolicitante.descricaoCompleta}" title="#{remessa.unidadeSolicitante.descricaoCompleta}"
+														styleClass="label-accordion" />
+												</div>
+											</td>
+											<!-- DATA DE ABERTURA -->
+											<td width="90px" align="center" style="border-right: 1px dotted #666; width: 90px; min-width: 90px; word-wrap: break-word;"><h:outputLabel
+													style="margin-top:0px;" value="#{remessa.dataHoraAberturaFormatada}" styleClass="label-accordion" /></td>
+											<!-- NOME DO DOCUMENTO -->
+											<td width="120px" align="center" style="border-right: 1px dotted #666; width: 120px; min-width: 120px; min-height: 34px; word-wrap: break-word;">
+												<h:outputLabel value="#{remessa.documento.nome}" styleClass="label-accordion" />
+											</td>
+											<!-- SITUAÇÃO DA REMESSA -->
+											<td width="90px" align="center"
+												style="border-right: 1px dotted #666; width: 90px; min-width: 90px; max-width: 90px; min-height: 34px; word-wrap: break-word;"><h:outputLabel
+													title="#{remessa.tramiteRemessaAtual.situacao.descricao}" value="#{remessa.tramiteRemessaAtual.situacao.nome}" styleClass="label-accordion">
+
+												</h:outputLabel></td>
+
+											<!-- TERMO -->
+											<td width="74px" align="center"
+												style="border-right: 0px dotted #666; width: 74px; min-width: 74px; max-width: 74px; min-height: 34px; word-wrap: break-word;">
+												<div style="width: 50px; min-width: 50px; max-width: 50px; text-align: center;">
+													<p:spacer width="1px" />
+													<h:outputLabel value="--" rendered="#{!editaRemessaController.exibirTermoResponsabilidade(remessa)}">
+													</h:outputLabel>
+													<h:commandLink id="idGeraTermo" styleClass="pdf" target="_blank" onclick="PrimeFaces.monitorDownload(showStatus, hideStatus)"
+														rendered="#{editaRemessaController.exibirTermoResponsabilidade(remessa)}"
+														actionListener="#{editaRemessaController.gerarTermoResponsabilidade()}" style="margin-top:-3px !important; margin-left: -14px !important;"
+														title="#{bundle['MH100']}">
+														<p:fileDownload value="#{editaRemessaController.termoResponsabilidade}" contentDisposition="inline" />
+													</h:commandLink>
+												</div>
+											</td>
+										</tr>
+									</table>
+								</div>
+
+								<div id="collapse1" class="accordion-body collapsed in">
+									<div class="accordion-inner" style="border-right: 1px dotted #666; border-left: 1px dotted #666;">
+										<h:panelGrid style="width:100%; margin-top: -2px; margin-bottom: -4px; margin-left: -2px;">
+											<p:dataTable id="dataTableCadastro" var="item" sortBy="codigoRemessa" style="margin-right: -4px !important;" widgetVar="remessaDocumento"
+												rowIndexVar="rowIx" value="#{remessa.remessaDocumentos}" styleClass="estilo-border-dotted" rowSelectMode="single"
+												emptyMessage="Nenhum registro correspondente encontrado" rowStyleClass="#{empty rowIx or rowIx mod 2 ne 0 ? 'even-row' : 'odd-row'}">
+
+												<!-- ITEM - Codigo de remesssa -->
+												<p:column style="text-align:center; border-left: 1px dotted #666 !important; width: 10px; min-width:20px !important;" styleClass="totalColetas">
+													<f:facet name="header">
+														<h:outputLabel value="#{bundle['remessa.mantemremessa.acordion.codigoRemessa']}" style="color: white;" />
+													</f:facet>
+													<p:commandLink title="#{bundle['MH103']}" id="idItem" actionListener="#{editaRemessaController.editarRemessaDocumento(item)}">
+														<div style="height: 100%; width: 100%;">
+															<span> <h:outputText value="#{item.codigoRemessa}" style="font-weight: bold !important;" />
+															</span>
+														</div>
+													</p:commandLink>
+												</p:column>
+
+												<!-- UNIDADE GERADORA -->
+												<p:column style="border-left: 1px dotted #666 !important; width: 130px !important;" styleClass="celulaConsulta">
+													<f:facet name="header">
+														<h:outputText style="color: white; text-align:center; " value="#{bundle['geral.label.unidadeGeradora.maiusculas']}" />
+													</f:facet>
+													<h:outputText value="#{item.unidadeGeradora.descricaoCompleta}" style="overflow:hidden;" />
+												</p:column>
+
+												<!-- DATA DE GERAÇÃO / PERÍODO -->
+												<p:column style="text-align:center; border-left: 1px dotted #666 !important; width: 80px !important;" styleClass="celulaConsulta">
+													<f:facet name="header">
+														<h:outputText style="color: white;" value="#{bundle['geral.label.dataGeracaoPeriodo']}" />
+													</f:facet>
+													<div>
+														<h:outputText value="#{item.dataGeracaoPeriodoFormatado}" style="overflow:hidden;" />
+													</div>
+												</p:column>
+
+<!-- 												LOTÉRICO -->
+<!-- 												<p:column style="text-align:center; border-left: 1px dotted #666 !important; width: 10px !important;" styleClass="celulaConsulta"> -->
+<!-- 													<f:facet name="header"> -->
+<!-- 														<h:outputText style="color: white;" value="#{bundle['geral.label.loterico.maiusculas']}" /> -->
+<!-- 													</f:facet> -->
+<!-- 													<h:outputText value="#{item.icLoterico}" /> -->
+<!-- 												</p:column> -->
+
+												<!--  GERAR CAPA DO LOTE -->
+												<p:column exportable="false" styleClass="totalColetas center" width="10%" style="text-align:left; border-left: 1px dotted #666 !important;">
+													<f:facet name="header">
+														<h:outputText value="GERAR" style="color: #FFF;" />
+													</f:facet>
+													<div style="width: 50px; min-width: 50px; max-width: 50px; text-align: center;">
+														<p:spacer width="1px" />
+														<h:outputLabel value="--" rendered="#{!editaRemessaController.exibirCapaLote(remessa)}">
+														</h:outputLabel>
+														<h:commandLink id="idGeraCapaLote" styleClass="pdf" target="_blank" onclick="PrimeFaces.monitorDownload(showStatus, hideStatus)"
+															rendered="#{editaRemessaController.exibirCapaLote(remessa)}"
+															actionListener="#{editaRemessaController.gerarCapaDeLote(item)}" style="margin-top:-3px !important; margin-left: -14px !important;"
+															title="#{bundle['MH074']}">
+															<p:fileDownload value="#{editaRemessaController.capaLote}" contentDisposition="inline" />
+														</h:commandLink>
+													</div>
+												</p:column>
+
+												<!-- REMOVER -->
+												<p:column exportable="false" style="text-align:left; border-left: 1px dotted #666 !important;" styleClass="totalColetas center" width="10%">
+													<f:facet name="header">
+														<h:outputText value="REMOVER" style="color: #FFF;" />
+													</f:facet>
+													<p:spacer width="11px" />
+													<p:commandLink id="idExcluir" style="margin-top:-3px;" update=":excluirForm:modalExcluirId" oncomplete="modalExcluir.show()" styleClass="excluir"
+														title="#{bundle['MH104']}">
+														<f:setPropertyActionListener value="#{item}" target="#{editaRemessaController.remessaDocumento}" />
+													</p:commandLink>
+												</p:column>
+
+												<p:columnGroup type="footer">
+													<p:row>
+														<p:column colspan="7" styleClass="footerAccordion" style="background: #808080 !important;" />
+													</p:row>
+												</p:columnGroup>
+											</p:dataTable>
+										</h:panelGrid>
+									</div>
+								</div>
+							</div>
+						</p:row>
+					</div>
+				</h:column>
+			</h:panelGrid>
+
+			<f:facet name="footer">
+				<h:panelGrid style="width:100%; border-right: 1px dotted #666; border-left: 1px dotted #666; border-bottom: 1px dotted #666;"
+					styleClass="header-table-accordion-requisicao">
+					<p:row>
+						<p:column style="height: 20px; " />
+					</p:row>
+				</h:panelGrid>
+			</f:facet>
+
+		</h:form>
+
+		<!-- MODAL CONFIRMA EXCLUSAO  -->
+		<h:form id="excluirForm">
+<!-- 			<p:dialog header="#{bundle['remessa.exclusao.modal.header']} #{editaRemessaController.remessaDocumento.nuItem}" id="modalExcluirId" widgetVar="modalExcluir" -->
+			<p:dialog header="#{bundle['remessa.exclusao.modal.header']}" id="modalExcluirId" widgetVar="modalExcluir"
+				styleClass="ui-dialog-background" modal="true" dynamic="true" resizable="false" position="center" onShow="giveFocus('excluirForm:btnExcluir')"
+				onHide="giveFocusRemote();">
+
+				<span id="atencaoId" class="atencao2" style="margin-top: -2px !important;" />
+
+				<h:outputFormat rendered="#{editaRemessaController.remessa.remessaDocumentos.size() > 1}" style="margin-left: 40px; font-weight: bold !important;"
+					value="#{bundle['MA023']}">
+				</h:outputFormat>
+
+				<h:outputFormat rendered="#{editaRemessaController.remessa.remessaDocumentos.size() == 1}" style="margin-left: 40px; font-weight: bold !important;"
+					value="#{bundle['MA047']}">
+				</h:outputFormat>
+
+				<br></br>
+				<p:commandLink id="btnExcluir" styleClass="btnAzul marginTop buttonSelected" update=":#{p:component('messages')},:excluirForm"
+					actionListener="#{editaRemessaController.excluir()}" oncomplete="modalExcluir.hide()">
+					<span><h:outputText style="width: 1; height: 1;" value="Sim" /></span>
+				</p:commandLink>
+				<p:commandLink id="btnNaoExcluir" styleClass="btnLaranja marginTop buttonSelected" oncomplete="modalExcluir.hide()">
+					<span><h:outputText style="width: 1; height: 1;" value="Não" /></span>
+				</p:commandLink>
+				<p:spacer height="30px" />
+			</p:dialog>
+		</h:form>
+
+		<!-- MODAL CONCLUIR REMESSA  -->
+		<p:dialog header="#{bundle['remessa.conclusao.modal.header']}" id="modalConfirmarId" widgetVar="modalConfirmar" width="500" styleClass="ui-dialog-background"
+			modal="true" dynamic="true" resizable="false" position="center" onShow="giveFocus('confirmarForm:btnConfirmar')">
+			<h:form id="confirmarForm">
+				<span class="atencao2" style="margin-top: -2px !important;" />
+
+				<h:outputLabel style="margin-left: 40px; max-width: 60px; font-weight: bold !important;" value="#{bundle['MI029']}">
+				</h:outputLabel>
+				<br></br>
+				<p:commandLink id="btnConfirmar" oncomplete="modalConfirmar.hide()" styleClass="btnAzul marginTop buttonSelected"
+					actionListener="#{editaRemessaController.concluirRemessa()}">
+					<span><h:outputText style="width: 1; height: 1;" value="Sim" /></span>
+				</p:commandLink>
+				<p:commandLink id="btnNaoConfirmar" styleClass="btnLaranja marginTop buttonSelected" oncomplete="modalConfirmar.hide()">
+					<span><h:outputText style="width: 1; height: 1;" value="Não" /></span>
+				</p:commandLink>
+				<p:spacer height="30px" />
+			</h:form>
+		</p:dialog>
+
+		<!-- MODAL CONCLUIR CORREÇÃO DA REMESSA  -->
+		<p:dialog header="#{bundle['remessa.correcao.modal.header']}" id="modalConcluirCorrecaoId" widgetVar="modalConcluirCorrecao" width="500"
+			styleClass="ui-dialog-background" modal="true" dynamic="true" resizable="false" position="center" onShow="giveFocus('corrigirForm:btnConfirmar')">
+			<h:form id="corrigirForm">
+				<span class="atencao2" style="margin-top: -2px !important;" />
+
+				<h:outputLabel style="margin-left: 40px; max-width: 60px; font-weight: bold !important;" value="#{bundle['MI032']}">
+				</h:outputLabel>
+				<br></br>
+				<p:commandLink id="btnConfirmar" oncomplete="modalConcluirCorrecao.hide()" styleClass="btnAzul marginTop buttonSelected"
+					actionListener="#{editaRemessaController.concluirCorrecaoRemessa()}">
+					<span><h:outputText style="width: 1; height: 1;" value="Sim" /></span>
+				</p:commandLink>
+				<p:commandLink id="btnNaoConfirmar" styleClass="btnLaranja marginTop buttonSelected" oncomplete="modalConcluirCorrecao.hide()">
+					<span><h:outputText style="width: 1; height: 1;" value="Não" /></span>
+				</p:commandLink>
+				<p:spacer height="30px" />
+			</h:form>
+		</p:dialog>
+
+	</ui:define>
+
+</ui:composition>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.0"
+	xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence
+        http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+	<persistence-unit name="siredPU" transaction-type="JTA">
+		<provider>org.hibernate.ejb.HibernatePersistence</provider>
+		<jta-data-source>java:jboss/datasources/sired-ds</jta-data-source>
+
+		<class>br.gov.caixa.gitecsa.sired.vo.AvaliacaoRequisicaoVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.BaseLoteSeqPK</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.BaseLoteSeqVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.BaseVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.CampoVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.CTDAUFPK</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.CTDAUFRestricaoVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.CTDAUFVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.CTDAVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.DocumentoVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.EmpresaContratoVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.EmpresaVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.FeriadoVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.FuncionalidadeVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.GrupoVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.GrupoCampoVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.GrupoCampoPK</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.LoteSequenciaVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.MotivoAvaliacaoVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.MunicipioVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.OcorrenciaAtendimentoVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.OperacaoVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.ParametroSistemaVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.PerfilFuncionalidadePK</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.PerfilFuncionalidadeVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.PerfilVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.RequisicaoDocumentoPK</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.RequisicaoDocumentoVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.RequisicaoVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.SituacaoRequisicaoVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.SuporteVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.TipoDemandaVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.TipoUnidadeVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.TramiteRequisicaoVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.UFVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.UnidadeGrupoOperacaoPK</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.UnidadeGrupoOperacaoVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.UnidadeGrupoPK</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.UnidadeGrupoVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.UnidadeVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.ViewPendenciaVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.ViewAbrangenciaPK</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.ViewAbrangenciaVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.RemessaDocumentoVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.RemessaVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.SituacaoRemessaVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.TramiteRemessaVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.ArquivoLoteVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.BaseAtendimentoVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.SituacaoDocumentoOriginalVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.DocumentoOriginalVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.TramiteDocumentoOriginalVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.TipoAuditoriaVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.AuditoriaVO</class>
+		<class>br.gov.caixa.gitecsa.sired.vo.RemessaMovimentoDiarioVO</class>
+
+		<exclude-unlisted-classes>true</exclude-unlisted-classes>
+		<properties>
+			<property name="hibernate.hbm2ddl.auto" value="validate" />
+			<property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect" />
+			<property name="hibernate.show_sql" value="false" />
+			<property name="hibernate.format_sql" value="false" />
+			<property name="hibernate.use_sql_comments" value="false" />
+			<property name="hibernate.cache.use_second_level_cache"
+				value="true" />
+			<property name="hibernate.search.lucene_version" value="LUCENE_CURRENT" />
+		</properties>
+	</persistence-unit>
+
+</persistence>

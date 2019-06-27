@@ -1,0 +1,447 @@
+<ui:composition template="/WEB-INF/templates/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+	<ui:define name="html-head">
+		<h:outputScript library="js" name="jquery.price_format.1.3.js" />
+		<h:outputScript library="js" name="duaListConfig.js" />
+		<h:outputScript library="js" name="jquery.pesquisa-unidade.js" />
+	</ui:define>
+	
+	<ui:param name="breadcrumbs" value="#{bundle['geral.breadcrumb.cadastro']},#{bundle['areameio.titulo']}" />
+
+	<ui:define name="content-main-page">
+
+		<h:form id="formConsulta">
+			<p:focus id="focusConsulta" for="formConsulta" />
+			<p:messages id="messages" showDetail="false" />
+			<h3 class="titlePage">#{bundle['areameio.consulta.cadastro']}</h3>
+			
+			<fieldset class="filtro">
+				<h:panelGrid>
+					
+					<!-- begin-of: unidade solicitante -->
+					<h:outputLabel styleClass="label-button" value="#{bundle['geral.label.areaMeio']}">
+						<br />
+						<h:inputText id="cgcUnidade" styleClass="filtro-opcional input-cgc-unidade"
+							value="#{areaMeioController.unidadeAreaMeio.id}" maxlength="4" style="width:30px; margin-right: 3px;"
+							onkeypress="return somenteNumero(event)" onchange="overSomenteNumeros(this);">
+							<f:converter converterId="javax.faces.Long" />
+							<p:ajax event="blur" listener="#{areaMeioController.pesquisarUnidadeAreaMeio()}" update="nomeUnidade,messages,btnLocalizar" process="cgcUnidade" />
+						</h:inputText>
+	
+						<h:inputText id="nomeUnidade" value="#{areaMeioController.unidadeAreaMeio.nome}"
+							styleClass="input-disabled input-readonly filtro-opcional" maxlength="100" style="width:245px;" disabled="true">
+						</h:inputText>
+					</h:outputLabel>
+					<!-- end-of: unidade solicitante -->
+					
+				</h:panelGrid>
+				
+				<!-- BOTÔES -->
+				<h:panelGroup id="pnlBotoes">
+				
+					<!-- begin-of: botão consultar -->
+					<p:commandLink id="btnLocalizar" title="#{bundle['MH008']}" styleClass="btnAzul marginTop buttonSelected btn-dep-cgc-unidade"
+						disabled="#{!areaMeioController.consultaHabilitada()}"
+						update="messages,pnlListaResultados,pnlBotoes" process="@form" actionListener="#{areaMeioController.localizar()}">
+						<span>Localizar</span>
+					</p:commandLink>
+					<!-- end-of: botão consultar -->
+					
+					<!-- begin-of: botão consultar todas -->
+					<p:commandLink title="Clique aqui para consultar todas as Área-Meio relacionadas."
+						styleClass="btnLaranja marginTop buttonSelected"
+						update="messages,pnlListaResultados,pnlBotoes" process="@form" actionListener="#{areaMeioController.localizarTodas()}">
+						<span>Localizar Todas</span>
+					</p:commandLink>
+					<!-- end-of: botão consultar todas -->
+				
+					<p:commandLink
+						title="#{bundle['MH021']}"
+						styleClass="btnLaranja marginTop buttonSelected"
+						onclick="guardarIdComponenteController(this); jQuery('#modalCadastroId .ui-dialog-title').text('Associar Abrangência e Grupo de Documentos à Área-Meio');"
+						oncomplete="modalCadastro.show();"
+						actionListener="#{areaMeioController.novo}" update=":associarForm :restricaoForm"
+						id="btnAssociar" disabled="#{areaMeioController.perfilConsulta}">
+						<span>#{bundle['MA056']}</span>
+					</p:commandLink>
+	
+					<p:commandLink styleClass="btnAzul marginTop buttonSelected"
+						onclick="PrimeFaces.monitorDownload(showStatus, hideStatus)"
+						title="#{bundle['MH010']}" ajax="false" 
+						disabled="#{empty areaMeioController.lista}" id="btnExportar">
+						<span>#{bundle['geral.button.exportar']}</span>
+						<p:dataExporter type="xls" target="dataTableCrud"
+							fileName="#{bundle['areameio.nome.relatorio']}"
+							postProcessor="#{areaMeioController.preExportar}" />
+					</p:commandLink>
+	
+				</h:panelGroup>
+			</fieldset>
+
+			<p:spacer height="30px" />
+
+			<!-- GRID DE CONSULTA -->
+			<p:outputPanel id="pnlListaResultados">
+				<p:dataTable value="#{areaMeioController.lista}" var="areameio"
+					widgetVar="areasmeio" id="dataTableCrud" rows="10"
+					rendered="#{areaMeioController.lista.size() > 0}"
+					emptyMessage="#{bundle['MA010']}" paginator="true"
+					filteredValue="#{areaMeioController.listaFiltro}" sortBy="nome"
+					tableStyleClass="tablefixa"
+					rowStyleClass="#{empty rowIx or rowIx mod 2 ne 0 ? 'even-row' : 'odd-row'}"
+					rowIndexVar="rowIx" styleClass="estilo-border-dotted zebr"
+					paginatorPosition="bottom"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					currentPageReportTemplate="#{bundle['geral.crud.exibindo']} {startRecord} #{bundle['geral.crud.ate']} {endRecord}  #{bundle['geral.crud.de']} {totalRecords}  #{bundle['geral.crud.registros']} "
+					rowsPerPageTemplate="5,10,25,50">
+
+					<f:facet name="header">
+						<p:outputPanel style="text-align:right; margin-right:-10px"
+							styleClass="ui-widget-auxiliar">
+							<h:outputText value="#{bundle['geral.label.pesquisar']}"
+								escape="false" />
+							<h:inputText id="globalFilter" onkeyup="areasmeio.filter();"	styleClass="semClear" style="width:150px;" maxlength="255">
+								<p:ajax event="keyup" update=":#{p:component('btnExportar')}" global="false" />
+							</h:inputText>
+						</p:outputPanel>
+					</f:facet>
+
+					<p:column sortBy="descricaoCompleta" 
+						sortFunction="#{areaMeioController.sortByString}"
+						filterStyle="display:none; visibility:hidden;"
+						filterBy="descricaoCompleta" style="width:30%"
+						styleClass="gri-alfanumericos noBackGroundImage">
+						<h:outputText value="#{areameio.descricaoCompleta}" />
+						<f:facet name="header">
+							<h:outputText value="#{bundle['areameio.titulo']}" />
+						</f:facet>
+					</p:column>
+
+					<p:column sortBy="UFAsString"
+						sortFunction="#{areaMeioController.sortByString}"
+						filterStyle="display:none; visibility:hidden;"
+						filterBy="UFAsString" style="width:30%"
+						styleClass="gri-alfanumericos noBackGroundImage">
+						<h:outputText value="#{areameio.UFAsString}" />
+						<f:facet name="header">
+							<h:outputText value="#{bundle['label.abrangencia']}" />
+						</f:facet>
+					</p:column>
+
+					<p:column sortBy="grupoAsString"
+						sortFunction="#{areaMeioController.sortByString}"
+						filterStyle="display:none; visibility:hidden;"
+						filterBy="grupoAsString" style="width:32%"
+						styleClass="gri-alfanumericos noBackGroundImage">
+						<h:outputText value="#{areameio.grupoAsString}" />
+						<f:facet name="header">
+							<h:outputText value="#{bundle['geral.label.grupoDocumentos']}" />
+						</f:facet>
+					</p:column>
+
+					<!--  COLUNAS QUE SÃO EXPORTADAS PARA O RELATÓRIO MAS NÃO ESTAO VISIVEIS NA TABELA -->
+					<p:column style="width:20%; display:none; visibility:hidden;">
+						<h:outputText value="#{areameio.retricoesAsString}" />
+						<f:facet name="header">
+							<h:outputText value="#{bundle['areameio.label.relatorio.grupoRestricao']}" />
+						</f:facet>
+					</p:column>			
+					<!--  COLUNAS QUE SÃO EXPOSTADAS PARA O RELATÓRIO MAS NÃO ESTAO VISIVEIS NA TABELA -->
+					
+
+					<!-- AÇÕES -->
+
+					<p:column headerText="#{bundle['geral.label.acoes']}"
+						styleClass="noBackGroundImage" style="width:8%" exportable="false">
+
+						<p:commandLink title="#{bundle['MH028']}"
+							actionListener="#{areaMeioController.edita(areameio)}"
+							styleClass="editar buttonSelected"
+							onclick="guardarIdComponenteController(this); jQuery('#modalCadastroId .ui-dialog-title').text('Associar Abrangência e Grupo de Documentos à Área-Meio');"
+							oncomplete="modalCadastro.show();"
+							update=":associarForm :restricaoForm :#{p:component('messagesAssociacao')} :#{p:component('messagesRestricao')}">
+						</p:commandLink>
+					</p:column>
+				</p:dataTable>
+			</p:outputPanel>
+		</h:form>
+
+
+		<!-- DIALOG ASSSOCIAR UF -->
+		<p:dialog header="#{bundle['MA057']}"
+			id="modalCadastroId" widgetVar="modalCadastro"
+			styleClass="ui-dialog-background" modal="true" dynamic="true"
+			width="700px" height="550px" resizable="false" position="center"
+			onShow="giveFocus('associarForm')" onHide="giveFocusRemote();">
+			<h:form id="associarForm">
+				<p:focus id="focusAssociacao" context="associarForm" />
+				<p:messages id="messagesAssociacao" escape="false"
+					showDetail="false" />
+				<fieldset class="filtro">
+
+					<h:panelGrid columns="2" id="modalPainelAssi01">
+						<h:outputLabel value="#{bundle['areameio.label.codigoAreaMeio']}"
+							styleClass="label-button">
+							<h:outputText value="" styleClass="pesquisaDireta" />
+						</h:outputLabel>
+
+						<h:outputLabel value="#{bundle['areameio.label.nomeAreaMeio']}"
+							styleClass="label-button" style="margin-left: 12px">
+							<h:outputText value="" styleClass="pesquisaDireta" />
+						</h:outputLabel>
+					</h:panelGrid>
+
+					<h:panelGrid columns="4" id="modalPainelAssi02">
+						<h:inputText value="#{areaMeioController.codigoFiltro}"
+							maxlength="4" size="18" id="codigoAreaMeio" 
+							disabled="#{areaMeioController.desabilitarPesquisarAssociacao}"
+							styleClass="#{areaMeioController.desabilitarPesquisarAssociacao ? 'select-disabled' : ''}"
+							onkeypress="return somenteNumero(event)">
+						</h:inputText>
+
+						<h:inputText id="nomeAreaMeio" value="#{areaMeioController.instance.nome}" maxlength="4" size="52" style="margin-left: 20px" disabled="true" styleClass="select-disabled" />
+
+						<p:commandLink title="#{bundle['MH008']}" style="margin-top:0px !important; margin-left: 20px" id="bntPesquisarAssociacao"
+							styleClass="btnLaranja marginTop buttonSelected"  
+							actionListener="#{areaMeioController.pesquisaAssociacao}"
+							update=":associarForm  :#{p:component('selectGrupoDocumento')} :#{p:component('selectOperacao')} :#{p:component('btnIncluirRestricao')} :#{p:component('modalPainelAssoGrupoRestricao03')} :#{p:component('dataTableCrudOp')}"
+							disabled="#{areaMeioController.desabilitarPesquisarAssociacao}" process="@form">
+							<span>#{bundle['geral.button.pesquisar']}</span>
+						</p:commandLink>
+
+						<p:commandLink title="#{bundle['MH012']}" style="margin-top:0px !important" 
+							styleClass="btnAzul buttonSelected"
+							actionListener="#{areaMeioController.loadTelaAssociada}"  
+							update=":restricaoForm :associarForm"
+							disabled="#{areaMeioController.faseEditar}"
+							immediate="true"
+							onclick="$('#associarForm\\:codigoAreaMeio').val('');">
+							<span>#{bundle['geral.button.limpar']}</span>
+						</p:commandLink>
+					</h:panelGrid>
+
+					<h:panelGrid columns="1" id="modalPainelAssi03">
+						<p:pickList id="pickList" styleClass="caixa-pick-list dualist"
+							removeLabel="#{bundle['MH026']}"
+							removeAllLabel="#{bundle['MH027']}"
+							addLabel="#{bundle['MH024']}"
+							addAllLabel="#{bundle['MH025']}"
+							value="#{areaMeioController.dualList}" var="uf" itemValue="#{uf}"
+							itemLabel="#{uf.descricao}" converter="UFConverter"
+							disabled="#{areaMeioController.disableAssociacao}">
+
+							<f:facet name="sourceCaption">#{bundle['areameio.label.dual.uf.naoAssociados']}</f:facet>
+							<f:facet name="targetCaption">#{bundle['areameio.label.dual.uf.associados']}</f:facet>
+
+							<p:ajax event="transfer"
+								listener="#{areaMeioController.ordenarDualList}" update=":associarForm :restricaoForm" />
+						</p:pickList>
+					</h:panelGrid>
+
+
+					<h:panelGrid columns="1" id="modalPainelAssoGrupo03">
+						<p:pickList id="pickListGrupo"
+							styleClass="caixa-pick-list dualist"
+							removeLabel="#{bundle['MH026']}"
+							removeAllLabel="#{bundle['MH027']}"
+							addLabel="#{bundle['MH024']}"
+							addAllLabel="#{bundle['MH025']}"
+							value="#{areaMeioController.dualListGrupo}" var="grupo"
+							itemValue="#{grupo}" itemLabel="#{grupo.nome}"
+							converter="GrupoConverter"
+							disabled="#{areaMeioController.disableAssociacao}">
+
+							<f:facet name="sourceCaption">#{bundle['areameio.label.dual.grupo.naoAssociados']}</f:facet>
+							<f:facet name="targetCaption">#{bundle['areameio.label.dual.grupo.associados']}</f:facet>
+
+							<p:ajax event="transfer"
+								listener="#{areaMeioController.ordenaDualListaRestricoes}"
+								update=":associarForm :restricaoForm" />
+
+						</p:pickList>
+
+					</h:panelGrid>
+
+				</fieldset>
+			</h:form>
+				
+			<h:form id="restricaoForm">
+				<p:messages id="messagesRestricao" escape="false" showDetail="false" rendered="#{!areaMeioController.gravacaoAlteracaoFinal}"  />
+				<fieldset class="filtro">
+
+					<h:panelGrid columns="2" id="modalPainelAssoGrupoRestricao">
+
+						<h:outputLabel value="#{bundle['geral.label.grupoDocumentos']}" styleClass="label-button">
+							<h:outputText value="" styleClass="pesquisaDireta" />
+						</h:outputLabel>
+
+						<h:outputLabel value="#{bundle['areameio.label.apenasOperacao']}" styleClass="label-button" style="margin-left: 220px !important">
+							<h:outputText value="" styleClass="pesquisaDireta" />
+						</h:outputLabel>
+						
+					</h:panelGrid>
+					
+					<h:panelGrid columns="3" id="modalPainelAssoGrupoRestricao02">
+
+						<h:selectOneMenu id="selectGrupoDocumento"
+							style="margin-right:8px;  width: 355px"
+							value="#{areaMeioController.idGrupoRestricao}" 
+							converter="omnifaces.SelectItemsConverter"
+							disabled="#{areaMeioController.disableAssociacao}" immediate="true">
+							<f:selectItem itemLabel="Selecione" noSelectionOption="true" />
+							<f:selectItems value="#{areaMeioController.listaGruposRestricao}" var="grupo" itemValue="#{grupo.id}" itemLabel="#{grupo.nome}" />
+							<p:ajax event="change" update=":#{p:component('messagesAssociacao')}" 
+								global="false" listener="#{areaMeioController.setGravacaoAlteracaoFinal(false)}"/>
+						</h:selectOneMenu>
+
+						<h:selectOneMenu id="selectOperacao"
+							style="margin-right:8px;  width: 205px"
+							value="#{areaMeioController.idOperacao}"
+							converter="omnifaces.SelectItemsConverter" 
+							disabled="#{areaMeioController.disableAssociacao}">
+							<f:selectItem itemLabel="Selecione" noSelectionOption="true" />
+							<f:selectItems value="#{areaMeioController.listaOperacoes}"
+								var="operacao" itemValue="#{operacao.id}"
+								itemLabel="#{operacao.descricaoCompleta}" />
+								<p:ajax event="change" update=":#{p:component('messagesAssociacao')}" global="false" 
+									listener="#{areaMeioController.setGravacaoAlteracaoFinal(false)}"/>
+						</h:selectOneMenu>
+
+						<p:commandLink title="#{bundle['MH088']}" style="margin-top:0px !important"
+							actionListener="#{areaMeioController.incluirRestricaoGrupoDocumento}"
+							styleClass="btnLaranja buttonSelected"
+							update=":restricaoForm"
+							process="@form"
+							disabled="#{areaMeioController.disableAssociacao || areaMeioController.perfilConsulta }"
+							id="btnIncluirRestricao" >
+							<span>#{bundle['geral.button.incluir']}</span>
+							<p:ajax event="click" update=":#{p:component('messagesAssociacao')}" global="false" listener="#{areaMeioController.setGravacaoAlteracaoFinal(false)}"/>
+						</p:commandLink>
+
+					</h:panelGrid>
+
+					<h:panelGrid columns="1" id="modalPainelAssoGrupoRestricao03">
+
+						<p:outputPanel id="pnlListaResultadosUnidadeOperacao">
+							<p:dataTable
+								value="#{areaMeioController.listaUnidadeGrupoOperacao}"
+								var="unidadeGrupoOp" widgetVar="unidadeGrupoOps"
+								id="dataTableCrudOp" rows="2" style=" width: 101%;"
+								emptyMessage="#{bundle['MA010']}"
+								paginator="true" sortBy="unidadeGrupo.grupo.nome"
+								tableStyleClass="tablefixa"
+								rowStyleClass="#{empty rowIx or rowIx mod 2 ne 0 ? 'even-row' : 'odd-row'}"
+								rowIndexVar="rowIx" styleClass="estilo-border-dotted zebr"
+								paginatorPosition="bottom"
+								paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+								currentPageReportTemplate="#{bundle['geral.crud.exibindo']} {startRecord} #{bundle['geral.crud.ate']} {endRecord}  #{bundle['geral.crud.de']} {totalRecords}  #{bundle['geral.crud.registros']} "
+								rowsPerPageTemplate="2,5,8,10">
+
+								<p:column sortBy="unidadeGrupo.grupo.nome" sortFunction="#{areaMeioController.sortByString}"
+									filterStyle="display:none; visibility:hidden;" filterBy="descricao" style="width:50%;" styleClass="gri-alfanumericos noBackGroundImage">
+									<h:outputText value="#{unidadeGrupoOp.unidadeGrupo.grupo.nome}" />
+									<f:facet name="header">
+										<h:outputText value="#{bundle['geral.label.grupoDocumentos']}" />
+									</f:facet>
+								</p:column>
+
+								<p:column sortBy="operacao.deOperacao" sortFunction="#{areaMeioController.sortByString}"
+									filterStyle="display:none; visibility:hidden;" filterBy="UFAsString" style="width:40%;"
+									styleClass="gri-alfanumericos noBackGroundImage">
+									<h:outputText value="#{unidadeGrupoOp.operacao.descricaoCompleta}" />
+									<f:facet name="header">
+										<h:outputText value="#{bundle['areameio.label.apenasOperacao']}" />
+									</f:facet>
+								</p:column>
+
+								<!-- AÇÕES -->
+								<p:column headerText="#{bundle['geral.label.acoes']}" styleClass="noBackGroundImage" style="width:10%" exportable="false">
+									<p:commandLink id="btnExcluir"  onclick="modalExcluir.show(); guardarIdComponenteController(this);" 
+										title="#{bundle['MH023']}" style="margin-left: 10px; background-image: block !important;"
+							 			disabled="#{areaMeioController.perfilConsulta}" styleClass="excluir buttonSelected"  immediate="true" >
+											<f:setPropertyActionListener target="#{areaMeioController.unidadeGrupoOperacaoExcluir}" value="#{unidadeGrupoOp}" />
+											
+									</p:commandLink>								
+								</p:column>
+							</p:dataTable>
+						</p:outputPanel>
+					</h:panelGrid>
+
+
+					<!-- GRAVAR CANCELAR -->
+					<h:panelGroup id="modalPainelAcoes">
+
+						<p:commandLink title="#{bundle['MH011']}"
+							actionListener="#{areaMeioController.salvar}"
+							styleClass="btnLaranja buttonSelected"
+							update=":#{p:component('messages')} :#{p:component('associarForm')} :#{p:component('restricaoForm')}  :#{p:component('btnExportar')}"
+							disabled="#{!areaMeioController.desabilitarPesquisarAssociacao || areaMeioController.perfilConsulta }"  process="@this"
+							id="btnGravarAssociacao" rendered="#{!areaMeioController.faseEditar}">
+							<span>#{bundle['geral.button.gravar']}</span>
+						</p:commandLink>
+						
+						
+						<p:commandLink title="#{bundle['MH028']}"
+							actionListener="#{areaMeioController.alterar}"
+							styleClass="btnLaranja buttonSelected"
+							update=":#{p:component('messages')} :#{p:component('associarForm')}  :#{p:component('restricaoForm')} :#{p:component('btnExportar')}"
+							disabled="#{!areaMeioController.desabilitarPesquisarAssociacao || areaMeioController.perfilConsulta }"  process="@this"
+							id="btnAlterarAssociacao" rendered="#{areaMeioController.faseEditar}">
+							<span>#{bundle['geral.button.alterar']}</span>
+						</p:commandLink>
+						
+
+						<p:commandLink title="#{bundle['MH013']}"
+							styleClass="btnAzul marginTop buttonSelected"
+							onclick="modalCadastro.hide();"
+							update=":#{p:component('messages')} :#{p:component('btnExportar')}" process="@this">
+							<span>#{bundle['MI010']}</span>
+							<p:resetInput target="@form" />
+						</p:commandLink>
+					</h:panelGroup>
+				</fieldset>
+			</h:form>
+		</p:dialog>
+
+
+
+
+		<!-- CONFIRMA EXCLUSAO  -->
+		<p:dialog header="#{bundle['areameio.header.exclusao.restricao']}" id="modalExcluirId" widgetVar="modalExcluir"
+			styleClass="ui-dialog-background" modal="true" dynamic="true" resizable="false" position="center"
+			onShow="giveFocus('excluirForm:btnExcluir')" onHide="giveFocusRemote();">
+			<h:form id="excluirForm">
+				<span id="atencaoId" class="atencao2" style="margin-top: -2px !important;" />
+
+				<h:outputFormat style="margin-left: 40px; font-weight: bold !important;" value="#{bundle['MA022']}">
+					<f:param value="#{bundle['areameio.mensagem.restricao']}" />
+				</h:outputFormat>
+				<br></br>
+				<p:commandLink id="btnExcluir"
+					styleClass="btnLaranja marginTop buttonSelected"
+					actionListener="#{areaMeioController.excluirRestricao}"
+					update=":#{p:component('restricaoForm')}  :#{p:component('modalPainelAssoGrupoRestricao03')} :#{p:component('modalPainelAssi01')}  :#{p:component('modalPainelAssi02')} 
+							:#{p:component('modalPainelAssi03')} :#{p:component('modalPainelAssoGrupo03')}  :#{p:component('modalPainelAssoGrupoRestricao')}  
+							:#{p:component('modalPainelAssoGrupoRestricao02')}  :#{p:component('modalPainelAcoes')} 
+							:#{p:component('focusAssociacao')} "
+					oncomplete="modalExcluir.hide()">
+					<p:ajax event="click"  global="false" listener="#{areaMeioController.setGravacaoAlteracaoFinal(false)}"/>
+					<span><h:outputText style="width: 1; height: 1;" title="Sim" value="Sim" /></span>
+				</p:commandLink>
+				<p:commandLink id="btnNaoExcluir" styleClass="btnAzul marginTop buttonSelected" oncomplete="modalExcluir.hide()" update=":#{p:component('messagesRestricao')}">
+					<span><h:outputText style="width: 1; height: 1;" title="Não" value="Não" /></span>
+				</p:commandLink>
+				<p:spacer height="30px" />
+			</h:form>
+		</p:dialog>
+
+
+
+	</ui:define>
+</ui:composition>

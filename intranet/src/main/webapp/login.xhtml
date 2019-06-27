@@ -1,0 +1,56 @@
+<ui:composition template="/WEB-INF/templates/template_login.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui">
+
+	<ui:define name="conteudo-principal">
+		<script type="text/javascript">
+	       $(document).on("keydown", function(event) {
+	           var tecla = event.keyCode || event.witch;
+	           if (tecla == 13) {
+	           		jQuery(PrimeFaces.escapeClientId("mainForm:btnEntrar")).click();
+	           }
+	          }
+	       );
+	     </script> 
+		<div class="barra-content" align="center">
+				<f:metadata>
+					<f:event type="preRenderView" listener="#{controleAcesso.limparSessao}" />
+					<f:event type="preRenderView" listener="#{controleAcesso.limparCampos}" />
+				</f:metadata>
+			<div class="login">
+				<h:form id="mainForm">
+					<p:focus for="mainForm" />
+					<h6 class="nivel4">#{bundle['login.label.loginUsuario']}</h6>
+					<h:messages id="messages" errorClass="msgLogin" showDetail="false" />
+					<h:panelGrid>
+						<h:outputLabel value="#{bundle['geral.label.usuario']}:"
+							styleClass="label-button" />
+						<p:inputMask id="j_username" maxlength="7"
+							style="width: 150px;text-align:left;"
+							value="#{controleAcesso.credentials.login}" placeHolder="" >
+						</p:inputMask>
+						<h:outputLabel value="#{bundle['login.label.senha']}:"
+							styleClass="label-button" />
+						<h:inputSecret id="j_senha" 
+							value="#{controleAcesso.credentials.senha}" style="width: 150px;"
+							maxlength="8" />
+						<h:commandLink id="btnEntrar"
+							onclick="showStatus()" oncomplete="hideStatus()"
+							action="#{controleAcesso.autenticarLdap}"
+							title="#{bundle['MH095']}"
+							styleClass="btnLaranjaSeta  marginTop"
+							onfocus="$(this).addClass('btnSelected');"
+	                        onblur="$(this).removeClass('btnSelected');">
+							<f:ajax execute="@form" render="@form" />
+							<span><h:outputText
+									value="#{bundle['geral.button.enviar']}" /> </span>
+						</h:commandLink>
+					</h:panelGrid>
+				</h:form>
+			</div>
+		</div>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,98 @@
+<ui:composition template="/WEB-INF/templates/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:caixa="http://java.sun.com/jsf/composite/components">
+
+	<ui:define name="html-head">
+		<h:outputScript library="js" name="jquery.form.min.js" />
+		<style type="text/css">
+			[id*=arquivo] {
+				width: 400px;
+				margin-right: 20px;
+			}
+		</style>
+	</ui:define>
+
+	<ui:param name="breadcrumbs"
+		value="#{bundle['geral.breadcrumb.remessa']},#{bundle['tituloPagina.aberturaLote']}" />
+
+	<ui:define name="content-main-page">
+
+		<h:form id="formAbertura" enctype="multipart/form-data" prependId="false">
+			<p:focus id="focusConsulta" />
+
+			<p:messages id="messagesAbertura" showDetail="false" />
+
+			<p:outputPanel id="logMsg">
+				<caixa:log-message 
+					rendered="#{aberturaRemessaLoteController.canDownloadLink()}" 
+					value="#{aberturaRemessaLoteController.downloadLog()}">
+				</caixa:log-message>
+			</p:outputPanel>
+	
+			<ui:fragment rendered="#{!aberturaRemessaLoteController.modoEdicaoRemessaAB}">
+			<h3 class="titlePage">#{bundle['remessa.tituloPagina.aberturaLote.descricao']}</h3>
+			</ui:fragment>
+			
+			<ui:fragment rendered="#{aberturaRemessaLoteController.modoEdicaoRemessaAB}">
+				<h3 class="title-page">#{bundle['remessa.tituloPagina.abertura.rascunhoNumero']} - #{aberturaRemessaLoteController.remessa.id}</h3>
+			</ui:fragment>
+			
+			<fieldset class="filtro">
+
+				<h:panelGrid columns="1">
+					<h:outputLabel value="Selecione o arquivo CSV para abertura em lote:" styleClass="label-button" />
+					<!-- begin-of: upload -->
+					<p:outputPanel id="pnlUploadCSV">
+						<table>
+							<tr>
+								<td>
+									<p:fileUpload id="arquivo" styleClass="marginTop" allowTypes="/(\.|\/)(txt|csv)/" mode="simple" 
+										value="#{aberturaRemessaLoteController.file}" skinSimple="false">
+									</p:fileUpload>									
+								</td>
+								<td>
+									<p:commandLink id="btnEnviarArqAbertura" styleClass="btnAzul marginBottom buttonSelected" title="#{bundle['MH090']}"
+										actionListener="#{aberturaRemessaLoteController.validarArquivo}" update="messagesAbertura" ajax="false">
+										<span>#{bundle['geral.button.enviar_arquivo']}</span>
+									</p:commandLink>
+								</td>
+							</tr>
+						</table>
+					</p:outputPanel>
+					<!-- end-of: upload -->
+				</h:panelGrid>
+				
+			</fieldset>
+		</h:form>
+		
+		<p:dialog header="ATENÇÃO" id="modalEnviarArquivo" widgetVar="mdlEnviarArquivo" styleClass="ui-dialog-background" 
+			modal="true" dynamic="true" visible="#{aberturaRemessaLoteController.showModalOnLoad}" resizable="false" position="center" onHide="giveFocusRemote();">
+			<h:form id="enviarArquivoForm">
+				<span id="atencaoId" class="atencao2" style="margin-top: -2px !important;" />
+				<h:outputText id="resumoAtendimento" style="margin-left: 40px; font-weight: bold !important;" 
+					value="Foi(ram) identificado(s) #{aberturaRemessaLoteController.numeroLinhas} itens para importação. Confirma a importação destes itens?" />
+				<br></br>
+				
+				<!-- botão enviar -->
+				<p:commandLink styleClass="btnLaranja marginTop buttonSelected" action="#{aberturaRemessaLoteController.processarArquivo()}"
+					update=":formAbertura:messagesAbertura :formAbertura:logMsg" oncomplete="mdlEnviarArquivo.hide()">
+					<span>Sim</span>
+				</p:commandLink>
+				
+				<!-- botão cancelar -->
+				<p:commandLink id="btnNaoEnviarArquivo" styleClass="btnAzul marginTop buttonSelected" oncomplete="mdlEnviarArquivo.hide()">
+					<span>Não</span>
+				</p:commandLink>
+				
+				<p:spacer height="30px" />
+			</h:form>
+		</p:dialog>
+		
+	</ui:define>
+
+</ui:composition>

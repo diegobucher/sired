@@ -1,0 +1,380 @@
+<ui:composition template="/WEB-INF/templates/template.xhtml" xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+	<ui:define name="html-head">
+		<h:outputScript library="js" name="jquery.price_format.1.3.js" />
+	</ui:define>
+
+	<ui:param name="breadcrumbs" value="#{bundle['geral.breadcrumb.cadastro']},#{bundle['geral.label.documento']}" />
+
+	<ui:define name="content-main-page">
+
+		<h:form id="formConsulta">
+			<p:focus id="focusConsulta" for="formConsulta" />
+			<p:messages id="messages" showDetail="false" />
+			<h3 class="titlePage">#{bundle['documento.consulta.cadastroDocumento']}</h3>
+
+			<!-- BOTÔES -->
+			<h:panelGroup>
+
+				<p:commandLink title="#{bundle['MH035']}" styleClass="btnLaranja marginTop buttonSelected" actionListener="#{documentoController.novo()}"
+					onclick="guardarIdComponenteController(this); jQuery('#modalCadastroId .ui-dialog-title').text('#{bundle['documento.label.novoDocumento']}');"
+					oncomplete="modalCadastro.show();" update=":cadastrarForm :#{p:component('messages')}" id="btnCadastro" disabled="#{documentoController.perfilConsulta}">
+					<span>#{bundle['documento.label.novoDocumento']}</span>
+				</p:commandLink>
+
+				<p:commandLink styleClass="btnAzul marginTop buttonSelected" onclick="PrimeFaces.monitorDownload(showStatus, hideStatus)" title="#{bundle['MH010']}"
+					ajax="false" disabled="#{documentoController.listaFiltro.size()==0}" id="btnExportar">
+					<span>#{bundle['geral.button.exportar']}</span>
+					<p:dataExporter type="xls" target="dataTableCrud" fileName="#{bundle['documento.label.nome.relatorio']}" postProcessor="#{documentoController.preExportar}" />
+				</p:commandLink>
+
+			</h:panelGroup>
+
+			<p:spacer height="30px" />
+
+			<!-- GRID DE CONSULTA -->
+			<p:outputPanel id="pnlListaResultados">
+
+				<p:dataTable value="#{documentoController.lista}" var="documento" widgetVar="documentos" id="dataTableCrud" rows="10" emptyMessage="#{bundle['MA010']}"
+					paginator="true" filteredValue="#{documentoController.listaFiltro}" sortBy="nome" sortFunction="#{documentoController.sortByString}"
+					tableStyleClass="tablefixa" rowStyleClass="#{empty rowIx or rowIx mod 2 ne 0 ? 'even-row' : 'odd-row'}" rowIndexVar="rowIx"
+					styleClass="estilo-border-dotted zebr" paginatorPosition="bottom"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					currentPageReportTemplate="#{bundle['geral.crud.exibindo']} {startRecord} #{bundle['geral.crud.ate']} {endRecord}  #{bundle['geral.crud.de']} {totalRecords}  #{bundle['geral.crud.registros']} "
+					rowsPerPageTemplate="5,10,25,50">
+
+
+					<f:facet name="header">
+						<p:outputPanel style="text-align:right; margin-right:-10px" styleClass="ui-widget-auxiliar">
+							<h:outputText value="#{bundle['geral.label.pesquisar']}" escape="false" />
+							<h:inputText id="globalFilter" onkeyup="documentos.filter();" style="width:150px;" maxlength="255" styleClass="letras-maiusculas semClear">
+								<p:ajax event="keyup" update=":#{p:component('btnExportar')}" global="false" />
+							</h:inputText>
+						</p:outputPanel>
+					</f:facet>
+
+					<!-- INÍCIO COLUNAS QUE SÃO EXPORTADAS PARA O RELATÓRIO MAS NÃO SÃO VISÍVEIS NA TABELA -->
+					<p:column sortFunction="#{documentoController.sortByString}" style=" display:none; visibility:hidden;" styleClass="gri-alfanumericos noBackGroundImage">
+						<h:outputText value="#{documento.id}" />
+						<f:facet name="header">
+							<h:outputText value="#{bundle['geral.label.codigoDoDocumento']}" />
+						</f:facet>
+					</p:column>
+					<!-- FIM COLUNAS QUE SÃO EXPORTADAS PARA O RELATÓRIO MAS NÃO SÃO VISÍVEIS NA TABELA -->
+					
+					<p:column sortBy="nome" sortFunction="#{documentoController.sortByString}" filterStyle="display:none; visibility:hidden;" filterBy="nome" style="width:30%"
+						styleClass="gri-alfanumericos noBackGroundImage">
+						<h:outputText value="#{documento.nome}" />
+						<f:facet name="header">
+							<h:outputText value="#{bundle['geral.label.documento']}" />
+						</f:facet>
+					</p:column>
+
+					<p:column sortBy="grupo.nome" sortFunction="#{documentoController.sortByString}" filterStyle="display:none; visibility:hidden;" filterBy="grupo.nome"
+						style="width:30%" styleClass="gri-alfanumericos noBackGroundImage">
+						<h:outputText value="#{documento.grupo.nome}" />
+						<f:facet name="header">
+							<h:outputText value="#{bundle['documento.label.grupo']}" />
+						</f:facet>
+					</p:column>
+
+					<p:column filterBy="icSetorial.descricao" filterStyle="display:none; visibility:hidden;" sortBy="icSetorial.descricao"
+						sortFunction="#{documentoController.sortByString}" style="width:15%" styleClass="gri-alfanumericos noBackGroundImage">
+						<h:outputText value="#{documento.icSetorial.descricao}" />
+						<f:facet name="header">
+							<h:outputText value="#{bundle['documento.label.tipo']}" />
+						</f:facet>
+					</p:column>
+
+					<p:column filterBy="icSetorial.descricao" filterStyle="display:none; visibility:hidden;" sortBy="icSetorial.descricao"
+						sortFunction="#{documentoController.sortByString}" style="width:15%" styleClass="gri-codigos noBackGroundImage">
+						<h:outputText value="#{documento.prazoFragmentacao}" />
+						<f:facet name="header">
+							<h:outputText value="#{bundle['documento.label.prazo.fragmentacao']}" />
+						</f:facet>
+					</p:column>
+
+					<!-- INÍCIO COLUNAS QUE SÃO EXPORTADAS PARA O RELATÓRIO MAS NÃO SÃO VISÍVEIS NA TABELA -->
+					<p:column sortFunction="#{documentoController.sortByString}" style=" display:none; visibility:hidden;" styleClass="gri-alfanumericos noBackGroundImage">
+						<h:outputText value="#{documento.icAtivo.descricao}" />
+						<f:facet name="header">
+							<h:outputText value="#{bundle['geral.label.situacao']}" />
+						</f:facet>
+					</p:column>
+					
+					<p:column style="display:none; visibility:hidden;">
+						<h:outputText value="#{documento.unidadesAutorizadas}" />
+						<f:facet name="header">
+							<h:outputText value="Unid. Autorizadas Automaticamente" />
+						</f:facet>
+					</p:column>
+					
+					<p:column sortFunction="#{documentoController.sortByString}" style="display:none; visibility:hidden;" styleClass="gri-alfanumericos noBackGroundImage">
+						<h:outputText value="#{documento.mensagem}" />
+						<f:facet name="header">
+							<h:outputText value="#{bundle['documento.label.mensagem']}" />
+						</f:facet>
+					</p:column>
+					<!-- FIM COLUNAS QUE SÃO EXPORTADAS PARA O RELATÓRIO MAS NÃO SÃO VISÍVEIS NA TABELA -->
+
+					<!-- AÇÕES -->
+
+					<p:column headerText="#{bundle['geral.label.acoes']}" styleClass="noBackGroundImage" style="width:10%" exportable="false">
+
+						<p:commandLink title="#{bundle['MH028']}" actionListener="#{documentoController.edita(documento)}" 
+							styleClass="editar buttonSelected" style="margin-left: 1px; background-image: block !important;"
+							onclick="guardarIdComponenteController(this); jQuery('#modalCadastroId .ui-dialog-title').text('#{bundle['geral.label.documento']}');"
+							oncomplete=" modalCadastro.show();" update=":cadastrarForm">
+						</p:commandLink>
+						
+						<p:commandLink title="Clique aqui para definir a Base de Atendimento do Documento" actionListener="#{documentoController.vincular(documento)}" 
+						    styleClass="icon-vincular buttonSelected" style="position: absolute; margin-left: 26px; margin-top: -12px;"
+							oncomplete="mdlVincular.show();" update=":modalVincular">
+						</p:commandLink>
+						
+						<p:commandLink id="btnExcluir" onclick="modalExcluir.show(); guardarIdComponenteController(this);" title="#{bundle['MH031']}"
+							style="margin-left: 52px; background-image: block !important;" disabled="#{documentoController.perfilConsulta}" styleClass="excluir buttonSelected">
+							<f:setPropertyActionListener target="#{documentoController.instanceExcluir}" value="#{documento}" />
+						</p:commandLink>
+					</p:column>
+				</p:dataTable>
+			</p:outputPanel>
+		</h:form>
+
+
+		<!-- DIALOG CADASTRAR DOCUMENTO -->
+		<p:dialog header="Cadastro/Alteração de Documento" id="modalCadastroId" widgetVar="modalCadastro" styleClass="ui-dialog-background" modal="true"
+			dynamic="true" width="760px" resizable="false" position="center" onShow="giveFocus('cadastrarForm')" onHide="giveFocusRemote();">
+			<p:ajax event="close" listener="#{documentoController.reset()}" />
+			<h:form id="cadastrarForm">
+				<p:focus id="focusCadastro" context="cadastrarForm" />
+				<p:messages id="messagesCadastro" escape="false" showDetail="false" />
+				<fieldset class="filtro">
+					<h:panelGrid columns="1" id="modalPainelCad01">
+
+						<h:outputLabel style="margin-right: 20px;" value="#{bundle['documento.label.nomeDocumento']}" styleClass="label-button">
+							<h:outputText value="" styleClass="pesquisaDireta" />
+						</h:outputLabel>
+
+						<h:inputText value="#{documentoController.instance.nome}" maxlength="200" size="113" id="textNome" styleClass="letras-maiusculas" required="true"
+							requiredMessage="#{documentoController.getRequiredMessage('documento.label.nomeDocumento')}"
+							onkeypress=" return somenteLetrasOuNumerosRemoveEspacoInicio(event, this); " />
+
+						<h:panelGrid columns="4" id="modalPainelCad02">
+							<h:outputLabel style="margin-right: 20px;" value="#{bundle['documento.label.tipo']}" styleClass="label-button">
+								<h:outputText value="" styleClass="pesquisaDireta" />
+							</h:outputLabel>
+							<h:outputLabel style="margin-right: 20px;" value="#{bundle['geral.label.situacao']}" styleClass="label-button">
+								<h:outputText value="" styleClass="pesquisaDireta" />
+							</h:outputLabel>
+							<h:outputLabel style="margin-right: 40px;" value="#{bundle['documento.label.tipoAgrupamento']}" styleClass="label-button">
+								<h:outputText value="" styleClass="pesquisaDireta" />
+							</h:outputLabel>
+							<h:outputLabel style="margin-right: 30px;" value="#{bundle['documento.label.prazoDefragmentacao']}" styleClass="label-button">
+								<h:outputText value="" styleClass="pesquisaDireta" />
+							</h:outputLabel>
+							<h:selectOneMenu id="selectTipoDocumento" style="margin-right: 20px; width: 120px;" value="#{documentoController.instance.icSetorial}" styleClass="''"
+								converter="omnifaces.SelectItemsConverter" required="true" requiredMessage="#{documentoController.getRequiredMessage('documento.label.tipo')}">
+								<f:selectItem itemLabel="Selecione" noSelectionOption="true" />
+								<f:selectItems value="#{documentoController.listaTiposDocumento}" var="tipoDocumento" itemValue="#{tipoDocumento}"
+									itemLabel="#{tipoDocumento.descricao}">
+								</f:selectItems>
+							</h:selectOneMenu>
+							<h:selectOneMenu id="selectSituacaoDocumentoID" style="margin-right: 20px; width: 120px;" value="#{documentoController.instance.icAtivo}" styleClass="''"
+								required="true" requiredMessage="#{documentoController.getRequiredMessage('geral.label.situacao')}">
+								<p:ajax event="change" update="idLabelMensagem" process="cadastrarForm:selectSituacaoDocumentoID" global="false" />
+								<f:selectItem itemLabel="Selecione" noSelectionOption="true" />
+								<f:selectItems value="#{documentoController.listaSituacaoDocumento}" var="situacaoDocumento" itemValue="#{situacaoDocumento}"
+									itemLabel="#{situacaoDocumento.descricao}" />
+							</h:selectOneMenu>
+							<h:selectOneMenu id="selectTipoAgrupamentoID" style="margin-right: 20px; width: 150px;" value="#{documentoController.instance.tipoAgrupamento}"
+								styleClass="''" required="true" requiredMessage="#{documentoController.getRequiredMessage('documento.label.tipoAgrupamento')}">
+								<f:selectItem itemLabel="Selecione" noSelectionOption="true" />
+								<f:selectItems value="#{documentoController.listaTipoAgrupamento}" var="tipoAgrumamento" itemValue="#{tipoAgrumamento}"
+									itemLabel="#{tipoAgrumamento.descricao}">
+								</f:selectItems>
+							</h:selectOneMenu>
+							<h:inputText value="#{documentoController.instance.prazoFragmentacao}" maxlength="3" size="3" id="textPrazo" styleClass="letras-maiusculas"
+								required="true" requiredMessage="#{documentoController.getRequiredMessage('documento.label.prazoDefragmentacao')}"
+								onkeypress="return somenteNumero(event)" />
+						</h:panelGrid>
+						
+						<!-- MENU - TIPO DOCUMENTAL - Inicio-->
+						<h:panelGrid columns="2" id="modalPainelCad03">
+						
+						
+							<h:outputLabel style="margin-right: 30px; width: 200px;" value="#{bundle['documento.label.numeroManualNormativo']}" styleClass="label-button">
+								<h:outputText value="" />
+							</h:outputLabel>
+							
+							<h:outputLabel style="margin-right: 30px; width: 200px;" value="#{bundle['documento.label.versaoManualNormativo']}" styleClass="label-button">
+								<h:outputText value="" />
+							</h:outputLabel>
+							
+														
+							<h:inputText value="#{documentoController.instance.numeroManualNormativo}" maxlength="5" size="5" id="textNuManual" styleClass="letras-maiusculas"/>
+							<h:inputText value="#{documentoController.instance.numeroManualNormativoVersao}" maxlength="3" size="3" id="textVerManual" onkeypress="return somenteNumero(event)" />
+							
+						</h:panelGrid>
+						
+						
+						<!-- MENU - TIPO DOCUMENTAL - Fim-->
+						
+						<h:outputLabel style="margin-right: 20px;" value="#{bundle['documento.label.unidadeAutorizadaAuto']}" styleClass="label-button" />
+						<h:inputText value="#{documentoController.instance.unidadesAutorizadas}" maxlength="100" size="113" id="textUnidades" 
+							styleClass="letras-maiusculas" 
+							onkeypress=" return somenteNumerosSeparadosPorVirgula(event, this); " />
+						
+						<h:outputLabel style="margin-right: 20px;" id="idLabelMensagem" value="#{bundle['documento.label.mensagem']}" styleClass="label-button">
+							<h:outputText value="" styleClass="#{documentoController.mensagemObrigatorio ? 'pesquisaDireta':''} " />
+						</h:outputLabel>
+						<h:inputTextarea id="idDescMensagem" rows="3" cols="115" onchange="limitarTextArea(this,500)" style="text-align: left; white-space: pre-wrap;"
+							onmouseout="limitarTextArea(this,500)" onkeyup="limitarTextArea(this,500)" value="#{documentoController.instance.mensagem}"
+							required="#{documentoController.mensagemObrigatorio}" requiredMessage="#{documentoController.mensagemValidacaoMensagemObrigatoria}" />
+					</h:panelGrid>
+					<!-- GRAVAR CANCELAR -->
+					<h:panelGroup>
+						<p:commandLink title="#{bundle['MH011']}" action="#{documentoController.salvar}" styleClass="btnLaranja marginTop buttonSelected"
+							update=":#{p:component('btnExportar')} :#{p:component('messagesCadastro')} :#{p:component('focusCadastro')} :#{p:component('btnExportar')} "
+							rendered="#{!documentoController.faseEditar}" id="btnGravar">
+							<span>#{bundle['geral.button.gravar']}</span>
+						</p:commandLink>
+						<p:commandLink title="#{bundle['MH028']}" action="#{documentoController.salvar}" styleClass="btnLaranja marginTop buttonSelected"
+							update=":#{p:component('btnExportar')} :#{p:component('messagesCadastro')} :#{p:component('focusCadastro')} :#{p:component('btnExportar')}"
+							rendered="#{documentoController.faseEditar}" disabled="#{documentoController.perfilConsulta}">
+							<span>#{bundle['geral.button.alterar']}</span>
+						</p:commandLink>
+						<p:commandLink title="#{bundle['MH013']}" styleClass="btnAzul marginTop buttonSelected" onclick="modalCadastro.hide();" process="@this"
+							update=":#{p:component('messages')}">
+							<p:resetInput target="@form" />
+							<span>#{bundle['MI010']}</span>
+						</p:commandLink>
+					</h:panelGroup>
+				</fieldset>
+			</h:form>
+		</p:dialog>
+
+
+		<!-- CONFIRMA EXCLUSAO  -->
+		<p:dialog header="#{bundle['documento.header.exclusao']}" id="modalExcluirId" widgetVar="modalExcluir" styleClass="ui-dialog-background" modal="true"
+			dynamic="true" resizable="false" position="center" onShow="giveFocus('excluirForm:btnExcluir')" onHide="giveFocusRemote();">
+			<h:form id="excluirForm">
+				<span id="atencaoId" class="atencao2" style="margin-top: -2px !important;" />
+
+				<h:outputFormat style="margin-left: 40px; font-weight: bold !important;" value="#{bundle['MA022']}">
+					<f:param value="#{bundle['geral.label.documento']}" />
+				</h:outputFormat>
+				<br></br>
+				<p:commandLink id="btnExcluir" styleClass="btnLaranja marginTop buttonSelected" action="#{documentoController.excluir}"
+					update=":#{p:component('messages')} :#{p:component('btnExportar')} :#{p:component('btnExportar')}" oncomplete="modalExcluir.hide()">
+					<span><h:outputText style="width: 1; height: 1;" title="Sim" value="Sim" /></span>
+				</p:commandLink>
+				<p:commandLink id="btnNaoExcluir" styleClass="btnAzul marginTop buttonSelected" oncomplete="modalExcluir.hide()"
+					update=":#{p:component('btnExportar')} :#{p:component('messages')}">
+					<span><h:outputText style="width: 1; height: 1;" title="Não" value="Não" /></span>
+				</p:commandLink>
+				<p:spacer height="30px" />
+			</h:form>
+		</p:dialog>
+
+		<!-- begin-of: vincular -->
+		<p:dialog header="RELACIONAR BASE DE ATENDIMENTO" id="modalVincular" widgetVar="mdlVincular" 
+			styleClass="ui-dialog-background" style="min-width: 400px;"
+			modal="true" dynamic="true" resizable="false" position="center"
+			onShow="giveFocus('vincularForm:btnGravar')" onHide="giveFocusRemote();">
+			<h:form id="vincularForm">
+			
+				<p:messages id="msgVinculacao" showDetail="false" />
+				
+				<p:fieldset styleClass="filtro">
+					
+					<h:panelGrid columns="1">
+						
+						<h:outputLabel styleClass="label-button" value="#{bundle['documento.label.nomeDocumento']}">
+							<br/>
+							<h:inputText size="103" value="#{documentoController.instance.nome}" disabled="true" />
+						</h:outputLabel>
+						
+						<h:outputLabel styleClass="label-button" value="#{bundle['documento.label.baseAtendimento']}">
+							<h:outputText styleClass="pesquisaDireta" /><br/>
+							<h:selectOneMenu value="#{documentoController.baseAtendimento}" converter="omnifaces.SelectItemsConverter"
+								disabled="#{documentoController.vinculado}"
+								required="true" requiredMessage="#{documentoController.getRequiredMessage('documento.label.baseAtendimento')}">
+								<f:selectItem itemLabel="Selecione" noSelectionOption="true" />
+								<f:selectItems value="#{documentoController.listBase}" 
+									var="item" itemValue="#{item}" itemLabel="#{item.nome}" />
+							</h:selectOneMenu>
+						</h:outputLabel>
+						
+						<br/>
+						
+						<p:outputPanel>
+							<h:selectBooleanCheckbox styleClass="table-left"
+								disabled="#{documentoController.vinculado}"
+								value="#{documentoController.checkDataInicioAtendimento}">
+								<f:ajax render="dtInicioAtendimento" listener="#{documentoController.ajustarDataInicioAtendimento()}" />
+							</h:selectBooleanCheckbox> <strong>#{bundle['documento.label.ignorarDataAtendimento']}</strong>
+						</p:outputPanel>
+					
+						<h:outputLabel id="dtInicioAtendimento" styleClass="label-button" value="#{bundle['documento.label.dataInicioAtendimento']}">
+							<h:outputText styleClass="pesquisaDireta" /><br/>
+							<p:calendar disabled="#{documentoController.vinculado or documentoController.checkDataInicioAtendimento}"
+								pattern="dd/MM/yyyy" size="8" maxlength="10" value="#{documentoController.dtInicioAtendimento}"
+								required="#{!documentoController.checkDataInicioAtendimento}" 
+								requiredMessage="#{documentoController.getRequiredMessage('documento.label.dataInicioAtendimento')}"
+								onkeyup="maskIt(this, event, '##/##/#####', false, false)" validator="dateValidator">
+								<f:attribute name="field" value="#{bundle['geral.label.dataInicio']}" />
+								<f:converter converterId="br.gov.caixa.gitecsa.DateConverter" />
+							</p:calendar>
+						</h:outputLabel>
+					
+					</h:panelGrid>
+					
+					<div class="wrap">
+					
+						<p:commandLink id="btnGravar" rendered="#{!documentoController.vinculado}"
+							styleClass="btnAzul marginTop btnFecharModalN btnAssociaBase"
+							action="#{documentoController.gravarVinculacao()}"
+							oncomplete="controlMessagesUpdates(args);">
+							<span>Gravar</span>
+						</p:commandLink>
+						
+						<p:commandLink id="btnOk" rendered="#{documentoController.vinculado}"
+							styleClass="btnAzul marginTop btnFecharModalN btnAssociaBase"
+							onclick="mdlVincular.hide()">
+							<span>Ok</span>
+						</p:commandLink>
+						
+						<p:commandLink
+							title="Clique aqui para cancelar." 
+							styleClass="btnLaranja marginTop btnFecharModalN"
+							onclick="mdlVincular.hide()">
+							<span>Cancelar</span>
+						</p:commandLink>
+					</div>
+				
+				</p:fieldset>					
+				
+				<p:remoteCommand name="rmcUpdateMainMessage" action="#{documentoController.showMensagemSucessoVinculacao()}" update=":formConsulta:messages :formConsulta:pnlListaResultados" />
+				<p:remoteCommand name="rmcUpdateVinculacaoMessage" update="msgVinculacao" />
+				
+			</h:form>
+		</p:dialog>
+		<!-- end-of: vincular -->
+		
+		<script type="text/javascript">
+			function controlMessagesUpdates(args) {
+				console.log(args)
+				if(typeof args.validationFailed === 'undefined' || !args.validationFailed) {
+					rmcUpdateMainMessage();
+					mdlVincular.hide(); 
+				} else { 
+					rmcUpdateVinculacaoMessage();
+				}
+			}
+		</script>
+		
+	</ui:define>
+</ui:composition>

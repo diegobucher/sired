@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8"  ?>
+<!-- Created with iReport - A designer for JasperReports -->
+<!DOCTYPE jasperReport PUBLIC "//JasperReports//DTD Report Design//EN" "http://jasperreports.sourceforge.net/dtds/jasperreport.dtd">
+<jasperReport
+		 name="Termo_responsabilidade"
+		 columnCount="1"
+		 printOrder="Vertical"
+		 orientation="Portrait"
+		 pageWidth="595"
+		 pageHeight="842"
+		 columnWidth="535"
+		 columnSpacing="0"
+		 leftMargin="30"
+		 rightMargin="30"
+		 topMargin="20"
+		 bottomMargin="20"
+		 whenNoDataType="NoPages"
+		 isTitleNewPage="false"
+		 isSummaryNewPage="false">
+	<property name="ireport.zoom" value="1.5" />
+	<property name="ireport.x" value="32" />
+	<property name="ireport.y" value="0" />
+	<property name="ireport.scriptlethandling" value="0" />
+	<property name="ireport.encoding" value="UTF-8" />
+	<import value="java.util.*" />
+	<import value="net.sf.jasperreports.engine.*" />
+	<import value="net.sf.jasperreports.engine.data.*" />
+
+	<parameter name="IMAGE_DIR" isForPrompting="true" class="java.lang.String"/>
+	<parameter name="CIDADE_LOTACAO" isForPrompting="true" class="java.lang.String"/>
+	<parameter name="DATA_ATUAL_EXTENSO" isForPrompting="true" class="java.lang.String"/>
+	<parameter name="NOME_EMPREGADO_LOGADO" isForPrompting="true" class="java.lang.String"/>
+	<parameter name="FUNCAO_LOGADO" isForPrompting="true" class="java.lang.String"/>
+	<parameter name="MATRICULA_LOGADO" isForPrompting="true" class="java.lang.String"/>
+	<parameter name="UNIDADE_LOGADO" isForPrompting="true" class="java.lang.String"/>
+	<parameter name="NOME_UNIDADE_LOGADO" isForPrompting="true" class="java.lang.String"/>
+
+	<field name="CIDADE_LOTACAO" class="java.lang.String"/>
+	<field name="DATA_ATUAL_EXTENSO" class="java.lang.String"/>
+	<field name="NOME_EMPREGADO_LOGADO" class="java.lang.String"/>
+	<field name="FUNCAO_LOGADO" class="java.lang.String"/>
+	<field name="MATRICULA_LOGADO" class="java.lang.String"/>
+	<field name="UNIDADE_LOGADO" class="java.lang.String"/>
+	<field name="NOME_UNIDADE_LOGADO" class="java.lang.String"/>
+
+		<background>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</background>
+		<title>
+			<band height="46"  isSplitAllowed="true" >
+				<image  evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="2"
+						y="6"
+						width="118"
+						height="34"
+						key="image"/>
+					<box></box>
+					<graphicElement stretchType="NoStretch"/>
+					<imageExpression class="java.lang.String"><![CDATA[$P{IMAGE_DIR}]]></imageExpression>
+				</image>
+			</band>
+		</title>
+		<pageHeader>
+			<band height="35"  isSplitAllowed="true" >
+				<staticText>
+					<reportElement
+						x="157"
+						y="7"
+						width="241"
+						height="27"
+						key="staticText-2"/>
+					<box></box>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" size="14" isBold="true" isUnderline="true"/>
+					</textElement>
+				<text><![CDATA[TERMO DE RESPONSABILIDADE
+
+
+
+]]></text>
+				</staticText>
+			</band>
+		</pageHeader>
+		<columnHeader>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</columnHeader>
+		<detail>
+			<band height="100"  isSplitAllowed="true" >
+				<staticText>
+					<reportElement
+						x="34"
+						y="5"
+						width="498"
+						height="14"
+						key="staticText-3"/>
+					<box></box>
+					<textElement textAlignment="Justified" verticalAlignment="Middle">
+						<font/>
+					</textElement>
+				<text><![CDATA[Pelo presente, declaramos que os documentos enviados ao arquivo encontram-se nos padrões estabelecidos pelo]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="0"
+						y="18"
+						width="54"
+						height="15"
+						key="staticText-5"/>
+					<box></box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font pdfFontName="Helvetica-Bold" isBold="true"/>
+					</textElement>
+				<text><![CDATA[MN AD015]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="55"
+						y="18"
+						width="246"
+						height="15"
+						key="staticText-6"/>
+					<box></box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font/>
+					</textElement>
+				<text><![CDATA[bem como estamos obedecendo as regras contidas no]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="302"
+						y="18"
+						width="55"
+						height="15"
+						key="staticText-7"/>
+					<box></box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font pdfFontName="Helvetica-Bold" isBold="true"/>
+					</textElement>
+				<text><![CDATA[MN AD015]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="356"
+						y="18"
+						width="171"
+						height="14"
+						key="staticText-8"/>
+					<box></box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font/>
+					</textElement>
+				<text><![CDATA[(remessa de documento), eximindo o]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="0"
+						y="32"
+						width="532"
+						height="42"
+						key="staticText-9"/>
+					<box></box>
+					<textElement textAlignment="Justified" verticalAlignment="Middle">
+						<font/>
+					</textElement>
+				<text><![CDATA[Arquivo Geral de quaisquer responsabilidades futuras, em decorrência da não observância às normas acima citadas, por isso estamos enviando bem lacradas as caixas-arquivo, para que sejam inseridas diretamente no acervo do Arquivo, evitando triagem prévia.]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="30"
+						y="81"
+						width="465"
+						height="17"
+						key="staticText-10"/>
+					<box></box>
+					<textElement verticalAlignment="Middle">
+						<font/>
+					</textElement>
+				<text><![CDATA[Onde constar na remessa "expurgo" ou outro termo semelhante significa sua destruição sumária. destruição sumária.
+
+]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="0"
+						y="81"
+						width="28"
+						height="17"
+						key="staticText-11"/>
+					<box></box>
+					<textElement verticalAlignment="Middle">
+						<font pdfFontName="Helvetica-Bold" isBold="true"/>
+					</textElement>
+				<text><![CDATA[OBS.:]]></text>
+				</staticText>
+			</band>
+		</detail>
+		<columnFooter>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</columnFooter>
+		<pageFooter>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</pageFooter>
+		<lastPageFooter>
+			<band height="2"  isSplitAllowed="true" >
+			</band>
+		</lastPageFooter>
+		<summary>
+			<band height="133"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="false" isBlankWhenNull="true" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="159"
+						y="15"
+						width="246"
+						height="14"
+						key="textField"/>
+					<box></box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$P{CIDADE_LOTACAO}.trim() + ", " + $P{DATA_ATUAL_EXTENSO}.trim()]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement
+						x="159"
+						y="56"
+						width="246"
+						height="17"
+						key="staticText-13"/>
+					<box></box>
+					<textElement>
+						<font/>
+					</textElement>
+				<text><![CDATA[______________________________________________]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="true" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="158"
+						y="73"
+						width="247"
+						height="14"
+						key="textField"/>
+					<box></box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$P{NOME_EMPREGADO_LOGADO}.trim()]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="true" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="158"
+						y="90"
+						width="247"
+						height="14"
+						key="textField"/>
+					<box></box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$P{FUNCAO_LOGADO}.trim() + " - " + $P{MATRICULA_LOGADO}.trim()]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="true" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="158"
+						y="107"
+						width="247"
+						height="14"
+						key="textField"/>
+					<box></box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$P{UNIDADE_LOGADO}.trim() + " - " + $P{NOME_UNIDADE_LOGADO}.trim()]]></textFieldExpression>
+				</textField>
+			</band>
+		</summary>
+</jasperReport>

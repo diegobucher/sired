@@ -1,0 +1,481 @@
+<ui:composition template="/WEB-INF/templates/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+	<ui:define name="html-head">
+		<h:outputScript library="js" name="jquery.price_format.1.3.js" />
+	</ui:define>
+
+	<ui:param name="breadcrumbs" value="#{bundle['geral.breadcrumb.cadastro']},#{bundle['empresa.consulta.tituloPagina']}" />
+
+	<ui:define name="content-main-page">
+
+		<h:form id="formConsulta">
+			<p:focus id="focusConsulta" for="formConsulta" />
+			<p:messages id="messages" showDetail="false" />
+			<h3 class="titlePage">#{bundle['empresa.consulta.cadastro']}</h3>
+
+			<!-- BOTÔES -->
+			<h:panelGroup>
+
+				<p:commandLink title="#{bundle['MH036']}"
+					styleClass="btnLaranja marginTop buttonSelected"
+					actionListener="#{empresaController.novo()}"
+					onclick="guardarIdComponenteController(this); jQuery('#modalCadastroId .ui-dialog-title').text('#{bundle['empresa.button.novo']}');"
+					oncomplete="modalCadastro.show();"
+					update=":cadastrarForm :#{p:component('messages')}"
+					id="btnCadastro" disabled="#{empresaController.perfilConsulta}">
+					<span>#{bundle['empresa.button.novo']}</span>
+				</p:commandLink>
+				
+				<p:commandLink
+					title="#{bundle['MH037']}"
+					styleClass="btnLaranja marginTop buttonSelected"
+					actionListener="#{empresaController.novaAssociacao}"
+					onclick="guardarIdComponenteController(this); jQuery('#modalCadastroId .ui-dialog-title').text('#{bundle['empresa.button.novo']}');"
+					oncomplete="modalAssociar.show();"
+					update=":associarForm :#{p:component('messages')}" id="btnAssociar"
+					disabled="#{empresaController.perfilConsulta}">
+					<span>#{bundle['empresa.button.associarContrato']}</span>
+				</p:commandLink>
+
+				<p:commandLink styleClass="btnAzul marginTop buttonSelected"
+					onclick="PrimeFaces.monitorDownload(showStatus, hideStatus)"
+					title="#{bundle['MH010']}" ajax="false" disabled="#{empresaController.listaFiltro.size()==0}" id="btnExportar">
+					<span>#{bundle['geral.button.exportar']}</span>
+					<p:dataExporter type="xls" target="dataTableCrud"
+						fileName="#{bundle['empresa.label.nome.relatorio']}"
+						postProcessor="#{empresaController.preExportar}" />
+				</p:commandLink>
+
+			</h:panelGroup>
+
+			<p:spacer height="30px" />
+
+			<!-- GRID DE CONSULTA -->
+			<p:outputPanel id="pnlListaResultados">
+
+				<p:dataTable value="#{empresaController.listaEmpresaContrato}"
+					var="empresaContrato" widgetVar="empresaContratos"
+					id="dataTableCrud" rows="10"
+					emptyMessage="#{bundle['MA010']}" paginator="true"
+					filteredValue="#{empresaController.listaFiltro}"
+					sortBy="empresa.nome"
+					sortFunction="#{empresaController.sortByString}"
+					tableStyleClass="tablefixa"
+					rowStyleClass="#{empty rowIx or rowIx mod 2 ne 0 ? 'even-row' : 'odd-row'}"
+					rowIndexVar="rowIx" styleClass="estilo-border-dotted zebr"
+					paginatorPosition="bottom"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					currentPageReportTemplate="#{bundle['geral.crud.exibindo']} {startRecord} #{bundle['geral.crud.ate']} {endRecord}  #{bundle['geral.crud.de']} {totalRecords}  #{bundle['geral.crud.registros']} "
+					rowsPerPageTemplate="5,10,25,50">
+
+
+					<f:facet name="header">
+						<p:outputPanel style="text-align:right; margin-right:-10px" styleClass="ui-widget-auxiliar">
+							<h:outputText value="#{bundle['geral.label.pesquisar']}" escape="false" />
+								<h:inputText id="globalFilter"	styleClass="semClear" onkeyup="empresaContratos.filter();" style="width:150px;"	maxlength="255" >
+									<p:ajax event="keyup" update=":#{p:component('btnExportar')}" global="false" />
+								</h:inputText>
+						</p:outputPanel>
+					</f:facet>
+
+					<p:column filterBy="empresaContrato.base.nome"
+						filterStyle="display:none; visibility:hidden;"
+						sortBy="empresaContrato.base.nome"
+						sortFunction="#{empresaController.sortByString}" style="width:12%"
+						styleClass="gri-alfanumericos noBackGroundImage">
+						<h:outputText value="#{empresaContrato.empresaContrato.base.nome}" />
+						<f:facet name="header">
+							<h:outputText value="#{bundle['base.label.base']}" />
+						</f:facet>
+					</p:column>
+
+					<!-- INÍCIO COLUNAS QUE SÃO EXPORTADAS PARA O RELATÓRIO MAS NÃO SÃO VISÍVEIS NA TABELA -->
+					<p:column sortFunction="#{empresaController.sortByString}" style=" display:none; visibility:hidden;" styleClass="gri-alfanumericos noBackGroundImage">
+						<h:outputText value="#{empresaContrato.empresa.id}" />
+						<f:facet name="header">
+							<h:outputText value="#{bundle['geral.label.codigoDaEmpresa']}" />
+						</f:facet>
+					</p:column>
+					<!-- FIM COLUNAS QUE SÃO EXPORTADAS PARA O RELATÓRIO MAS NÃO SÃO VISÍVEIS NA TABELA -->
+					
+					<p:column filterBy="empresa.nome"
+						filterStyle="display:none; visibility:hidden;"
+						sortBy="empresa.nome"
+						sortFunction="#{empresaController.sortByString}" style="width:14%"
+						styleClass="gri-alfanumericos noBackGroundImage">
+						<h:outputText value="#{empresaContrato.empresa.nome}" />
+						<f:facet name="header">
+							<h:outputText value="#{bundle['empresa.label.empresa']}" />
+						</f:facet>
+					</p:column>
+
+					<p:column filterBy="empresa.cnpj"
+						filterStyle="display:none; visibility:hidden;"
+						sortBy="empresa.cnpj"
+						sortFunction="#{empresaController.sortByString}" style="width:14%"
+						styleClass="gri-alfanumericos noBackGroundImage">
+						<h:outputText value="#{empresaContrato.empresa.cnpjFormatado}" />
+						<f:facet name="header">
+							<h:outputText value="#{bundle['empresa.label.cnpj']}" />
+						</f:facet>
+					</p:column>
+
+					<p:column filterBy="empresaContrato.numeroContrato"
+						filterStyle="display:none; visibility:hidden;"
+						sortBy="empresaContrato.numeroContrato"
+						sortFunction="#{empresaController.sortByString}" style="width:11%"
+						styleClass="gri-alfanumericos noBackGroundImage">
+						<h:outputText
+							value="#{empresaContrato.empresaContrato.numeroContrato}" />
+						<f:facet name="header">
+							<h:outputText value="#{bundle['empresa.label.contrato']}" />
+						</f:facet>
+					</p:column>
+
+					<p:column filterBy="empresaContrato.dataInicioVigenciaFormatado"
+						filterStyle="display:none; visibility:hidden;"
+						sortBy="empresaContrato.dataInicioVigenciaFormatado"
+						sortFunction="#{empresaController.sortByString}" style="width:9%"
+						styleClass="gri-alfanumericos noBackGroundImage">
+						<h:outputText
+							value="#{empresaContrato.empresaContrato.dataInicioVigenciaFormatado}" />
+						<f:facet name="header">
+							<h:outputText value="#{bundle['empresa.label.inicio']}"
+								title="#{bundle['empresa.label.inicioVigencia']}" />
+						</f:facet>
+					</p:column>
+
+					<p:column filterBy="empresaContrato.dataFimVigenciaFormatado"
+						filterStyle="display:none; visibility:hidden;"
+						sortBy="empresaContrato.dataFimVigenciaFormatado"
+						sortFunction="#{empresaController.sortByString}" style="width:9%"
+						styleClass="gri-alfanumericos noBackGroundImage">
+						<h:outputText
+							value="#{empresaContrato.empresaContrato.dataFimVigenciaFormatado}" />
+						<f:facet name="header">
+							<h:outputText value="#{bundle['empresa.label.fim']}"
+								title="#{bundle['empresa.label.fimVigencia']}" />
+						</f:facet>
+					</p:column>
+
+
+					<p:column filterBy="empresa.caixaPostal"
+						filterStyle="display:none; visibility:hidden;"
+						sortBy="empresa.caixaPostal"
+						sortFunction="#{empresaController.sortByString}" style="width:12%"
+						styleClass="gri-alfanumericos noBackGroundImage">
+						<h:outputText value="#{empresaContrato.empresa.caixaPostal}" />
+						<f:facet name="header">
+							<h:outputText value="#{bundle['empresa.label.caixaPostal']}" />
+						</f:facet>
+					</p:column>
+
+					<p:column filterBy="empresa.site"
+						filterStyle="display:none; visibility:hidden;"
+						sortBy="empresa.site"
+						sortFunction="#{empresaController.sortByString}" style="width:11%"
+						styleClass="gri-alfanumericos noBackGroundImage">
+						<h:outputText value="#{empresaContrato.empresa.site}" />
+						<f:facet name="header">
+							<h:outputText value="#{bundle['empresa.label.site']}" />
+						</f:facet>
+					</p:column>
+
+
+					<!-- AÇÕES -->
+					<p:column headerText="#{bundle['geral.label.acoes']}"
+						styleClass="noBackGroundImage" style="width:11%" exportable="false">
+						<p:commandLink title="#{bundle['MH037']}"
+							actionListener="#{empresaController.editarContrato(empresaContrato)}"
+							onclick="guardarIdComponenteController(this);"
+							oncomplete="modalAssociar.show();"
+							update=":associarForm :#{p:component('messages')}" id="btnAssociar"
+							styleClass="image-link">
+							<img class="icon-contrato" src="#{request.contextPath}/resources/imagens/img_trans.gif" width="1" height="1" />
+						</p:commandLink>
+						
+						<p:commandLink title="#{bundle['MH028']}"
+							actionListener="#{empresaController.edita(empresaContrato)}"
+							styleClass="image-link"
+							onclick="guardarIdComponenteController(this); jQuery('#modalCadastroId .ui-dialog-title').text('#{bundle['empresa.consulta.tituloPagina']}');"
+							oncomplete=" modalCadastro.show(); " update=":cadastrarForm">
+							<img class="icon-editar" src="#{request.contextPath}/resources/imagens/img_trans.gif" width="1" height="1" />
+						</p:commandLink>
+						
+						<p:commandLink id="btnExcluir"	onclick="modalExcluir.show(); guardarIdComponenteController(this);"
+							title="#{bundle['MH031']}"
+							disabled="#{empresaController.perfilConsulta}"
+							styleClass="image-link">
+							<img class="icon-excluir" src="#{request.contextPath}/resources/imagens/img_trans.gif" width="1" height="1" />
+							<f:setPropertyActionListener target="#{empresaController.instanceExcluir}" value="#{empresaContrato.empresa}" />
+							<f:setPropertyActionListener target="#{empresaController.empresaContratoExcluir}" value="#{empresaContrato.empresaContrato}" />
+						</p:commandLink>
+					</p:column>
+				</p:dataTable>
+			</p:outputPanel>
+		</h:form>
+
+
+		<!-- DIALOG CADASTRAR DOCUMENTO -->
+		<p:dialog header="Cadastro/Alteração de Documento"
+			id="modalCadastroId" widgetVar="modalCadastro"
+			styleClass="ui-dialog-background" modal="true" dynamic="true"
+			width="700px" resizable="false" position="center"
+			onShow="formatarCnpj(); giveFocus('cadastrarForm')" onHide="giveFocusRemote();">
+			<p:ajax event="close" listener="#{empresaController.reset()}"/>
+			<h:form id="cadastrarForm">
+				<p:focus id="focusCadastro" context="cadastrarForm" />
+				<p:messages id="messagesCadastro" escape="false" showDetail="false" />
+				<fieldset class="filtro">
+					<h:panelGrid columns="1" id="modalPainelCad01">
+
+						<h:outputLabel style="margin-right: 20px;"
+							value="#{bundle['empresa.label.nomeEmpresa']}"
+							styleClass="label-button">
+							<h:outputText value="" styleClass="pesquisaDireta" />
+						</h:outputLabel>
+
+						<h:inputText value="#{empresaController.instance.nome}"
+							maxlength="50" size="113" id="textNome" required="true"
+							requiredMessage="#{empresaController.getRequiredMessage('empresa.label.nomeEmpresa')}"   onkeypress="return removeEspacoInicio(event, this);"/>
+					</h:panelGrid>
+
+					<h:panelGrid columns="2" id="modalPainelCad02">
+						<h:outputLabel style="margin-right: 20px;"
+							value="#{bundle['empresa.label.cnpj']}" styleClass="label-button">
+							<h:outputText value="" styleClass="pesquisaDireta" />
+						</h:outputLabel>
+
+						<h:outputLabel style="margin-right: 40px;"
+							value="#{bundle['empresa.label.caixaPostal']}"
+							styleClass="label-button">
+							<h:outputText value="" styleClass="pesquisaDireta" />
+						</h:outputLabel>
+
+						<p:inputText style="width:122px; margin-right: 8px;"
+							maxlength="18" title="#{bundle['empresa.label.cnpj']}"
+							id="idCnpj" value="#{empresaController.instance.cnpj}"
+							converter="converter.CnpjConverter"
+							onkeypress="return inserirMascalimparCampoCNPJ(event)"
+							onkeyup="maskIt(this,event,'##.###.###/####-##',false,false)"
+							onblur="formatarCnpj();" required="true"
+							disabled="#{!empty empresaController.instance.id}"
+							requiredMessage="#{empresaController.getRequiredMessage('empresa.label.cnpj')}" />
+
+						<h:inputText value="#{empresaController.instance.caixaPostal}"
+							maxlength="100"  id="textCaixaPostal"
+							style="width:486px;" required="true"
+							requiredMessage="#{empresaController.getRequiredMessage('empresa.label.caixaPostal')}"  onkeypress="return removeEspacoInicio(event, this);"/>
+					</h:panelGrid>
+
+					<h:panelGrid columns="1" id="modalPainelCad03">
+
+						<h:outputLabel style="margin-right: 20px;"
+							value="#{bundle['empresa.label.site']}" styleClass="label-button">
+							<h:outputText value="" styleClass="pesquisaDireta" />
+						</h:outputLabel>
+
+						<h:inputText value="#{empresaController.instance.site}"
+							maxlength="100" size="113" id="textSite" required="true"
+							requiredMessage="#{empresaController.getRequiredMessage('empresa.label.site')}"  onkeypress="return removeEspacoInicio(event, this);"/>
+					</h:panelGrid>
+
+
+					<!-- GRAVAR CANCELAR -->
+					<h:panelGroup>
+
+						<p:commandLink title="#{bundle['MH011']}"
+							actionListener="#{empresaController.salvar}"
+							styleClass="btnLaranja marginTop buttonSelected"
+							update=":#{p:component('messagesCadastro')} :#{p:component('focusCadastro')} :#{p:component('dataTableCrud')} :#{p:component('btnExportar')}" 
+							rendered="#{!empresaController.faseEditar}" id="btnGravar">
+							<span>#{bundle['geral.button.gravar']}</span>
+						</p:commandLink>
+
+						<p:commandLink title="#{bundle['MH028']}"
+							actionListener="#{empresaController.salvar}"
+							styleClass="btnLaranja marginTop buttonSelected"
+							update=":#{p:component('messagesCadastro')} :#{p:component('focusCadastro')} :#{p:component('dataTableCrud')} :#{p:component('btnExportar')}"
+							rendered="#{empresaController.faseEditar}"
+							disabled="#{empresaController.perfilConsulta}">
+							<span>#{bundle['geral.button.alterar']}</span>
+						</p:commandLink>
+
+						<p:commandLink title="#{bundle['MH013']}"
+							styleClass="btnAzul marginTop buttonSelected"
+							onclick="modalCadastro.hide();" process="@this"
+							update=":#{p:component('messages')}">
+							<p:resetInput target="@form" />
+							<span>#{bundle['MI010']}</span>
+						</p:commandLink>
+					</h:panelGroup>
+				</fieldset>
+			</h:form>
+		</p:dialog>
+
+
+		<!-- DIALOG ASSOCIAR -->
+		<p:dialog header="#{bundle['empresa.title.associarContrato']}"
+			id="modalAssociarID" widgetVar="modalAssociar"
+			styleClass="ui-dialog-background" modal="true" dynamic="true"
+			resizable="false" position="center"
+			onShow="giveFocus('associarForm')" onHide="giveFocusRemote();">
+			<h:form id="associarForm">
+				<p:focus id="focusAssociar" context="associarForm" />
+				<p:messages id="messagesAssociar" escape="false" showDetail="false" />
+				<fieldset class="filtro">
+
+					<h:panelGrid columns="3" id="modalPainelCad04">
+						<h:outputLabel style="margin-right: 20px;" value="#{bundle['base.label.base']}" styleClass="label-button" >
+							<h:outputText value="" styleClass="pesquisaDireta" />
+						</h:outputLabel>
+						<h:outputLabel style="margin-left: 112px;" value="#{bundle['empresa.label.empresa']}" styleClass="label-button" >
+							<h:outputText value="" styleClass="pesquisaDireta" />
+						</h:outputLabel>
+						<h:outputLabel style="margin-left: 192px;;"	value="#{bundle['empresa.label.numeroContrato']}" styleClass="label-button" >
+							<h:outputText value="" styleClass="pesquisaDireta" />
+						</h:outputLabel>
+					</h:panelGrid>
+
+					<h:panelGrid columns="4" id="modalPainelCad05">
+						<h:selectOneMenu id="selectBase" style="margin-right: 8px; width: 150px;"	
+							value="#{empresaController.empresaContrato.base}"  converter="omnifaces.SelectItemsConverter"  required="true"
+								 requiredMessage="#{empresaController.getRequiredMessage('base.label.base')}"  immediate="true">
+							<f:selectItem itemLabel="Selecione"  noSelectionOption="true" />
+							<f:selectItems value="#{empresaController.listaBase}" var="base" itemValue="#{base}" itemLabel="#{base.nome}" />
+							<p:ajax event="change" listener="#{empresaController.limparPesquisa}" update="modalPainelCad06 panielAcoes" global="false" />
+						</h:selectOneMenu>
+						
+						<h:selectOneMenu id="selectEmpresa" style="margin-right: 8px; width: 250px;"	
+							value="#{empresaController.empresaContrato.empresa}"  converter="omnifaces.SelectItemsConverter"  required="true"
+								 requiredMessage="#{empresaController.getRequiredMessage('empresa.label.empresa')}"  immediate="true">
+							<f:selectItem itemLabel="Selecione" noSelectionOption="true" />
+							<f:selectItems value="#{empresaController.listaEmpresa}" var="empresa" itemValue="#{empresa}" itemLabel="#{empresa.nome}" />
+							<p:ajax event="change" listener="#{empresaController.limparPesquisa}" update="modalPainelCad06 panielAcoes" global="false" />
+						</h:selectOneMenu>
+
+						<h:inputText value="#{empresaController.empresaContrato.numeroContrato}" maxlength="20" size="20" id="textContrato" 
+						required="true" requiredMessage="#{empresaController.getRequiredMessage('empresa.label.numeroContrato')}" immediate="true">
+							<p:ajax event="keyup" listener="#{empresaController.limparPesquisa}" update="modalPainelCad06 panielAcoes" global="false"/>
+						</h:inputText>
+						
+						<p:commandLink title="#{bundle['MH008']}"
+							style="margin-top:0px !important; margin-left: 8px"
+							actionListener="#{empresaController.pesquisarContrato}"
+							styleClass="btnLaranja marginTop buttonSelected" update="modalPainelCad06 panielAcoes focusAssociar messagesAssociar idDataInicio"
+							id="bntPesquisarAssociacao" disabled="#{empresaController.desabilitarPesquisarAssociacao}">
+							<span>#{bundle['geral.button.pesquisar']}</span>
+						</p:commandLink>
+						
+					
+					</h:panelGrid>
+
+					<fieldset class="secaoBorda">
+						<LEGEND>#{bundle['empresa.legend.vigenciaContrato']}</LEGEND>
+						<h:panelGrid columns="2" id="modalPainelCad06">
+							<h:outputLabel style="margin-right: 20px;" value="#{bundle['empresa.label.inicioVigencia']}" styleClass="label-button">
+								<h:outputText value="" styleClass="pesquisaDireta" />
+							</h:outputLabel>
+							
+							<h:outputLabel style="margin-right: 20px;" value="#{bundle['empresa.label.fimVigencia']}" styleClass="label-button">
+								<h:outputText value="" styleClass="pesquisaDireta" />
+							</h:outputLabel>
+
+							<p:calendar id="idDataInicio" size="15"
+								style="margin-right: 20px;"
+								value="#{empresaController.empresaContrato.dataInicioVigencia}"
+								pattern="dd/MM/yyyy" locale="pt_BR"
+								title="#{bundle['empresa.toltip.label.data.inicio']}"
+								converter="converter.DataConverter" maxlength="10"
+								onkeyup="maskIt(this,event,'##/##/#####',false,false)"
+								disabled="#{!empresaController.desabilitarPesquisarAssociacao}"
+								styleClass="#{!empresaController.desabilitarPesquisarAssociacao ? 'select-disable': ''} "
+								required="#{empresaController.desabilitarPesquisarAssociacao}"
+								requiredMessage="#{empresaController.getRequiredMessage('empresa.label.inicioVigencia')}"
+								validator="validator.DataValidator"
+								validatorMessage="#{bundle['empresa.label.inicioVigencia']} deve ter um formato de data válido.">
+							</p:calendar>
+
+
+							<p:calendar id="idDataFim" size="15" style="margin-right: 20px;"
+								value="#{empresaController.empresaContrato.dataFimVigencia}"
+								pattern="dd/MM/yyyy" locale="pt_BR"
+								title="#{bundle['empresa.toltip.label.data.fim']}"
+								converter="converter.DataConverter" maxlength="10"
+								onkeyup="maskIt(this,event,'##/##/#####',false,false)"
+								disabled="#{!empresaController.desabilitarPesquisarAssociacao}"
+								styleClass="#{!empresaController.desabilitarPesquisarAssociacao ? 'select-disable': ''} "
+								validator="validator.DataValidator"
+								required="#{empresaController.desabilitarPesquisarAssociacao}"
+								requiredMessage="#{empresaController.getRequiredMessage('empresa.label.fimVigencia')}"
+								validatorMessage="#{bundle['empresa.label.fimVigencia']} deve ter um formato de data válido.">
+							</p:calendar>
+						</h:panelGrid>
+					</fieldset>
+
+					<!-- GRAVAR CANCELAR -->
+					<h:panelGroup id="panielAcoes">
+
+						<p:commandLink title="#{bundle['MH011']}"
+							actionListener="#{empresaController.salvarContrato}"
+							styleClass="btnLaranja marginTop buttonSelected"
+							update=":#{p:component('messagesAssociar')} :#{p:component('focusAssociar')} :#{p:component('dataTableCrud')}" id="btnGravarAssociacao"
+							disabled="#{!empresaController.desabilitarPesquisarAssociacao}"
+							>
+							<span>#{bundle['geral.button.gravar']}</span>
+						</p:commandLink>
+
+						<p:commandLink title="#{bundle['MH013']}"
+							styleClass="btnAzul marginTop buttonSelected"
+							onclick="modalAssociar.hide();" process="@this"
+							update=":#{p:component('messages')}">
+							<p:resetInput target="@form" />
+							<span>#{bundle['MI010']}</span>
+						</p:commandLink>
+					</h:panelGroup>
+				</fieldset>
+			</h:form>
+		</p:dialog>
+
+
+		<!-- CONFIRMA EXCLUSAO  -->
+		<p:dialog header="#{bundle['empresa.header.exclusao']}"
+			id="modalExcluirId" widgetVar="modalExcluir"
+			styleClass="ui-dialog-background" modal="true" dynamic="true"
+			resizable="false" position="center"
+			onShow="giveFocus('excluirForm:btnExcluir')"
+			onHide="giveFocusRemote();">
+			<h:form id="excluirForm">
+				<span id="atencaoId" class="atencao2" style="margin-top: -2px !important;" />
+
+				<h:outputFormat
+					style="margin-left: 40px; font-weight: bold !important;"
+					value="#{bundle['MA022']}">
+					<f:param value="#{bundle['empresa.consulta.tituloPagina']}" />
+				</h:outputFormat>
+				<br></br>
+				<p:commandLink id="btnExcluir"
+					styleClass="btnLaranja marginTop buttonSelected"
+					action="#{empresaController.excluir()}"
+					update=":#{p:component('messages')} :#{p:component('btnExportar')}"
+					oncomplete="modalExcluir.hide()" >
+					<span><h:outputText style="width: 1; height: 1;" title="Sim"
+							value="Sim" /></span>
+				</p:commandLink>
+				<p:commandLink id="btnNaoExcluir"
+					styleClass="btnAzul marginTop buttonSelected"
+					oncomplete="modalExcluir.hide()" update=":#{p:component('btnExportar')} :#{p:component('messages')}">
+					<span><h:outputText style="width: 1; height: 1;" title="Não"
+							value="Não" /></span>
+				</p:commandLink>
+				<p:spacer height="30px" />
+			</h:form>
+		</p:dialog>
+	</ui:define>
+</ui:composition>

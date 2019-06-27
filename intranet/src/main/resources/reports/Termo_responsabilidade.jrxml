@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Termo_responsabilidade" pageWidth="535" pageHeight="802" columnWidth="535" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="7a4e14f2-46eb-45d5-8ea0-c92b537e9183">
+	<property name="ireport.zoom" value="0.7697371773460628"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="ireport.scriptlethandling" value="0"/>
+	<property name="ireport.encoding" value="UTF-8"/>
+	<import value="net.sf.jasperreports.engine.*"/>
+	<import value="java.util.*"/>
+	<import value="net.sf.jasperreports.engine.data.*"/>
+	<parameter name="IMAGE_DIR" class="java.lang.String"/>
+	<parameter name="CIDADE_LOTACAO" class="java.lang.String"/>
+	<parameter name="DATA_ATUAL_EXTENSO" class="java.lang.String"/>
+	<parameter name="NOME_EMPREGADO_LOGADO" class="java.lang.String"/>
+	<parameter name="FUNCAO_LOGADO" class="java.lang.String"/>
+	<parameter name="MATRICULA_LOGADO" class="java.lang.String"/>
+	<parameter name="UNIDADE_LOGADO" class="java.lang.String"/>
+	<parameter name="NOME_UNIDADE_LOGADO" class="java.lang.String"/>
+	<parameter name="NUMERO_REMESSA" class="java.lang.String"/>
+	<parameter name="UNIDADE_REMESSA" class="java.lang.String"/>
+	<parameter name="ABERTURA_REMESSA" class="java.lang.String"/>
+	<parameter name="SITUACAO_REMESSA" class="java.lang.String"/>
+	<field name="caixaArquivo" class="java.lang.Long"/>
+	<field name="conteudo" class="java.lang.String"/>
+	<title>
+		<band height="83" splitType="Stretch">
+			<image>
+				<reportElement key="image" x="23" y="19" width="147" height="41" uuid="5e2fbc12-22ba-4e76-8028-108e5e5336bf"/>
+				<imageExpression><![CDATA[$P{IMAGE_DIR}]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="219" splitType="Stretch">
+			<staticText>
+				<reportElement key="staticText-2" x="0" y="0" width="535" height="36" uuid="6142ff61-a7b4-46b1-8c11-54a470c24c28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true" isUnderline="false" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[TERMO DE RESPONSABILIDADE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-9" x="27" y="36" width="478" height="64" uuid="97c3fee6-e9a6-4eaa-8a42-0da191f6e14d"/>
+				<textElement textAlignment="Justified" verticalAlignment="Middle"/>
+				<text><![CDATA[Pelo presente, declaramos que os documentos enviados ao arquivo (quadro abaixo) encontram-se nos padrões estabelecidos pelo MN AD 015, eximindo o Arquivo Geral de quaisquer responsabilidades futuras, em decorrência da não observância às normas acima pertinentes.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="27" y="100" width="95" height="35" uuid="653048af-5cc9-4127-88b9-5e3d1ddfd6c3"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nº da Remessa]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="122" y="100" width="183" height="35" uuid="229291a1-52ea-4e7e-8acd-06e0a0ea63bb"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Unidade]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="305" y="100" width="95" height="35" uuid="20b1d7d4-5d54-40d3-99fd-05cdc7a08431"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Abertura]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="400" y="100" width="105" height="35" uuid="d868cbb8-4d8c-4033-9985-0bca2014f1af"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Situação]]></text>
+			</staticText>
+			<textField>
+				<reportElement stretchType="RelativeToTallestObject" x="27" y="135" width="95" height="20" uuid="75d7bcc0-46c0-440c-9ddd-1018524dee0c"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{NUMERO_REMESSA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement stretchType="RelativeToTallestObject" x="122" y="135" width="183" height="20" uuid="88570df3-5854-4a5a-95a4-16eefecd01fe"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{UNIDADE_REMESSA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement stretchType="RelativeToTallestObject" x="305" y="135" width="95" height="20" uuid="9332bf52-62f5-41f6-9b03-185a1782014c"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{ABERTURA_REMESSA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement stretchType="RelativeToTallestObject" x="400" y="135" width="105" height="20" uuid="a883cf67-0b63-41e8-a20c-8297b521edc3"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{SITUACAO_REMESSA}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="27" y="184" width="151" height="35" uuid="bc14e604-1d2d-4b2b-b8e2-26039d550001"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nº Caixa-Arquivo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="178" y="184" width="327" height="35" uuid="8316730d-bf02-422a-a650-591ec0afe1ae"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Conteúdo]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="21" splitType="Stretch">
+			<textField>
+				<reportElement x="27" y="1" width="151" height="20" uuid="bc826184-3950-444f-8d61-fd201af17372"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<paragraph firstLineIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{caixaArquivo}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="178" y="1" width="327" height="20" uuid="cc613218-95aa-4c10-9204-9bb648307b41"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<paragraph firstLineIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{conteudo}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="235" splitType="Stretch">
+			<staticText>
+				<reportElement key="staticText-13" x="159" y="139" width="246" height="17" uuid="219e515a-739d-4b23-8002-aaef1dc28336"/>
+				<text><![CDATA[______________________________________________]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement key="textField" x="90" y="156" width="382" height="14" uuid="bdb60aae-10df-461b-bfc0-1626b665b65f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{NOME_EMPREGADO_LOGADO}.trim()]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement key="textField" x="90" y="173" width="382" height="14" uuid="967ba926-85dc-460e-a6bc-aaec268afac2"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{FUNCAO_LOGADO}.trim() + " - " + $P{MATRICULA_LOGADO}.trim()]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement key="textField" x="90" y="190" width="382" height="14" uuid="f6ca97db-d78a-4260-ac9d-206f78786bf2"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{UNIDADE_LOGADO}.trim() + " - " + $P{NOME_UNIDADE_LOGADO}.trim()]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement key="textField" x="27" y="39" width="478" height="19" uuid="921537bb-783a-416f-b04f-12b13a1a6b42"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<paragraph firstLineIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{CIDADE_LOTACAO}.trim() + ", " + $P{DATA_ATUAL_EXTENSO}.trim()]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

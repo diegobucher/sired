@@ -1,0 +1,139 @@
+/* #barra-gov{
+  background: #004b82 ; 
+  height:28px;
+}
+#barra-gov.navbar{
+   background: #004b82 ;  
+}
+#barra-gov.navbar-inner {
+   background: #004b82 ;  
+}
+#barra-brasil { 
+  position:relative;
+  overflow:hidden;
+  	min-width:960px;
+  background: url("#{request.contextPath}/resources/imagens/banner-ac/barra-brasil-v3-bgx.png");
+  background-position: center bottom ;
+  background-repeat: no-repeat;
+}
+
+#barra-brasil .barra {
+  display: block;
+  	width: 960px;
+  height:28px;
+  margin: 0 auto;
+  background: url("#{request.contextPath}/resources/imagens/banner-ac/barra-brasil-v3-bgx.gif");
+  background-position: 0 bottom;
+  background-repeat: repeat-x;
+}
+*/
+.barra-topo{
+  top:0;	
+  height:135px;	
+  width:100%;
+  background: url("#{request.contextPath}/resources/imagens/barra-topo.gif");
+  background-position: top;
+  background-repeat: repeat-x;
+}
+
+.barra-content{
+  min-height:207px;
+}
+
+ .logo{
+   /* position:absolute; */
+	  	  /*  float: right; */
+	   /* min-width: 251px; */
+	  
+	   height: 50px;
+	   background:  url("#{request.contextPath}/resources/imagens/logocaixa.gif")  no-repeat;
+	  /*  margin: 0;  */
+	  background-position: 200px;
+	  
+    }
+    
+   .nm-sistema{
+      margin-top:20px;
+   	  font-size: 27px; 
+	  color: #FFFFFF; 
+   	  font-weight: bold;
+   	  font-family: sans-serif;
+   	  margin-left: 200px;
+   } 
+   
+   .ds-sistema{
+   	  font-size: 15px; 
+	  color: #FFFFFF; 
+   	  font-weight: bold;
+   	  font-family: sans-serif;
+      margin-left: 200px;
+   } 
+   
+   .ds-rodape{
+   	  font-size: 12px; 
+	  color: #FFFFFF; 
+   	  font-weight: bold;
+   	  font-family: sans-serif;
+      margin-left: 200px;
+      padding-top:20px;
+   } 
+   
+   .barra-menu{
+     height: 55px;
+   	 background:  url("#{request.contextPath}/resources/imagens/barra-menu.gif") ;
+   	 background-repeat: repeat-x;
+   }
+   
+   .barra-rodape{
+     height: 70px;
+     width:100%;
+     position:absolute;
+     bottom:0;
+   	 background:  url("#{request.contextPath}/resources/imagens/barra-rodape.png") ;
+   	 background-repeat: repeat-x;
+   }
+	
+/*
+#barra-brasil .barra ul {
+  float:right;
+  width: 319px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+#barra-brasil .barra ul li {
+  float: left;
+  padding-left: 25px;
+}
+
+#barra-brasil .ai {
+  display: block;
+  width: 161px;
+  height: 28px;
+  text-indent: -1000px;
+  overflow:hidden;
+  background: url("#{request.contextPath}/resources/imagens/banner-ac/ai.png");
+  background-position: 0 4px;
+  background-repeat: no-repeat;
+}
+
+#barra-brasil .brasilgov {
+  display: block;
+  width: 108px;
+  height: 28px;
+  text-indent: -1000px;
+  overflow:hidden;
+
+  background: url("#{request.contextPath}/resources/imagens/banner-ac/brasil.png");
+  background-position: 0 4px;
+  background-repeat: no-repeat;
+}
+
+#barra-brasil .navbar-inner {
+  min-height: 28px;
+  border: none;
+} */
+
+
+

@@ -1,0 +1,1604 @@
+<ui:composition template="/WEB-INF/templates/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+	<ui:define name="html-head">
+		<h:outputScript library="js" name="jquery.price_format.1.3.js" />
+		<h:outputScript library="js" name="mantem-remessa.js" />
+
+		<h:outputStylesheet library="css" name="mantem-remessa.css" />
+		<h:outputStylesheet library="css" name="font-awesome.min.css" />
+	</ui:define>
+
+	<ui:param name="breadcrumbs"
+		value="#{bundle['geral.breadcrumb.remessa']},#{bundle['remessa.manutencao.breadcrumb']}" />
+
+	<ui:define name="content-main-page">
+
+		<h:form id="formConsulta">
+			<p:focus id="focusConsulta" context="formConsulta" />
+
+			<p:messages id="messages" showDetail="false" />
+
+			<h3 class="titlePage">#{bundle['remessa.mantemremessa.tituloPagina.descricao']}</h3>
+
+			<fieldset class="filtro">
+				<h:panelGrid columns="2" id="modalPainelCad06">
+					<h:outputLabel
+						value="#{bundle['remessa.mantemremessa.label.numeroRemessa']}"
+						styleClass="label-filtro-remessa"
+						title="#{bundle['remessa.mantemremessa.filtro.numeroRemessa.hint']}">
+						<br />
+						<p:inputText maxlength="10" id="numRemessaFiltro"
+							value="#{mantemRemessaController.nuRemessa}"
+							style="width: 75px; text-align:left;"
+							onchange="overSomenteNumeros(this);"
+							onkeypress="return somenteNumero(event);">
+							<p:ajax event="keyup"
+								listener="#{mantemRemessaController.handleNumeroRemessa()}"
+								update="pnlCamposFiltro" process="numRemessaFiltro"
+								global="false" />
+						</p:inputText>
+					</h:outputLabel>
+
+					<h:panelGrid columns="7" id="pnlCamposFiltro">
+
+						<!-- MATRICULA DO USUÁRIO -->
+						<h:outputLabel value="#{bundle['geral.label.usuario']}"
+							styleClass="label-filtro-remessa" title="#{bundle['MH094']}">
+							<br />
+							<p:inputMask id="j_username"
+								style="width: 50px; text-align:left;" placeHolder=""
+								value="#{mantemRemessaController.coUsuarioFiltro}"
+								disabled="#{mantemRemessaController.nuRemessa > 0}">
+							</p:inputMask>
+						</h:outputLabel>
+
+						<!-- DATA INICIO -->
+						<h:outputLabel value="#{bundle['geral.label.dataInicio']}"
+							styleClass="label-filtro-remessa" title="#{bundle['MH091']}">
+							<h:outputText styleClass="pesquisaDireta" />
+							<br />
+							<p:calendar id="idDataInicio" size="8" style="margin-right: 0px;"
+								value="#{mantemRemessaController.dataInicioFiltro}"
+								requiredMessage="#{bundle['requisicao.consulta.data.obrigatorio']}"
+								pattern="dd/MM/yyyy" locale="pt_BR"
+								converter="converter.DataConverter" maxlength="10"
+								onkeyup="maskIt(this,event,'##/##/#####',false,false)"
+								disabled="#{mantemRemessaController.nuRemessa > 0}"
+								validator="validator.DataValidator"
+								validatorMessage="Campo #{bundle['geral.label.dataInicio']} inválido.">
+
+							</p:calendar>
+						</h:outputLabel>
+
+						<!-- DATA FIM -->
+						<h:outputLabel value="#{bundle['geral.label.dataFim']}"
+							styleClass="label-filtro-remessa" title="#{bundle['MH092']}">
+							<br />
+							<p:calendar id="idDataFim" size="8" style="margin-right: 0px;"
+								value="#{mantemRemessaController.dataFimFiltro}"
+								pattern="dd/MM/yyyy" locale="pt_BR"
+								converter="converter.DataConverter" maxlength="10"
+								onkeyup="maskIt(this,event,'##/##/#####',false,false)"
+								disabled="#{mantemRemessaController.nuRemessa > 0}"
+								validator="validator.DataValidator"
+								validatorMessage="Campo #{bundle['geral.label.dataFim']} inválido.">
+							</p:calendar>
+						</h:outputLabel>
+
+						<!-- UNIDADE SOLICITANTE -->
+						<h:outputLabel value="#{bundle['geral.label.unidadeSolicitante']}"
+							styleClass="label-filtro-remessa" title="#{bundle['MH112']}">
+							<br />
+							<h:inputText maxlength="4"
+								value="#{mantemRemessaController.codigoUnidadeFiltro}"
+								style="width: 30px; margin-right: 2px;" id="codigoUnidadeFiltro"
+								onkeypress="return somenteNumero(event)"
+								onchange="overSomenteNumeros(this);"
+								disabled="#{mantemRemessaController.nuRemessa > 0}"
+								styleClass="#{mantemRemessaController.nuRemessa > 0 ? 'input-disabled': ''}">
+								<p:ajax event="change"
+									listener="#{mantemRemessaController.pesquisarUnidadeSolicitante()}"
+									update="nomeUnidadeSolicitante messages"
+									process="codigoUnidadeFiltro" />
+							</h:inputText>
+							<h:inputText maxlength="100" id="nomeUnidadeSolicitante"
+								value="#{mantemRemessaController.nomeUnidadeFiltro}"
+								style="width: 245px; margin-right: 0px; font-size: 12px !important;"
+								disabled="true" styleClass="input-disabled">
+							</h:inputText>
+						</h:outputLabel>
+
+						<!-- SITUAÇÃO DA REMESSA -->
+						<h:outputLabel value="#{bundle['geral.label.situacao']}"
+							styleClass="label-filtro-remessa"
+							title="#{bundle['remessa.mantemremessa.filtro.situacao.hint']}">
+							<br />
+							<h:selectOneMenu id="selectAvaliacao"
+								style="margin-right:2px;  min-width: 120px"
+								disabled="#{mantemRemessaController.nuRemessa > 0}"
+								value="#{mantemRemessaController.situacaoFiltro}"
+								converter="omnifaces.SelectItemsConverter">
+								<f:selectItem itemLabel="PENDENTES" noSelectionOption="true" />
+								<f:selectItems
+									value="#{mantemRemessaController.situacoesRemessaFiltro}"
+									var="situacao" itemValue="#{situacao}"
+									itemLabel="#{situacao.descricao.toUpperCase()}" />
+							</h:selectOneMenu>
+						</h:outputLabel>
+
+						<!-- BASE DA REMESSA -->
+						<h:outputLabel value="#{bundle['base.label.base']}"
+							styleClass="label-filtro-remessa" title="#{bundle['MH118']}"
+							style="margin-right: 0px !important;">
+							<br />
+							<h:selectOneMenu id="selectBase"
+								disabled="#{mantemRemessaController.nuRemessa > 0}"
+								style="width: 100px"
+								value="#{mantemRemessaController.baseFiltro}"
+								converter="omnifaces.SelectItemsConverter">
+								<f:selectItem itemLabel="TODAS" noSelectionOption="true" />
+								<f:selectItems value="#{mantemRemessaController.listaBase}"
+									var="base" itemValue="#{base}" itemLabel="#{base.nome}" />
+							</h:selectOneMenu>
+						</h:outputLabel>
+					</h:panelGrid>
+				</h:panelGrid>
+
+				<p:commandLink title="#{bundle['MH008']}"
+					styleClass="btnAzul marginTop buttonSelected" id="btnLocalizar"
+					actionListener="#{mantemRemessaController.localizar()}"
+					process="formConsulta" update="formConsulta, tabela">
+					<span>#{bundle['geral.button.consultar']}</span>
+					<f:setPropertyActionListener
+						target="#{mantemRemessaController.pesquisaPorNumeroRemessa}"
+						value="true" />
+				</p:commandLink>
+
+				<!-- LIMPAR -->
+				<p:commandLink id="idLimpar" update="formConsulta" process="@this"
+					title="#{bundle['MH012']}" styleClass="btnLaranja marginTopField"
+					actionListener="#{mantemRemessaController.limparFiltro()}">
+					<span>#{bundle['geral.button.limpar']}</span>
+				</p:commandLink>
+
+				<p:commandLink styleClass="btnLaranja marginTop buttonSelected"
+					title="#{bundle['MH010']}" ajax="false"
+					actionListener="#{mantemRemessaController.exportarDatagrid()}"
+					onclick="var myVar = setTimeout(function(){ hideStatus(); clearTimeout(myVar); }, 2000);"
+					id="btnExportar"
+					rendered="#{mantemRemessaController.listaRemessaModel != null and (mantemRemessaController.listaRemessaModel.rowCount > 0)}">
+					<span>#{bundle['geral.button.exportar']}</span>
+				</p:commandLink>
+			</fieldset>
+
+			<!-- ACCORDION -->
+			<h:panelGrid id="pnlAccordion" style="width: 100%"
+				rendered="#{mantemRemessaController.listaRemessaModel != null and (mantemRemessaController.listaRemessaModel.rowCount > 0)}">
+				<f:facet name="header">
+					<table class="header-table-accordion-requisicao"
+						style="border-right: 1px dotted #666; border-left: 1px dotted #666; border-top: 1px dotted #666;">
+						<tr>
+							<!-- NUMERO DA REMESSA -->
+							<td width="125px"
+								style="border-right: 1px dotted #666; min-width: 125px; width: 125px;">
+								<h:outputText
+									value="#{bundle['remessa.mantemremessa.acordion.numCodRemessa']}" />
+							</td>
+							<!-- UNIDADE SOLICITANTE -->
+							<td width="200px"
+								style="border-right: 1px dotted #666; width: 200px; min-width: 200px;">
+								<h:outputText
+									value="#{bundle['geral.label.unidadeSolicitante.maiusculas']}" />
+							</td>
+							<!-- DATA DE ABERTURA -->
+							<td width="100px"
+								style="border-right: 1px dotted #666; min-width: 100px; width: 100px;">
+								<h:outputText
+									value="#{bundle['remessa.mantemremessa.acordion.abertura']}" />
+							</td>
+							<!-- DATA DE AGENDAMENTO DO TRAMITE -->
+							<td
+								style="border-right: 1px dotted #666; width: 100px; min-width: 100px;">
+								<h:outputText
+									value="#{bundle['remessa.mantemremessa.acordion.agendamento']}" />
+							</td>
+							<!-- BASE -->
+							<td width="100px"
+								style="border-right: 1px dotted #666; width: 100px; min-width: 100px;">
+								<h:outputText value="#{bundle['base.label.baseMaiusculas']}" />
+							</td>
+							<!-- SITUAÇÃO DA REMESSA -->
+							<td width="120px"
+								style="border-right: 1px dotted #666; min-width: 120px; width: 120px">
+								<h:outputText
+									value="#{bundle['remessa.mantemremessa.acordion.situacao']}" />
+							</td>
+							<!-- AÇÕES -->
+							<td width="170px"
+								style="border-right: 1px dotted #666; min-width: 170px; width: 170px">
+								<h:outputText value="#{bundle['geral.label.acoes.maiusculas']}" />
+							</td>
+						</tr>
+					</table>
+				</f:facet>
+				<h:column>
+					<div style="width: 100%">
+						<p:dataList id="tabela"
+							value="#{mantemRemessaController.listaRemessaModel}" lazy="true"
+							varStatus="size" var="remessa" type="unordered" itemType="none"
+							paginator="true" rows="10" styleClass="paginated list-style-none"
+							paginatorPosition="bottom"
+							paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+							currentPageReportTemplate="#{bundle['geral.crud.exibindo']} {startRecord} #{bundle['geral.crud.ate']} {endRecord}  #{bundle['geral.crud.de']} {totalRecords}  #{bundle['geral.crud.registros']} "
+							rowsPerPageTemplate="5,10,25,50"
+							emptyMessage="#{bundle['MA010']}">
+
+							<div class="accordion" id="accordion#{size.index}">
+								<!-- accordion do cadastro -->
+								<p:row>
+									<div class="accordion-group">
+										<div class="accordion-heading"
+											style="top: 0px; border-right: 1px dotted #666; border-left: 1px dotted #666; min-height: 44px !important;">
+											<table>
+												<tr>
+													<!-- NUMERO DA REMESSA -->
+													<td width="125px" align="left"
+														style="border-right: 1px dotted #666; min-width: 125px; word-wrap: break-word;">
+														<a class="accordion-toggle tabAcordionSelected collapsed"
+														id="a-collapse#{size.index}" data-toggle="collapse"
+														data-parent="#accordion#{size.index}"
+														href="#collapse#{size.index}">
+															<div style="min-height: 44px;">
+																<div style="padding-top: 12px;">
+																	<span> <h:outputText
+																			style="margin-left:5px; border-right: 1px dotted #666;"
+																			styleClass="icon-expand" />
+																	</span>
+																	<ui:fragment>
+																		<h:outputLabel value="#{remessa.id}"
+																			styleClass="label-accordion"
+																			style="margin-left:25px; font-weight: bold !important;" />
+																	</ui:fragment>
+																	<ui:fragment
+																		rendered="#{remessa.tipoRemessaMoviMentoDiario}">
+																		<h:outputLabel value=" / #{remessa.codigoRemessaTipoC}"
+																			styleClass="label-accordion"
+																			style="font-weight: bold !important;" />
+																	</ui:fragment>
+																</div>
+															</div>
+													</a>
+													</td>
+													<!-- UNIDADE SOLICITANTE -->
+													<td width="200px" align="center"
+														style="border-right: 1px dotted #666; width: 150px; min-width: 200px; max-width: 200px; min-height: 34px; word-wrap: break-word;">
+														<div align="left">
+															<h:outputLabel
+																value="#{remessa.unidadeSolicitante.descricaoCompleta}"
+																title="#{remessa.unidadeSolicitante.descricaoCompleta}"
+																styleClass="label-accordion-sem-link" />
+														</div>
+													</td>
+													<!-- DATA DE ABERTURA -->
+													<td width="100px" align="center"
+														style="border-right: 1px dotted #666; width: 100px; min-width: 100px; word-wrap: break-word;">
+														<h:outputLabel style="margin-top:0px;"
+															value="#{remessa.dataHoraAberturaFormatada}"
+															styleClass="label-accordion-sem-link" />
+													</td>
+													<!-- DATA DE AGENDAMENTO -->
+													<td align="center"
+														style="border-right: 1px dotted #666; width: 100px; min-width: 100px; min-height: 36px; word-wrap: break-word;">
+														<h:outputLabel
+															value="#{remessa.dataAgendamentoFormatada != null ? remessa.dataAgendamentoFormatada : '--' }"
+															styleClass="label-accordion-sem-link" />
+													</td>
+													<!-- BASE -->
+													<td width="100px" align="center"
+														style="border-right: 1px dotted #666; width: 100px; min-width: 100px; max-width: 100px; min-height: 34px; word-wrap: break-word;">
+														<h:outputLabel
+															value="#{remessa.empresaContrato.base.nome}"
+															styleClass="label-accordion-sem-link" />
+													</td>
+													<!-- SITUAÇÃO DA REMESSA -->
+													<td width="120px"
+														style="text-align: center; border-right: 1px dotted #666; width: 120px; min-width: 120px; max-width: 120px; min-height: 34px; word-wrap: break-word;">
+														<h:outputLabel
+															value="#{remessa.tramiteRemessaAtual.situacao.nome.toUpperCase()}"
+															styleClass="label-accordion-sem-link"
+															rendered="#{mantemRemessaController.exibirDemaisSituacoesRemessa(remessa)}">
+														</h:outputLabel> <!-- REMESSA SITUACAO EM DISPUTA PARA USUÁRIOS QUE NÃO SÃO GESTORES -->
+														<h:outputLabel
+															value="#{remessa.tramiteRemessaAtual.situacao.nome.toUpperCase()}"
+															styleClass="label-accordion-sem-link"
+															rendered="#{mantemRemessaController.exibirSituacaoEmDisputaUsuarioComum(remessa)}">
+														</h:outputLabel> <!-- REMESSA SITUACAO ALTERADA  --> <p:commandLink
+															rendered="#{mantemRemessaController.exibirSituacaoAlterada(remessa)}"
+															title="#{bundle['MH142']}"
+															value="#{remessa.tramiteRemessaAtual.situacao.nome.toUpperCase()}"
+															actionListener="#{mantemRemessaController.prepararAcao(remessa)}"
+															update=":modalAcoesRemessaId, :formAcaoRemessa"
+															styleClass="label-link-situacao #{remessa.tramiteRemessaAtual.situacao.id == 9 ? 'pintaFonteVermelha' : ''}">
+														</p:commandLink> <!-- REMESSA SITUACAO EM DISPUTA  --> <p:commandLink
+															rendered="#{mantemRemessaController.exibirSituacaoEmDisputa(remessa)}"
+															title="#{bundle['MH143']}"
+															value="#{remessa.tramiteRemessaAtual.situacao.nome.toUpperCase()}"
+															actionListener="#{mantemRemessaController.prepararAcao(remessa)}"
+															update=":modalAcoesRemessaId, :formAcaoRemessa"
+															styleClass="label-link-situacao #{remessa.tramiteRemessaAtual.situacao.id == 9 ? 'pintaFonteVermelha' : ''}">
+														</p:commandLink> <!-- BLOQUEAR REMESSA ABERTA  --> <p:commandLink
+															rendered="#{mantemRemessaController.exibirSituacaoAberta(remessa)}"
+															title="#{bundle['MH079']}"
+															value="#{remessa.tramiteRemessaAtual.situacao.nome.toUpperCase()}"
+															actionListener="#{mantemRemessaController.preparaBloqueioRemessa(remessa)}"
+															update=":modalBloqueioId, :formBloqueioRemessa"
+															styleClass="label-link-situacao">
+														</p:commandLink> <!-- DESBLOQUEAR REMESSA BLOQUEADA  --> <p:commandLink
+															rendered="#{mantemRemessaController.exibirSituacaoBloqueada(remessa)}"
+															title="#{bundle['MH081']}"
+															value="#{remessa.tramiteRemessaAtual.situacao.nome.toUpperCase()}"
+															actionListener="#{mantemRemessaController.preparaDesbloqueioRemessa(remessa)}"
+															update=":modalDesbloqueioId, :formDesbloqueioRemessa"
+															styleClass="label-link-situacao">
+														</p:commandLink> <!-- FECHAR REMESSA INCONSISTENTE  --> <p:commandLink
+															rendered="#{mantemRemessaController.exibirSituacaoInvalida(remessa)}"
+															title="#{bundle['MH083']}"
+															value="#{remessa.tramiteRemessaAtual.situacao.nome.toUpperCase()}"
+															actionListener="#{mantemRemessaController.preparaFechamentoRemessaInvalida(remessa)}"
+															update=":modalFechamentoId, :formFechamentoRemessa"
+															styleClass="label-link-situacao">
+														</p:commandLink>
+													</td>
+													<!-- AÇÕES -->
+													<td width="170px" align="center"
+														style="border-right: 1px dotted #666; width: 170px; min-width: 170px; max-width: 170px; min-height: 34px; word-wrap: break-word;">
+														<!-- EDITAR -->
+															<p:commandLink id="idEditarRemessa"
+																rendered="#{mantemRemessaController.exibirEditarRemessa(remessa)}"
+																actionListener="#{mantemRemessaController.editarRemessa(remessa)}"
+																update=":formConsulta:messages"
+																title="#{bundle['MH075']}"
+																style="text-decoration: none;">
+																<span class="fa fa-pencil fa-2x corAzulIcone fa-fw"></span>
+															</p:commandLink>
+														 <!-- TERMO DE RESPONSABILIDADE -->
+														 <ui:fragment rendered="#{!remessa.tipoRemessaMoviMentoDiario}">
+																<p:commandLink id="idGeraTermo"
+																	ajax="false" title="#{bundle['MH100']}"
+																	onclick="PrimeFaces.monitorDownload(showStatus, hideStatus)"
+																	update=":formConsulta:messages"
+																	style="text-decoration: none;"
+																	rendered="#{mantemRemessaController.exibirBotaoTermoCapaLote(remessa)}">
+																	<span class="fa fa-file-pdf-o fa-2x corAzulIcone fa-fw"></span>
+																	<p:fileDownload
+																		value="#{mantemRemessaController.gerarTermoResponsabilidade(remessa)}" />
+																</p:commandLink>
+														</ui:fragment> 
+														<!-- ETIQUETA DE MOVIMENTO REMESSA AB  -->
+														<ui:fragment rendered="#{!remessa.tipoRemessaMoviMentoDiario}">
+																<p:commandLink id="idGeraEtiquetaAB"
+																	ajax="false" title="#{bundle['MH074']}"
+																	onclick="PrimeFaces.monitorDownload(showStatus, hideStatus)"
+																	update=":formConsulta:messages"
+																	style="text-decoration: none;"
+																	rendered="#{mantemRemessaController.exibirBotaoTermoCapaLote(remessa)}">
+																	<p:fileDownload
+																		value="#{mantemRemessaController.gerarEtiquetaDocumentoAB(remessa)}" />
+																		<span class="fa fa-tags fa-2x corAzulIcone fa-fw"></span>
+																</p:commandLink>
+														</ui:fragment>
+														<!-- ETIQUETA DE MOVIMENTO DIÁRIO  --> 
+														<ui:fragment rendered="#{remessa.tipoRemessaMoviMentoDiario}">
+																<p:commandLink id="idGeraEtiquetaC"
+																	ajax="false" title="#{bundle['MH074']}"
+																	onclick="PrimeFaces.monitorDownload(showStatus, hideStatus)"
+																	update=":formConsulta:messages"
+																	style="text-decoration: none;"
+																	rendered="#{mantemRemessaController.exibirBotaoTermoCapaLote(remessa)}">
+																	<p:fileDownload
+																		value="#{mantemRemessaController.gerarEtiquetaMovimentoDiario(remessa)}"/>
+																		<span class="fa fa-tags fa-2x corAzulIcone fa-fw"></span>
+																</p:commandLink>
+														</ui:fragment>
+														<!-- CLONAR REMESSA -->
+															<p:commandLink id="idClonar"
+																update="@(.ui-dialog),:modalClonarId"
+																style="margin-top: -12px !important; text-decoration: none;"
+																actionListener="#{mantemRemessaController.preparaClonarRemessa(remessa)}"
+																rendered="#{mantemRemessaController.exibirBotaoClonarRemessa(remessa)}"
+																title="Clique aqui para clonar a remessa">
+																<span class="fa fa-copy fa-2x corAzulIcone fa-fw"></span>
+															</p:commandLink>
+														 <!-- HISTÓRICO DA REMESSA -->
+															<p:commandLink id="idHistorico" 
+																style="margin-top: -12px !important; text-decoration: none;"
+																actionListener="#{mantemRemessaController.verHistoricoRemessa(remessa)}"
+																update="@(.ui-dialog),:modalHistoricoId,:formHistorico"
+																title="#{bundle['MH067']}">
+																<i class="fa fa-info-circle fa-2x corAzulIcone fa-fw"></i>
+															</p:commandLink>
+													</td>
+												</tr>
+											</table>
+										</div>
+
+										<div id="collapse#{size.index}"
+											class="accordion-body collapse">
+											<div class="accordion-inner"
+												style="border-right: 1px dotted #666 !important; border-left: 1px dotted #666 !important;">
+												<h:panelGrid
+													style=" margin-top: -2px; margin-bottom: -2px; margin-left: -2px; width:100%;">
+
+													<!-- REMESSA DE DOCUMENTOS A-B -->
+													<ui:fragment
+														rendered="#{!remessa.tipoRemessaMoviMentoDiario}">
+														<p:dataTable id="dataTableCadastro" var="docAB"
+															style="margin-right: -4px !important;"
+															sortBy="codigoRemessa" widgetVar="remessaDocumento"
+															rowIndexVar="rowIx"
+															value="#{remessa.remessaDocumentosTratados()}"
+															styleClass="estilo-border-dotted" rowSelectMode="single"
+															emptyMessage="Nenhum registro correspondente encontrado"
+															rowStyleClass="#{empty rowIx or rowIx mod 2 ne 0 ? 'even-row' : 'odd-row'}">
+
+															<!-- CAIXA ARQUIVO -->
+															<p:column
+																style="text-align:center; border-left: 1px dotted #666 !important; width: 45px !important;"
+																styleClass="totalColetas">
+																<f:facet name="header">
+																	<h:outputLabel
+																		value="#{bundle['geral.label.caixaArquivo']}"
+																		style="color: white;" />
+																</f:facet>
+																<p:commandLink id="idItem"
+																	update="@(.ui-dialog),:modalRemessaDocumentoID"
+																	actionListener="#{mantemRemessaController.visualizarRemessaDocumento(docAB)}">
+																	<span><h:outputText
+																			value="#{docAB.codigoRemessa}"
+																			style="font-weight: bold !important;"
+																			styleClass="#{docAB.icAlteracaoValida.value == 2 ? 'pintaFonteVermelha' : ''}" /></span>
+																</p:commandLink>
+															</p:column>
+
+															<!-- UNIDADE GERADORA -->
+															<p:column
+																style="border-left: 1px dotted #666 !important; width: 130px !important;"
+																styleClass="celulaConsulta">
+																<f:facet name="header">
+																	<h:outputText style="color: white; text-align:center;"
+																		value="#{bundle['geral.label.unidadeGeradora.maiusculas']}" />
+																</f:facet>
+																<h:outputText
+																	styleClass="#{docAB.icAlteracaoValida.value == 2 ? 'pintaFonteVermelha' : ''}"
+																	value="#{docAB.unidadeGeradora.descricaoCompleta}"
+																	style="overflow:hidden; " />
+															</p:column>
+
+															<!-- DOCUMENTO -->
+															<p:column
+																style="border-left: 1px dotted #666 !important; width: 120px !important;"
+																styleClass="celulaConsulta">
+																<f:facet name="header">
+																	<h:outputText style="color: white; text-align:center;"
+																		value="#{bundle['geral.label.documento.maiusculas']}" />
+																</f:facet>
+																<div>
+																	<h:outputText
+																		styleClass="#{docAB.icAlteracaoValida.value == 2 ? 'pintaFonteVermelha' : ''}"
+																		value="#{docAB.documento.nome}"
+																		style="overflow:hidden; text-align:left;" />
+																</div>
+															</p:column>
+
+															<!-- DATA DE GERAÇÃO / PERÍODO -->
+															<p:column
+																style="text-align:center; border-left: 1px dotted #666 !important; width: 120px !important;"
+																styleClass="celulaConsulta">
+																<f:facet name="header">
+																	<h:outputText style="color: white;"
+																		value="#{bundle['geral.label.dataGeracaoPeriodo']}" />
+																</f:facet>
+																<div>
+																	<h:outputText
+																		styleClass="#{docAB.icAlteracaoValida.value == 2 ? 'pintaFonteVermelha' : ''}"
+																		value="#{docAB.dataGeracaoPeriodoFormatado}"
+																		style="overflow:hidden;" />
+																</div>
+															</p:column>
+
+															<!-- GERAR CAPA DE LOTE -->
+															<p:column exportable="false"
+																styleClass="totalColetas center"
+																style="text-align:center; width: 74px !important; border-left: 1px dotted #666 !important;">
+																<f:facet name="header">
+																	<h:outputText value="AÇÕES" style="color: #FFF;" />
+																</f:facet>
+																<h:outputLabel style="margin-left: -115px;"
+																	title="#{bundle['MH139']}"
+																	rendered="#{mantemRemessaController.exibirBotaoAlteracao(docAB)}">
+																	<span class="fa fa-exclamation-triangle fa-2x "
+																		style="color: red"></span>
+																</h:outputLabel>
+																<!-- ETIQUETA DE MOVIMENTO REMESSA AB - ITEM  -->
+																<div
+																	style="float: left; margin-left: 50% !important; margin-top: 10px !important;">
+																	<p:commandLink id="idGeraEtiquetaABItem"
+																		ajax="false"
+																		title="#{bundle['MH074']}"
+																		onclick="PrimeFaces.monitorDownload(showStatus, hideStatus)"
+																		update=":formConsulta:messages"
+																		rendered="#{mantemRemessaController.exibirBotaoTermoCapaLote(docAB.remessa)}">
+																		<p:fileDownload
+																			value="#{mantemRemessaController.gerarEtiquetaDocumentoABIndividual(docAB)}" />
+																			<span class="fa fa-tags fa-2x corAzulIcone"></span>
+																	</p:commandLink>
+																</div>
+															</p:column>
+
+															<p:columnGroup type="footer">
+																<p:row>
+																	<p:column colspan="6" styleClass="footerAccordion"
+																		style="background: #808080 !important;" />
+																</p:row>
+															</p:columnGroup>
+														</p:dataTable>
+													</ui:fragment>
+
+													<!-- REMESSA DE DOCUMENTOS C -->
+													<ui:fragment
+														rendered="#{remessa.tipoRemessaMoviMentoDiario}">
+														<p:dataTable id="dtMovDiario" var="itemDiario"
+															style="margin-right: -4px !important;"
+															sortBy="dataMovimento" widgetVar="remessaDocumentoDiario"
+															rowIndexVar="rowIx" value="#{remessa.remessaDTOTratado()}"
+															styleClass="estilo-border-dotted" rowSelectMode="single"
+															emptyMessage="Nenhum registro correspondente encontrado"
+															rowStyleClass="#{empty rowIx or rowIx mod 2 ne 0 ? 'even-row' : 'odd-row'}">
+
+															<!-- DATA MOVIMENTO DIARIO -->
+															<p:column
+																style="text-align:center; border-left: 1px dotted #666 !important; width: 70px !important;"
+																styleClass="celulaConsulta">
+																<f:facet name="header">
+																	<h:outputText style="color: white;"
+																		value="#{bundle['geral.label.dataGeracaoDiario']}" />
+																</f:facet>
+																<p:commandLink id="idItem"
+																	update="@(.ui-dialog),:modalDetalharRemessaDocumentoID"
+																	actionListener="#{mantemRemessaController.visualizarRemessaDocumentoMovimentoDiario(itemDiario)}">
+																	<div style="height: 100%; width: 100%;">
+																		<span><h:outputText
+																				value="#{itemDiario.dataFormatada}"
+																				style="overflow:hidden;"
+																				styleClass="#{itemDiario.remessaMovimentoAlterado() ? 'pintaFonteVermelha' : ''}
+																				#{itemDiario.remessaMovimentoAdicionado() ? 'pintaFonteVerde' : ''}" /></span>
+																	</div>
+																</p:commandLink>
+															</p:column>
+
+
+															<!-- UNIDADE GERADORA -->
+															<p:column
+																style="border-left: 1px dotted #666 !important; width: 150px !important;"
+																styleClass="celulaConsulta">
+																<f:facet name="header">
+																	<h:outputText style="color: white;"
+																		value="#{bundle['geral.label.unidadeGeradora.maiusculas']}" />
+																</f:facet>
+																<h:outputText value="#{itemDiario.nomeUnidadeFormatada}"
+																	style="overflow:hidden;"
+																	styleClass="#{itemDiario.remessaMovimentoAlterado() ? 'pintaFonteVermelha' : ''}
+																	#{itemDiario.remessaMovimentoAdicionado() ? 'pintaFonteVerde' : ''}" />
+															</p:column>
+
+															<!-- Número de terminais -->
+															<p:column exportable="false"
+																styleClass="totalColetas center"
+																style="text-align:center; width: 74px !important; border-left: 1px dotted #666 !important;">
+																<f:facet name="header">
+																	<h:outputText
+																		value="#{bundle['remessa.headerGrid.numeroTerminais']}"
+																		style="color: #FFF;" />
+																</f:facet>
+																<div>
+																<h:outputLabel style="float: left;"
+																	title="#{bundle['MH139']}"
+																	rendered="#{mantemRemessaController.exibirBotaoAlteracaoTipoC(itemDiario)}">
+																	<span class="fa fa-exclamation-triangle fa-2x "
+																		style="color: red"></span>
+																</h:outputLabel>
+																</div>
+																<div>
+																<h:outputLabel style="float: left;"
+																	title="#{bundle['MH145']}"
+																	rendered="#{mantemRemessaController.exibirBotaoAdicaoTipoC(itemDiario)}">
+																	<span class="fa fa-plus-circle fa-2x "
+																		style="color: green"></span>
+																</h:outputLabel>
+																</div>
+																<h:outputText
+																	value="#{itemDiario.tamanhoRemessaTratada()}"
+																	style="overflow:hidden;"
+																	styleClass="#{itemDiario.remessaMovimentoAlterado() ? 'pintaFonteVermelha' : ''}
+																	#{itemDiario.remessaMovimentoAdicionado() ? 'pintaFonteVerde' : ''}" />
+															</p:column>
+
+															<p:columnGroup type="footer">
+																<p:row>
+																	<p:column colspan="6" styleClass="footerAccordion"
+																		style="background: #808080 !important;" />
+																</p:row>
+															</p:columnGroup>
+														</p:dataTable>
+													</ui:fragment>
+												</h:panelGrid>
+											</div>
+										</div>
+									</div>
+								</p:row>
+							</div>
+						</p:dataList>
+					</div>
+				</h:column>
+			</h:panelGrid>
+		</h:form>
+
+		<!-- MODAL HISTORICO -->
+		<p:dialog
+			header="#{bundle['remessa.mantemremessa.header.modalHistorico']} #{mantemRemessaController.remessa.id}"
+			closable="true" id="modalHistoricoId" widgetVar="modalHistorico"
+			width="600" minHeight="190" styleClass="ui-dialog-background"
+			modal="true" resizable="false" position="center"
+			onHide="giveFocusRemote();">
+			<h:form id="formHistorico">
+				<h:panelGrid id="gridDataTable" columns="1" width="100%">
+					<p:dataTable id="dataTable" var="tramite"
+						widgetVar="historicoRemessa"
+						value="#{mantemRemessaController.listaTramitesRemessa}"
+						paginatorPosition="bottom" styleClass="estilo-border-dotted zebr"
+						rowSelectMode="single" rowIndexVar="rowIx"
+						emptyMessage="Nenhum registro correspondente encontrado"
+						filteredValue="#{mantemRemessaController.filtredListaTramitesRemessa}"
+						paginator="true" rows="10" paginatorAlwaysVisible="true"
+						paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+						currentPageReportTemplate="Exibindo {startRecord} até {endRecord} de {totalRecords} registros "
+						rowStyleClass="#{empty rowIx or rowIx mod 2 ne 0 ? 'even-row' : 'odd-row'}">
+
+						<p:column sortBy="#{tramite.situacao.nome}"
+							filterBy="#{tramite.situacao.nome}"
+							filterStyle="display:none; visibility:hidden;"
+							style="text-align:left; width: 0px;"
+							styleClass="noBackGroundImage" width="20%">
+							<f:facet name="header">
+								<h:outputText
+									value="#{bundle['remessa.mantemremessa.modalHistorico.evento']}" />
+							</f:facet>
+							<h:outputText value="#{tramite.situacao.nome.toUpperCase()}">
+							</h:outputText>
+						</p:column>
+						<p:column sortBy="#{tramite.dataTramiteRemessaFormatada}"
+							filterBy="#{tramite.dataTramiteRemessaFormatada}"
+							filterStyle="display:none; visibility:hidden;"
+							style="text-align:center; width: 0px;"
+							styleClass="noBackGroundImage" width="22%">
+							<f:facet name="header">
+								<h:outputText
+									value="#{bundle['geral.label.dataHora.maiusculas']}" />
+							</f:facet>
+							<h:outputText value="#{tramite.dataTramiteRemessaFormatada}">
+							</h:outputText>
+						</p:column>
+						<!-- USUÁRIO -->
+						<p:column sortBy="#{tramite.codigoUsuario}"
+							filterBy="#{tramite.codigoUsuario}"
+							filterStyle="display:none; visibility:hidden;"
+							style="text-align:left; width: 0px;"
+							styleClass="noBackGroundImage" width="18%">
+							<f:facet name="header">
+								<h:outputText
+									value="#{bundle['geral.label.usuario.maiusculas']}" />
+							</f:facet>
+							<h:outputText value="#{tramite.codigoUsuario}">
+							</h:outputText>
+						</p:column>
+						<!-- OBSERVAÇÃO -->
+						<p:column sortBy="#{tramite.observacao}"
+							filterBy="#{tramite.observacao}"
+							filterStyle="display:none; visibility:hidden;"
+							style="text-align:left; width: 0px;"
+							styleClass="noBackGroundImage" width="40%">
+							<f:facet name="header">
+								<h:outputText
+									value="#{bundle['remessa.mantemremessa.modalHistorico.observacao']}" />
+							</f:facet>
+							<h:outputLabel value="--"
+								rendered="#{tramite.observacao == null}">
+							</h:outputLabel>
+							<h:outputText rendered="#{tramite.observacao != null}"
+								value="#{tramite.observacao}">
+							</h:outputText>
+						</p:column>
+					</p:dataTable>
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+		<!--  BLOQUEIO DE REMESSA  -->
+		<p:dialog
+			header="#{bundle['remessa.mantemremessa.bloqueio.header.parte1']} #{mantemRemessaController.remessa.id} - #{bundle['remessa.mantemremessa.bloqueio.header.parte2']} #{mantemRemessaController.remessa.tramiteRemessaAtual.situacao.nome}"
+			id="modalBloqueioId" widgetVar="modalBloqueio"
+			styleClass="ui-dialog-background" modal="true" dynamic="true"
+			resizable="false" position="center" onHide="giveFocusRemote();">
+			<h:form id="formBloqueioRemessa">
+				<p:messages id="mdlMessageBloqueio" />
+				<h:panelGrid columns="1" id="modalPainelBloqueio">
+					<h:outputLabel value="#{bundle['geral.label.usuario']}"
+						styleClass="label-button">
+						<br />
+						<p:inputMask id="j_username"
+							style="width: 150px; text-align:left;" disabled="true"
+							value="#{mantemRemessaController.tramiteRemessaVO.codigoUsuario}"
+							placeHolder="">
+						</p:inputMask>
+					</h:outputLabel>
+					<h:outputLabel
+						value="#{bundle['remessa.mantemremessa.bloqueio.label.motivo']}"
+						styleClass="label-button">
+						<h:outputText value="" styleClass="pesquisaDireta" />
+						<br />
+						<p:inputTextarea required="true"
+							title="#{bundle['remessa.mantemremessa.bloqueio.label.motivo']}"
+							style="text-align: left; white-space: pre-wrap;"
+							requiredMessage="#{mantemRemessaController.getRequiredMessage('remessa.mantemremessa.bloqueio.label.motivo')}"
+							value="#{mantemRemessaController.tramiteRemessaVO.observacao}"
+							onchange="limitarTextArea(this,200)"
+							onmouseout="limitarTextArea(this,200)"
+							onkeyup="limitarTextArea(this,200)" maxlength="200" cols="90"
+							rows="8">
+						</p:inputTextarea>
+					</h:outputLabel>
+				</h:panelGrid>
+				<br />
+
+				<p:commandLink id="btnConfirmar"
+					styleClass="btnAzul marginTop buttonSelected"
+					process=":formBloqueioRemessa" update="mdlMessageBloqueio"
+					actionListener="#{mantemRemessaController.gravarBloqueioRemessa()}">
+					<span><h:outputText style="width: 1; height: 1;"
+							title="#{bundle['MH080']}"
+							value="#{bundle['geral.button.remessa.bloquear']}" /></span>
+				</p:commandLink>
+				<p:commandLink id="btnNaoConfirmar"
+					styleClass="btnLaranja marginTop buttonSelected"
+					oncomplete="modalBloqueio.hide()">
+					<span><h:outputText style="width: 1; height: 1;"
+							title="#{bundle['MH013']}" value="#{bundle['MI010']}" /></span>
+				</p:commandLink>
+				<p:spacer height="30px" />
+			</h:form>
+		</p:dialog>
+
+		<!-- ALTERADA/EM DISPUTA  -->
+		<p:dialog
+			header="#{bundle['geral.label.remessa']} #{mantemRemessaController.remessa.id} - #{bundle['geral.label.situacaoAtual']} #{mantemRemessaController.remessa.tramiteRemessaAtual.situacao.nome}"
+			id="modalAcoesRemessaId" widgetVar="modalAcoesRemessa"
+			styleClass="ui-dialog-background" modal="true" dynamic="true"
+			width="600px" draggable="true" resizable="false" position="center"
+			onHide="giveFocusRemote();">
+			<h:form id="formAcaoRemessa">
+				<p:messages id="messagesAcao" />
+				<h:panelGrid columns="2" id="modalPainelAcao">
+
+					<!-- AÇÃO -->
+					<h:outputLabel value="#{bundle['geral.label.acoes']}"
+						styleClass="label-button">
+						<h:outputText styleClass="pesquisaDireta" />
+						<br />
+						<h:selectOneMenu id="selectAcao"
+							style="margin-right:2px;  width: 205px"
+							value="#{mantemRemessaController.acaoRemessa}">
+							<f:selectItem itemLabel="Selecione" noSelectionOption="true" />
+							<f:selectItems
+								value="#{mantemRemessaController.listaAcaoRemessa}" var="acao"
+								itemValue="#{acao}" itemLabel="#{acao}" />
+						</h:selectOneMenu>
+
+					</h:outputLabel>
+
+				</h:panelGrid>
+
+				<!-- OBSERVAÇÃO	 -->
+				<h:outputLabel value="#{bundle['requisicao.label.observacao']}"
+					styleClass="label-button">
+					<br />
+					<p:inputTextarea
+						value="#{mantemRemessaController.tramiteRemessaVO.observacao}"
+						style="text-align: left; white-space: pre-wrap;"
+						onchange="limitarTextArea(this,200)"
+						onmouseout="limitarTextArea(this,200)"
+						onkeyup="limitarTextArea(this,200)" maxlength="200" cols="90"
+						rows="8">
+					</p:inputTextarea>
+				</h:outputLabel>
+
+				<!-- QUEBRA DE LINHA ANTES DOS BOTÕES -->
+				<p:spacer style="width: 300px !important; height: 5px !important;"></p:spacer>
+
+				<p:commandLink id="btnConfirmarAcao"
+					styleClass="btnAzul marginTop buttonSelected" update="messagesAcao"
+					actionListener="#{mantemRemessaController.definirSituacaoTramite()}"
+					oncomplete="modalAcoesRemessa.hide()">
+					<span><h:outputText style="width: 1; height: 1;"
+							title="#{bundle['MH011']}"
+							value="#{bundle['geral.button.gravar']}" /></span>
+				</p:commandLink>
+
+				<p:commandLink id="btnNaoConfirmarAcao"
+					styleClass="btnLaranja marginTop buttonSelected"
+					oncomplete="modalAcoesRemessa.hide()">
+					<span><h:outputText style="width: 1; height: 1;"
+							title="#{bundle['MH013']}" value="#{bundle['MI010']}" /></span>
+				</p:commandLink>
+				<p:spacer height="30px" />
+
+			</h:form>
+		</p:dialog>
+
+		<!--  DESBLOQUEIO DE REMESSA  -->
+		<p:dialog
+			header="#{bundle['remessa.mantemremessa.desbloqueio.header.parte1']} #{mantemRemessaController.remessa.id} - #{bundle['remessa.mantemremessa.bloqueio.header.parte2']} #{mantemRemessaController.remessa.tramiteRemessaAtual.situacao.nome}"
+			id="modalDesbloqueioId" widgetVar="modalDesbloqueio"
+			styleClass="ui-dialog-background" modal="true" dynamic="true"
+			resizable="false" position="center" onHide="giveFocusRemote();">
+			<h:form id="formDesbloqueioRemessa">
+				<p:messages id="mdlMessageDesbloqueio" />
+				<h:panelGrid columns="1" id="modalPainelDesbloqueio">
+					<h:outputLabel value="#{bundle['geral.label.usuario']}"
+						styleClass="label-button">
+						<br />
+						<p:inputMask id="j_username"
+							style="width: 150px; text-align:left;" disabled="true"
+							value="#{mantemRemessaController.tramiteRemessaVO.codigoUsuario}"
+							placeHolder="">
+						</p:inputMask>
+					</h:outputLabel>
+					<!-- MOTIVO BLOQUEIO -->
+					<h:outputLabel
+						value="#{bundle['remessa.mantemremessa.bloqueio.label.motivo']}"
+						styleClass="label-button">
+						<br />
+						<p:inputTextarea
+							value="#{mantemRemessaController.tramiteRemessaVO.observacao}"
+							disabled="true" cols="90" rows="8"
+							style="text-align: left; white-space: pre-wrap;" maxlength="200">
+						</p:inputTextarea>
+					</h:outputLabel>
+					<!-- DATA HORA -->
+					<h:outputLabel
+						value="#{bundle['geral.label.dataHora']} #{mantemRemessaController.tramiteRemessaVO.dataTramiteRemessaFormatada}"
+						styleClass="label-button">
+					</h:outputLabel>
+				</h:panelGrid>
+
+				<p:commandLink id="btnConfirmar"
+					styleClass="btnAzul marginTop buttonSelected"
+					update="mdlMessageDesbloqueio"
+					actionListener="#{mantemRemessaController.gravarDesbloqueioRemessa()}">
+					<span><h:outputText style="width: 1; height: 1;"
+							title="#{bundle['MH082']}"
+							value="#{bundle['geral.button.remessa.desbloquear']}" /></span>
+				</p:commandLink>
+				<p:commandLink id="btnNaoConfirmar"
+					oncomplete="modalDesbloqueio.hide()"
+					styleClass="btnLaranja marginTop buttonSelected">
+					<span><h:outputText style="width: 1; height: 1;"
+							title="#{bundle['MH013']}" value="#{bundle['MI010']}" /></span>
+				</p:commandLink>
+				<p:spacer height="30px" />
+			</h:form>
+		</p:dialog>
+
+		<!--  CORREÇÃO DE REMESSA  -->
+		<p:dialog
+			header="#{bundle['remessa.mantemremessa.correcao.header.parte1']} #{mantemRemessaController.remessa.id} - #{bundle['remessa.mantemremessa.correcao.header.parte2']} #{mantemRemessaController.remessa.tramiteRemessaAtual.situacao.nome}"
+			id="modalCorrecaoId" widgetVar="modalCorrecao"
+			styleClass="ui-dialog-background" modal="true" dynamic="true"
+			resizable="false" position="center" onHide="giveFocusRemote();">
+			<h:form id="formCorrecaoRemessa">
+				<p:messages id="messagesCorrecao" />
+				<h:panelGrid columns="1" id="modalPainelCorrecao">
+					<h:outputLabel value="#{bundle['geral.label.usuario']}"
+						styleClass="label-button">
+						<br />
+						<p:inputMask id="j_username"
+							style="width: 150px; text-align:left;" disabled="true"
+							value="#{mantemRemessaController.tramiteRemessaVO.codigoUsuario}"
+							placeHolder="">
+						</p:inputMask>
+					</h:outputLabel>
+					<!-- MOTIVO DEVOLUÇÃO -->
+					<h:outputLabel
+						value="#{bundle['remessa.mantemremessa.correcao.label.motivo']}"
+						styleClass="label-button">
+						<br />
+						<p:inputTextarea
+							value="#{mantemRemessaController.tramiteRemessaVO.observacao}"
+							style="text-align: left; white-space: pre-wrap;" disabled="true"
+							cols="90" rows="8" maxlength="200">
+						</p:inputTextarea>
+					</h:outputLabel>
+					<!-- DATA HORA -->
+					<h:outputLabel
+						value="#{bundle['geral.label.dataHora']} #{mantemRemessaController.tramiteRemessaVO.dataTramiteRemessaFormatada}"
+						styleClass="label-button">
+					</h:outputLabel>
+				</h:panelGrid>
+
+				<p:commandLink id="btnConfirmar"
+					styleClass="btnAzul marginTop buttonSelected"
+					update="messagesCorrecao"
+					actionListener="#{mantemRemessaController.corrigirRemessa()}">
+					<span><h:outputText style="width: 1; height: 1;"
+							title="#{bundle['MH078']}"
+							value="#{bundle['geral.button.remessa.corrigir']}" /></span>
+				</p:commandLink>
+				<p:commandLink id="btnNaoConfirmar"
+					styleClass="btnLaranja marginTop buttonSelected"
+					oncomplete="modalCorrecao.hide()">
+					<span><h:outputText style="width: 1; height: 1;"
+							title="#{bundle['MH013']}" value="#{bundle['MI010']}" /></span>
+				</p:commandLink>
+				<p:spacer height="30px" />
+			</h:form>
+		</p:dialog>
+
+		<!-- FECHAMENTO DE REMESSA INCONSISTENTE -->
+		<p:dialog
+			header="#{bundle['remessa.mantemremessa.fechamento.header.parte1']} #{mantemRemessaController.remessa.id} - #{bundle['remessa.mantemremessa.bloqueio.header.parte2']} #{mantemRemessaController.remessa.tramiteRemessaAtual.situacao.nome}"
+			id="modalFechamentoId" widgetVar="modalFechamento"
+			styleClass="ui-dialog-background" modal="true" dynamic="true"
+			resizable="false" position="center" onHide="giveFocusRemote();">
+			<h:form id="formFechamentoRemessa">
+				<p:messages id="mdlMessageFechamento" />
+				<h:panelGrid columns="1" id="modalPainelFechamento">
+					<h:outputLabel value="#{bundle['geral.label.usuario']}"
+						styleClass="label-button">
+						<br />
+						<p:inputMask id="j_username"
+							style="width: 150px; text-align:left;" disabled="true"
+							value="#{mantemRemessaController.tramiteRemessaVO.codigoUsuario}"
+							placeHolder="">
+						</p:inputMask>
+					</h:outputLabel>
+					<!-- MOTIVO BLOQUEIO -->
+					<h:outputLabel
+						value="#{bundle['remessa.mantemremessa.fechamento.label.motivo']}"
+						styleClass="label-button">
+						<br />
+						<p:inputTextarea
+							value="#{mantemRemessaController.tramiteRemessaVO.observacao}"
+							style="text-align: left; white-space: pre-wrap;" disabled="true"
+							cols="90" rows="8" maxlength="200">
+						</p:inputTextarea>
+					</h:outputLabel>
+					<!-- DATA HORA -->
+					<h:outputLabel
+						value="#{bundle['geral.label.dataHora']} #{mantemRemessaController.tramiteRemessaVO.dataTramiteRemessaFormatada}"
+						styleClass="label-button">
+					</h:outputLabel>
+				</h:panelGrid>
+
+				<!-- FECHAR REMESSA -->
+				<p:commandLink id="btnConfirmar"
+					styleClass="btnAzul marginTop buttonSelected"
+					update="mdlMessageFechamento"
+					actionListener="#{mantemRemessaController.gravarFechamentoRemessaInconsistente()}">
+					<span><h:outputText style="width: 1; height: 1;"
+							title="#{bundle['MH084']}"
+							value="#{bundle['geral.button.remessa.fechar']}" /></span>
+				</p:commandLink>
+				<!-- CANCELAR -->
+				<p:commandLink id="btnNaoConfirmar"
+					oncomplete="modalFechamento.hide()"
+					styleClass="btnLaranja marginTop buttonSelected">
+					<span><h:outputText style="width: 1; height: 1;"
+							title="#{bundle['MH013']}" value="#{bundle['MI010']}" /></span>
+				</p:commandLink>
+				<p:spacer height="30px" />
+			</h:form>
+		</p:dialog>
+
+		<!-- VISUALIZAR REMESSA DOCUMENTO -->
+		<p:dialog
+			header="#{bundle['remessa.mantemremessa.remessaDocumento.header.parte1']} #{bundle['remessa.mantemremessa.remessaDocumento.header.parte2']} #{mantemRemessaController.remessa.id}"
+			id="modalRemessaDocumentoID" widgetVar="modalRemessaDocumento"
+			styleClass="ui-dialog-background" modal="true" dynamic="true"
+			width="600px" draggable="true" position="center"
+			onHide="giveFocusRemote();">
+			<!-- style="max-height: 550px;" resizable="false"  -->
+
+			<h:form id="formRemessaDocumento">
+
+				<!-- UNIDADE GERADORA -->
+				<h:outputLabel value="#{bundle['geral.label.unidadeGeradora']}"
+					styleClass="label-button" title="#{bundle['MH003']}">
+					<h:outputText value="" styleClass="pesquisaDireta" />
+					<br />
+					<h:inputText maxlength="4"
+						value="#{mantemRemessaController.remessaDocumento.unidadeGeradora.id}"
+						id="codigoUnidadeFiltro" style="width: 35px; margin-right: 3px;"
+						disabled="true" styleClass="input-disabled">
+					</h:inputText>
+					<h:inputText maxlength="4" id="nomeUnidadeGeradora"
+						value="#{mantemRemessaController.remessaDocumento.unidadeGeradora.nome}"
+						style="width: 450px; margin-right: 8px;" disabled="true"
+						styleClass="input-disabled">
+					</h:inputText>
+				</h:outputLabel>
+
+				<ui:repeat var="grupoCampos"
+					value="#{mantemRemessaController.getListGrupoCampo()}">
+					<h:outputLabel
+						value="#{grupoCampos.legenda != null ? grupoCampos.legenda :grupoCampos.campo.descricao}"
+						styleClass="label-button" title="#{grupoCampos.mensagem}">
+
+						<h:outputText value=""
+							styleClass="#{grupoCampos.campoObrigatorio.id == 1 ?'pesquisaDireta':'' }" />
+						<br />
+
+						<p:inputMask id="input_M#{grupoCampos.campo.id}"
+							mask="#{grupoCampos.campo.mascara}" disabled="true"
+							title="#{grupoCampos.mensagem}"
+							rendered="#{grupoCampos.campo.tipo.id != 2 and mantemRemessaController.contemMascara(grupoCampos.campo.mascara)}"
+							maxlength="#{grupoCampos.campo.tamanho}"
+							style="#{mantemRemessaController.calculaTamanhoCampo(grupoCampos.legenda,  grupoCampos.campo.descricao, grupoCampos.campo.tamanho, grupoCampos.campoObrigatorio)}"
+							value="#{grupoCampos.valor}"
+							styleClass="#{grupoCampos.campo.tipo.id == 1 ? 'gri-numericos': ''} input-disabled">
+						</p:inputMask>
+
+						<h:inputText id="input_I#{grupoCampos.campo.id}"
+							title="#{grupoCampos.mensagem}" disabled="true"
+							rendered="#{grupoCampos.campo.tipo.id != 2 and mantemRemessaController.mascaraNumerica(grupoCampos.campo.mascara)  and !grupoCampos.campo.nome.equals('NU_OPERACAO_A11')}"
+							maxlength="#{grupoCampos.campo.tamanho}"
+							style="#{mantemRemessaController.calculaTamanhoCampo(grupoCampos.legenda,  grupoCampos.campo.descricao, grupoCampos.campo.tamanho, grupoCampos.campoObrigatorio)}"
+							value="#{grupoCampos.valor}"
+							styleClass="#{grupoCampos.campo.tipo.id == 1? 'gri-numericos': ''} input_din_#{formulariosRequisicaoCampos.campo.id} input-disabled">
+						</h:inputText>
+
+						<h:inputText id="input_D#{grupoCampos.campo.id}"
+							title="#{grupoCampos.mensagem}" disabled="true"
+							rendered="#{grupoCampos.campo.tipo.id != 2 and mantemRemessaController.mascaraMoeda(grupoCampos.campo.mascara) }"
+							maxlength="#{grupoCampos.campo.tamanho}"
+							style="#{mantemRemessaController.calculaTamanhoCampo(grupoCampos.legenda,  grupoCampos.campo.descricao, grupoCampos.campo.tamanho, grupoCampos.campoObrigatorio)}"
+							value="#{grupoCampos.valor}"
+							styleClass="#{grupoCampos.campo.tipo.id == 1 ? 'gri-numericos': ''} input_din_M#{grupoCampos.campo.id} input-disabled">
+						</h:inputText>
+
+						<h:inputText id="input_N#{grupoCampos.campo.id}"
+							title="#{grupoCampos.mensagem}" disabled="true"
+							rendered="#{grupoCampos.campo.tipo.id != 2 and grupoCampos.campo.mascara == null}"
+							maxlength="#{grupoCampos.campo.tamanho}"
+							style="#{mantemRemessaController.calculaTamanhoCampo(grupoCampos.legenda,  grupoCampos.campo.descricao, grupoCampos.campo.tamanho, grupoCampos.campoObrigatorio)}"
+							value="#{grupoCampos.valor}"
+							styleClass="#{grupoCampos.campo.tipo.id == 1 ? 'gri-numericos': ''} input-disabled">
+						</h:inputText>
+
+						<p:calendar id="campoData" disabled="true" styleClass="dataForm"
+							rendered="#{grupoCampos.campo.tipo.id == 2}"
+							value="#{grupoCampos.valorData}" title="#{grupoCampos.mensagem}"
+							pattern="dd/MM/yyyy" locale="pt_BR"
+							converter="converter.DataConverter" maxlength="10"
+							validator="validator.DataValidator">
+						</p:calendar>
+
+						<h:selectOneMenu id="idOperacao" style="width: 150px;"
+							rendered="#{grupoCampos.campo.nome.equals('NU_OPERACAO_A11')}"
+							converter="omnifaces.SelectItemsConverter"
+							styleClass="select-disabled" disabled="true"
+							value="#{grupoCampos.valor}">
+							<f:selectItem itemLabel="Selecione" noSelectionOption="true" />
+							<f:selectItems value="#{remessaController.operacoes}"
+								var="operacao" itemValue="#{operacao}"
+								itemLabel="#{operacao.descricaoCompleta}" />
+						</h:selectOneMenu>
+
+					</h:outputLabel>
+
+				</ui:repeat>
+
+				<p:spacer width="200px" height="45px"></p:spacer>
+				<p:outputPanel>
+					<p:commandLink id="btnFecharModalRemessaDocumento"
+						oncomplete="modalRemessaDocumento.hide(); "
+						styleClass="btnLaranja marginTop buttonSelected">
+						<span><h:outputText style="width: 1; height: 1;"
+								title="#{bundle['MH070']}"
+								value="#{bundle['geral.button.fechar']}" /></span>
+					</p:commandLink>
+				</p:outputPanel>
+
+				<!-- Forçando a criação da máscara nos imput -->
+				<script type="text/javascript">
+					<ui:repeat var="grupoCampos"
+						value="#{mantemRemessaController.getListGrupoCampo()}">
+							jQuery(".input_din_#{grupoCampos.campo.id}, .input_din_#{grupoCampos.campo.id} input").inputmask('#{grupoCampos.campo.mascara}');				
+							jQuery(".input_din_M#{grupoCampos.campo.id}").priceFormat({
+							    centsSeparator: ',',
+							    thousandsSeparator: '.'
+							});
+					</ui:repeat>
+					jQuery('#modalRemessaDocumentoID .ui-state-disabled').css('background-color','#EEEEEE !important;').css('font-weight','normal');
+					jQuery('#modalRemessaDocumentoID .ui-state-disabled, #modalRemessaDocumentoID .ui-inputfield').removeClass('ui-state-disabled').removeClass('ui-inputfield');
+				</script>
+			</h:form>
+
+		</p:dialog>
+
+		<!-- VISUALIZAR REMESSA DOCUMENTO EM ALTERACAO -->
+		<!-- 			header="#{bundle['remessa.mantemremessa.remessaDocumento.header.parte1']} #{mantemRemessaController.remessaDocumento.nuItem} #{bundle['remessa.mantemremessa.remessaDocumento.header.parte2']} #{mantemRemessaController.remessa.id}" -->
+		<p:dialog
+			header="#{bundle['remessa.mantemremessa.remessaDocumento.header.parte1']} #{bundle['remessa.mantemremessa.remessaDocumento.header.parte2']} #{mantemRemessaController.remessa.id}"
+			id="modalRemessaDocumentoAlteracaoID"
+			widgetVar="modalRemessaDocumentoAlteracao"
+			styleClass="ui-dialog-background" modal="true" dynamic="true"
+			width="800px" draggable="true" position="center"
+			onHide="giveFocusRemote();">
+			<!-- style="max-height: 550px;" resizable="false"  -->
+
+			<h:form id="formRemessaDocumentoAlteracao">
+
+				<fieldset style="border: grey solid 1px; padding: 10px !important;">
+					<legend>Original</legend>
+					<!-- UNIDADE GERADORA -->
+					<h:outputLabel value="#{bundle['geral.label.unidadeGeradora']}"
+						styleClass="label-button" title="#{bundle['MH003']}">
+						<h:outputText value="" styleClass="pesquisaDireta" />
+						<br />
+						<h:inputText maxlength="4"
+							value="#{mantemRemessaController.remessaDocumento.unidadeGeradora.id}"
+							id="codigoUnidadeFiltro" style="width: 35px; margin-right: 3px;"
+							disabled="true" styleClass="input-disabled">
+						</h:inputText>
+						<h:inputText maxlength="4" id="nomeUnidadeGeradora"
+							value="#{mantemRemessaController.remessaDocumento.unidadeGeradora.nome}"
+							style="width: 450px; margin-right: 8px;" disabled="true"
+							styleClass="input-disabled">
+						</h:inputText>
+					</h:outputLabel>
+
+					<!-- VALORES ORIGINAIS -->
+					<ui:repeat var="grupoCamposOriginais"
+						value="#{mantemRemessaController.getListGrupoCampoOriginal()}">
+						<h:outputLabel
+							value="#{grupoCamposOriginais.legenda != null ? grupoCamposOriginais.legenda :grupoCamposOriginais.campo.descricao}"
+							styleClass="label-button"
+							title="#{grupoCamposOriginais.mensagem}">
+
+							<h:outputText value=""
+								styleClass="#{grupoCamposOriginais.campoObrigatorio.id == 1 ?'pesquisaDireta':'' }" />
+							<br />
+
+							<p:inputMask id="input_M#{grupoCamposOriginais.campo.id}Original"
+								mask="#{grupoCamposOriginais.campo.mascara}" disabled="true"
+								title="#{grupoCamposOriginais.mensagem}"
+								rendered="#{grupoCamposOriginais.campo.tipo.id != 2 and mantemRemessaController.contemMascara(grupoCamposOriginais.campo.mascara)}"
+								maxlength="#{grupoCamposOriginais.campo.tamanho}"
+								style="#{mantemRemessaController.calculaTamanhoCampo(grupoCamposOriginais.legenda,  grupoCamposOriginais.campo.descricao, grupoCamposOriginais.campo.tamanho, grupoCamposOriginais.campoObrigatorio)}"
+								value="#{grupoCamposOriginais.valor}"
+								styleClass="#{grupoCamposOriginais.campo.tipo.id == 1 ? 'gri-numericos': ''} input-disabled">
+							</p:inputMask>
+
+							<h:inputText id="input_I#{grupoCamposOriginais.id}Original"
+								title="#{grupoCamposOriginais.mensagem}" disabled="true"
+								rendered="#{grupoCamposOriginais.campo.tipo.id != 2 and mantemRemessaController.mascaraNumerica(grupoCamposOriginais.campo.mascara)  and !grupoCamposOriginais.campo.nome.equals('NU_OPERACAO_A11')}"
+								maxlength="#{grupoCamposOriginais.campo.tamanho}"
+								style="#{mantemRemessaController.calculaTamanhoCampo(grupoCamposOriginais.legenda,  grupoCamposOriginais.campo.descricao, grupoCamposOriginais.campo.tamanho, grupoCamposOriginais.campoObrigatorio)}"
+								value="#{grupoCamposOriginais.valor}"
+								styleClass="#{grupoCamposOriginais.campo.tipo.id == 1? 'gri-numericos': ''} input_din_#{formulariosRequisicaoCampos.campo.id} input-disabled">
+							</h:inputText>
+
+							<h:inputText id="input_D#{grupoCamposOriginais.campo.id}Original"
+								title="#{grupoCamposOriginais.mensagem}" disabled="true"
+								rendered="#{grupoCamposOriginais.campo.tipo.id != 2 and mantemRemessaController.mascaraMoeda(grupoCamposOriginais.campo.mascara) }"
+								maxlength="#{grupoCamposOriginais.campo.tamanho}"
+								style="#{mantemRemessaController.calculaTamanhoCampo(grupoCamposOriginais.legenda,  grupoCamposOriginais.campo.descricao, grupoCampo.campo.tamanho, grupoCamposOriginais.campoObrigatorio)}"
+								value="#{grupoCamposOriginais.valor}"
+								styleClass="#{grupoCamposOriginais.campo.tipo.id == 1 ? 'gri-numericos': ''} input_din_M#{grupoCamposOriginais.campo.id} input-disabled">
+							</h:inputText>
+
+							<h:inputText id="input_N#{grupoCamposOriginais.campo.id}Original"
+								title="#{grupoCamposOriginais.mensagem}" disabled="true"
+								rendered="#{grupoCamposOriginais.campo.tipo.id != 2 and grupoCamposOriginais.campo.mascara == null}"
+								maxlength="#{grupoCamposOriginais.campo.tamanho}"
+								style="#{mantemRemessaController.calculaTamanhoCampo(grupoCamposOriginais.legenda,  grupoCamposOriginais.campo.descricao, grupoCamposOriginais.campo.tamanho, grupoCamposOriginais.campoObrigatorio)}"
+								value="#{grupoCamposOriginais.valor}"
+								styleClass="#{grupoCamposOriginais.campo.tipo.id == 1 ? 'gri-numericos': ''} input-disabled">
+							</h:inputText>
+
+							<p:calendar id="campoDataOriginal" disabled="true"
+								styleClass="dataForm"
+								rendered="#{grupoCamposOriginais.campo.tipo.id == 2}"
+								value="#{grupoCamposOriginais.valorData}"
+								title="#{grupoCamposOriginais.mensagem}" pattern="dd/MM/yyyy"
+								locale="pt_BR" converter="converter.DataConverter"
+								maxlength="10" validator="validator.DataValidator">
+							</p:calendar>
+
+							<h:selectOneMenu id="idOperacaoOriginal" style="width: 150px;"
+								rendered="#{grupoCamposOriginais.campo.nome.equals('NU_OPERACAO_A11')}"
+								converter="omnifaces.SelectItemsConverter"
+								styleClass="select-disabled" disabled="true"
+								value="#{grupoCamposOriginais.valor}">
+								<f:selectItem itemLabel="Selecione" noSelectionOption="true" />
+								<f:selectItems value="#{remessaController.operacoes}"
+									var="operacao" itemValue="#{operacao}"
+									itemLabel="#{operacao.descricaoCompleta}" />
+							</h:selectOneMenu>
+
+						</h:outputLabel>
+
+					</ui:repeat>
+				</fieldset>
+
+				<div class="clear"
+					style="min-height: 10px !important; height: 10px !important"></div>
+				<div class="alert alert-danger">
+					<p>A(s) alteração(ões) feita(s) pela empresa terceirizada estão
+						destacadas em vermelho.</p>
+				</div>
+
+				<fieldset style="border: grey solid 1px; padding: 10px !important;">
+					<legend>Alterado pela terceirizada</legend>
+					<!-- UNIDADE GERADORA -->
+					<h:outputLabel value="#{bundle['geral.label.unidadeGeradora']}"
+						styleClass="label-button" title="#{bundle['MH003']}">
+						<h:outputText value="" styleClass="pesquisaDireta" />
+						<br />
+						<h:inputText maxlength="4"
+							value="#{mantemRemessaController.remessaDocumento.numeroRemessaTipoAB.unidadeGeradora.id}"
+							id="codigoUnidadeFiltroClone"
+							style="width: 35px; margin-right: 3px;" disabled="true"
+							styleClass="input-disabled">
+						</h:inputText>
+						<h:inputText maxlength="4" id="nomeUnidadeGeradoraClone"
+							value="#{mantemRemessaController.remessaDocumento.numeroRemessaTipoAB.unidadeGeradora.nome}"
+							style="width: 450px; margin-right: 8px;" disabled="true"
+							styleClass="input-disabled">
+						</h:inputText>
+					</h:outputLabel>
+
+					<!-- VALORES ALTERADOS PELA TERCEIRIZADA -->
+					<ui:repeat var="grupoCampos"
+						value="#{mantemRemessaController.getListGrupoCampo()}">
+						<h:outputLabel
+							value="#{grupoCampos.legenda != null ? grupoCampos.legenda :grupoCampos.campo.descricao}"
+							styleClass="label-button" title="#{grupoCampos.mensagem}">
+
+							<h:outputText value=""
+								styleClass="#{grupoCampos.campoObrigatorio.id == 1 ?'pesquisaDireta':'' }" />
+							<br />
+
+							<p:inputMask id="input_M#{grupoCampos.campo.id}"
+								mask="#{grupoCampos.campo.mascara}" disabled="true"
+								title="#{grupoCampos.mensagem}"
+								rendered="#{grupoCampos.campo.tipo.id != 2 and mantemRemessaController.contemMascara(grupoCampos.campo.mascara)}"
+								maxlength="#{grupoCampos.campo.tamanho}"
+								style="#{mantemRemessaController.calculaTamanhoCampo(grupoCampos.legenda,  grupoCampos.campo.descricao, grupoCampos.campo.tamanho, grupoCampos.campoObrigatorio)}"
+								value="#{grupoCampos.valor}"
+								styleClass="#{grupoCampos.campo.tipo.id == 1 ? 'gri-numericos': ''} input-disabled
+							#{grupoCampos.valoresDiferentes? 'pintaValorVermelho' : ''}">
+							</p:inputMask>
+
+							<h:inputText id="input_I#{grupoCampos.id}"
+								title="#{grupoCampos.mensagem}" disabled="true"
+								rendered="#{grupoCampos.campo.tipo.id != 2 and mantemRemessaController.mascaraNumerica(grupoCampos.campo.mascara)  and !grupoCampos.campo.nome.equals('NU_OPERACAO_A11')}"
+								maxlength="#{grupoCampos.campo.tamanho}"
+								style="#{mantemRemessaController.calculaTamanhoCampo(grupoCampos.legenda,  grupoCampos.campo.descricao, grupoCampos.campo.tamanho, grupoCampos.campoObrigatorio)}"
+								value="#{grupoCampos.valor}"
+								styleClass="#{grupoCampos.campo.tipo.id == 1? 'gri-numericos': ''} input_din_#{formulariosRequisicaoCampos.campo.id} input-disabled 
+							#{grupoCampos.valoresDiferentes? 'pintaValorVermelho' : ''}">
+							</h:inputText>
+
+							<h:inputText id="input_D#{grupoCampos.campo.id}"
+								title="#{grupoCampos.mensagem}" disabled="true"
+								rendered="#{grupoCampos.campo.tipo.id != 2 and mantemRemessaController.mascaraMoeda(grupoCampos.campo.mascara) }"
+								maxlength="#{grupoCampos.campo.tamanho}"
+								style="#{mantemRemessaController.calculaTamanhoCampo(grupoCampos.legenda,  grupoCampos.campo.descricao, grupoCampo.campo.tamanho, grupoCampos.campoObrigatorio)}"
+								value="#{grupoCampos.valor}"
+								styleClass="#{grupoCampos.campo.tipo.id == 1 ? 'gri-numericos': ''} input_din_M#{grupoCampos.campo.id} input-disabled
+							#{grupoCampos.valoresDiferentes? 'pintaValorVermelho' : ''}">
+							</h:inputText>
+
+							<h:inputText id="input_N#{grupoCampos.campo.id}"
+								title="#{grupoCampos.mensagem}" disabled="true"
+								rendered="#{grupoCampos.campo.tipo.id != 2 and grupoCampos.campo.mascara == null}"
+								maxlength="#{grupoCampos.campo.tamanho}"
+								style="#{mantemRemessaController.calculaTamanhoCampo(grupoCampos.legenda,  grupoCampos.campo.descricao, grupoCampos.campo.tamanho, grupoCampos.campoObrigatorio)}"
+								value="#{grupoCampos.valor}"
+								styleClass="#{grupoCampos.campo.tipo.id == 1 ? 'gri-numericos': ''} input-disabled
+							#{grupoCampos.valoresDiferentes? 'pintaValorVermelho' : ''}">
+							</h:inputText>
+
+							<h:inputText id="campoData" disabled="true"
+								styleClass="#{grupoCampos.valoresDiferentes? 'pintaValorVermelho' : ''} input-disabled"
+								rendered="#{grupoCampos.campo.tipo.id == 2}"
+								value="#{grupoCampos.valorDataFormatada}" title="#{grupoCampos.mensagem}">
+							</h:inputText>
+
+							<h:selectOneMenu id="idOperacao" style="width: 150px;"
+								rendered="#{grupoCampos.campo.nome.equals('NU_OPERACAO_A11')}"
+								converter="omnifaces.SelectItemsConverter"
+								styleClass="select-disabled #{grupoCampos.valoresDiferentes? 'pintaValorVermelho' : ''}"
+								disabled="true" value="#{grupoCampos.valor}">
+								<f:selectItem itemLabel="Selecione" noSelectionOption="true" />
+								<f:selectItems value="#{remessaController.operacoes}"
+									var="operacao" itemValue="#{operacao}"
+									itemLabel="#{operacao.descricaoCompleta}" />
+							</h:selectOneMenu>
+
+						</h:outputLabel>
+
+					</ui:repeat>
+				</fieldset>
+
+				<p:spacer width="200px" height="5px"></p:spacer>
+				<p:outputPanel>
+					<p:commandLink id="btnFecharModalRemessaDocumento"
+						oncomplete="modalRemessaDocumentoAlteracao.hide(); "
+						styleClass="btnAzul marginTop buttonSelected">
+						<span><h:outputText style="width: 1; height: 1;"
+								title="#{bundle['MH070']}"
+								value="#{bundle['geral.button.fechar']}" /></span>
+					</p:commandLink>
+				</p:outputPanel>
+
+				<!-- Forçando a criação da máscara nos imput -->
+				<script type="text/javascript">
+					jQuery('#modalRemessaDocumentoAlteracaoID .ui-state-disabled').css('background-color','#EEEEEE !important;').css('font-weight','normal');
+					jQuery('#modalRemessaDocumentoAlteracaoID .ui-state-disabled, #modalRemessaDocumentoAlteracaoID .ui-inputfield').removeClass('ui-state-disabled').removeClass('ui-inputfield');
+				</script>
+			</h:form>
+
+		</p:dialog>
+
+		<!-- VISUALIZAR REMESSA DOCUMENTO TIPO C -->
+		<p:dialog
+			header="#{bundle['remessa.mantemremessa.correcao.header.parte3']} #{mantemRemessaController.itemDetalheTipoCCDTO.codigoRemessaTipoC}"
+			id="modalDetalharRemessaDocumentoID"
+			widgetVar="modalDetalharRemessaDocumento"
+			styleClass="ui-dialog-background" modal="true" dynamic="true"
+			width="600px" draggable="true" position="center"
+			onHide="giveFocusRemote();">
+
+			<h:form id="formModalDetalhar">
+				<div style="overflow-y: auto; max-height: 600px !important;">
+				
+				<h:panelGroup layout="block" rendered="#{mantemRemessaController.exibirMensagemInclusaoTipoC()}">
+					<div class="alert alert-success">
+						<p>A(s) inclusão(ões) feita(s) pela empresa terceirizada
+							estão destacadas em verde.</p>
+					</div>
+				</h:panelGroup>
+				
+					<table id="grid_remessa" class="table table-striped table-hover"
+						width="100%" style="border: 1px dotted #666" cellpadding="0">
+						<thead>
+							<tr>
+								<th style="text-align: center;">TF/Lotérico</th>
+								<th style="text-align: center;">Número TF/LOT</th>
+								<th style="text-align: center;">Qtd Envelopes Grupo 1</th>
+								<th style="text-align: center;">Qtd Envelopes Grupo 2</th>
+								<th style="text-align: center;">Qtd Envelopes Grupo 3</th>
+							</tr>
+						</thead>
+						<tbody>
+							<ui:repeat var="detalheDiario"
+								value="#{mantemRemessaController.carregarListaMovDiarioTratado()}"
+								varStatus="row">
+								<tr class="rowGrid">
+									<td style="text-align: left;"><h:outputText
+											value="#{detalheDiario.icLoterico.descricaoCompleta}"
+											style="font-weight: bold !important;"
+											styleClass="#{detalheDiario.icAlteracaoValida.getValue() == 5 ? 'pintaFonteVerde' : ''}" /></td>
+									<td style="text-align: right;"><h:outputText
+											value="#{detalheDiario.nuTerminal}"
+											style="font-weight: bold !important;" 
+											styleClass="#{detalheDiario.icAlteracaoValida.getValue() == 5 ? 'pintaFonteVerde' : ''}" /></td>
+									<td style="text-align: right;"><h:outputText
+											value="#{detalheDiario.grupo1}"
+											style="font-weight: bold !important;"
+											styleClass="#{detalheDiario.icAlteracaoValida.getValue() == 5 ? 'pintaFonteVerde' : ''}" /></td>
+									<td style="text-align: right;"><h:outputText
+											value="#{detalheDiario.grupo2}"
+											style="font-weight: bold !important;" 
+											styleClass="#{detalheDiario.icAlteracaoValida.getValue() == 5 ? 'pintaFonteVerde' : ''}" /></td>
+									<td style="text-align: right;"><h:outputText
+											value="#{detalheDiario.grupo3}"
+											style="font-weight: bold !important;" 
+											styleClass="#{detalheDiario.icAlteracaoValida.getValue() == 5 ? 'pintaFonteVerde' : ''}" /></td>
+								</tr>
+							</ui:repeat>
+						</tbody>
+					</table>
+				</div>
+				<p:commandLink id="btnFechar" styleClass="btnAzul btn_fechar_modal"
+					oncomplete="modalDetalharRemessaDocumento.hide()"
+					actionListener="#{mantemRemessaController.limparDetalheMovimentotipoC()}">
+					<span><h:outputText style="width: 1; height: 1;"
+							value="Fechar" /></span>
+				</p:commandLink>
+			</h:form>
+
+		</p:dialog>
+
+		<!-- begin-of: modal clonar -->
+		<p:dialog widgetVar="mdlClonar" id="modalClonarId"
+			header="Deseja clonar a Remessa Cód. #{mantemRemessaController.remessa.id}?"
+			modal="true" width="480" height="90" resizable="false">
+			<h:form>
+				<table>
+					<tr>
+						<td class="icon-atencao" style="padding-right: 10px;"></td>
+						<td><b>Confirma a clonagem do item?</b></td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							<div class="wrap" align="center">
+								<h:commandLink styleClass="btnAzul marginTop btnClonar"
+									action="#{mantemRemessaController.clonarRemessa()}">
+									<span>Sim</span>
+								</h:commandLink>
+								<h:commandLink styleClass="btnLaranja marginTop btnFecharModalN"
+									onclick="mdlClonar.hide(); return false;">
+									<span>Não</span>
+								</h:commandLink>
+							</div>
+						</td>
+					</tr>
+				</table>
+			</h:form>
+		</p:dialog>
+		<!-- end-of: modal clonar -->
+
+		<!-- VISUALIZAR REMESSA DOCUMENTO TIPO C ALTERACAO-->
+		<p:dialog
+			header="#{bundle['remessa.mantemremessa.correcao.header.parte3']} #{mantemRemessaController.itemDetalheTipoCCDTO.codigoRemessaTipoC}"
+			id="modalDetalharRemessaDocumentoAlteracaoID"
+			widgetVar="modalDetalharRemessaDocumentoAlteracao"
+			styleClass="ui-dialog-background" modal="true" dynamic="true"
+			width="700px" draggable="true" position="center"
+			onHide="giveFocusRemote();">
+			
+			<h:panelGroup layout="block" rendered="#{mantemRemessaController.exibirMensagemInclusaoTipoC()}">
+					<div class="alert alert-success">
+						<p>A(s) inclusão(ões) feita(s) pela empresa terceirizada
+							estão destacadas em verde.</p>
+					</div>
+				</h:panelGroup>
+
+			<h:form id="formModalDetalharAlteradas">
+				<div style="overflow-y: auto; max-height: 600px !important;">
+					<table id="grid_remessa" class="table table-striped table-hover"
+						width="100%" style="border: 1px dotted #666" cellpadding="0">
+						<thead>
+							<tr>
+								<th style="text-align: center;">Nº Item</th>
+								<th style="text-align: center;">TF/Lotérico</th>
+								<th style="text-align: center;">Número TF/LOT</th>
+								<th style="text-align: center;">Qtd Envelopes Grupo 1</th>
+								<th style="text-align: center;">Qtd Envelopes Grupo 2</th>
+								<th style="text-align: center;">Qtd Envelopes Grupo 3</th>
+							</tr>
+						</thead>
+						<tbody>
+							<ui:repeat var="detalheDiario"
+								value="#{mantemRemessaController.carregarListasAlteracaoSubstituido()}"
+								varStatus="row">
+								<tr class="rowGrid">
+									<td style="text-align: right;"><h:outputText
+											value="#{detalheDiario.nuItem}"
+											style="font-weight: bold !important;" 
+											styleClass="#{detalheDiario.icAlteracaoValida.getValue() == 5 ? 'pintaFonteVerde' : ''}"/></td>
+									<td style="text-align: left;"><h:outputText
+											value="#{detalheDiario.icLoterico.descricaoCompleta}"
+											style="font-weight: bold !important;" 
+											styleClass="#{detalheDiario.icAlteracaoValida.getValue() == 5 ? 'pintaFonteVerde' : ''}"/></td>
+									<td style="text-align: right;"><h:outputText
+											value="#{detalheDiario.nuTerminal}"
+											style="font-weight: bold !important;" 
+											styleClass="#{detalheDiario.icAlteracaoValida.getValue() == 5 ? 'pintaFonteVerde' : ''}"/></td>
+									<td style="text-align: right;"><h:outputText
+											value="#{detalheDiario.grupo1}"
+											style="font-weight: bold !important;" 
+											styleClass="#{detalheDiario.icAlteracaoValida.getValue() == 5 ? 'pintaFonteVerde' : ''}"/></td>
+									<td style="text-align: right;"><h:outputText
+											value="#{detalheDiario.grupo2}"
+											style="font-weight: bold !important;" 
+											styleClass="#{detalheDiario.icAlteracaoValida.getValue() == 5 ? 'pintaFonteVerde' : ''}"/></td>
+									<td style="text-align: right;"><h:outputText
+											value="#{detalheDiario.grupo3}"
+											style="font-weight: bold !important;" 
+											styleClass="#{detalheDiario.icAlteracaoValida.getValue() == 5 ? 'pintaFonteVerde' : ''}"/></td>
+								</tr>
+							</ui:repeat>
+						</tbody>
+					</table>
+
+					<div class="clear"
+						style="min-height: 10px !important; height: 10px !important"></div>
+					<div class="alert alert-danger">
+						<p>A(s) alteração(ões) feita(s) pela empresa terceirizada
+							estão destacadas em vermelho.</p>
+					</div>
+
+					<table id="grid_remessa" class="table table-striped table-hover"
+						width="100%" style="border: 1px dotted #666" cellpadding="0">
+						<thead>
+							<tr>
+								<th style="text-align: center;">Nº Item Alt.</th>
+								<th style="text-align: center;">TF/Lotérico</th>
+								<th style="text-align: center;">Número TF/LOT</th>
+								<th style="text-align: center;">Qtd Envelopes Grupo 1</th>
+								<th style="text-align: center;">Qtd Envelopes Grupo 2</th>
+								<th style="text-align: center;">Qtd Envelopes Grupo 3</th>
+							</tr>
+						</thead>
+						<tbody>
+							<ui:repeat var="detalheDiarioAlterado"
+								value="#{mantemRemessaController.carregarListasAlteracaoAlterado()}"
+								varStatus="row">
+								<tr class="rowGrid">
+									<td style="text-align: right;"><h:outputText
+											value="#{detalheDiarioAlterado.numeroRemessaTipoC.nuItem}"
+											style="font-weight: bold !important;" /></td>
+									<td style="text-align: left;"><h:outputText
+											value="#{detalheDiarioAlterado.icLoterico.descricaoCompleta}"
+											style="font-weight: bold !important;"
+											styleClass="#{detalheDiarioAlterado.flagValorDiferenteIcLoterico ? 'pintaFonteVermelha' : ''}" />
+									</td>
+									<td style="text-align: right;"><h:outputText
+											value="#{detalheDiarioAlterado.nuTerminal}"
+											style="font-weight: bold !important;"
+											styleClass="#{detalheDiarioAlterado.flagValorDiferenteNuTerminal ? 'pintaFonteVermelha' : ''}" />
+									</td>
+									<td style="text-align: right;"><h:outputText
+											value="#{detalheDiarioAlterado.grupo1}"
+											style="font-weight: bold !important;"
+											styleClass="#{detalheDiarioAlterado.flagValorDiferenteIcGrupo1 ? 'pintaFonteVermelha' : ''}" />
+									</td>
+									<td style="text-align: right;"><h:outputText
+											value="#{detalheDiarioAlterado.grupo2}"
+											style="font-weight: bold !important;"
+											styleClass="#{detalheDiarioAlterado.flagValorDiferenteIcGrupo2 ? 'pintaFonteVermelha' : ''}" />
+									</td>
+									<td style="text-align: right;"><h:outputText
+											value="#{detalheDiarioAlterado.grupo3}"
+											style="font-weight: bold !important;"
+											styleClass="#{detalheDiarioAlterado.flagValorDiferenteIcGrupo3 ? 'pintaFonteVermelha' : ''}" />
+									</td>
+								</tr>
+							</ui:repeat>
+						</tbody>
+					</table>
+				</div>
+				
+				<ui:fragment rendered="#{mantemRemessaController.hasQuantitativoZerado()}">
+					<div class="pintaFonteVermelha">#{bundle['MH152']}</div>
+				</ui:fragment>
+				
+				<p:commandLink id="btnFechar" styleClass="btnAzul btn_fechar_modal"
+					oncomplete="modalDetalharRemessaDocumentoAlteracao.hide()"
+					actionListener="#{mantemRemessaController.limparDetalheMovimentotipoC()}">
+					<span><h:outputText style="width: 1; height: 1;"
+							value="Fechar" /></span>
+				</p:commandLink>
+			</h:form>
+
+		</p:dialog>
+	</ui:define>
+</ui:composition>

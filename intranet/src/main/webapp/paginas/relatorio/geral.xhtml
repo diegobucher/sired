@@ -1,0 +1,299 @@
+<ui:composition template="/WEB-INF/templates/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+	<ui:param name="breadcrumbs"
+		value="#{bundle['geral.breadcrumb.relatorio']},#{bundle['relatorio.geral.tituloPagina']}" />
+
+	<ui:define name="content-main-page">
+
+		<h:form id="formConsulta">
+			<p:focus id="focusConsulta" context="formConsulta" />
+			<p:messages id="messages" showDetail="false" />
+			<h3 class="titlePage">#{bundle['relatorio.geral.tituloPagina.descricao']}</h3>
+
+			<fieldset class="filtro">
+
+				<!-- begin-of: data início -->
+				<h:outputLabel styleClass="label-button"
+					value="#{bundle['geral.label.dataInicio']}"
+					title="#{bundle['geral.label.dataInicio']}">
+					<h:outputText styleClass="pesquisaDireta" />
+					<br />
+					<p:calendar id="idDataInicio"
+						value="#{relatorioGeralController.dataInicio}"
+						requiredMessage="#{bundle['requisicao.consulta.data.obrigatorio']}"
+						pattern="dd/MM/yyyy" size="8" maxlength="10"
+						onkeyup="maskIt(this, event, '##/##/#####', false, false)"
+						validator="dateValidator">
+						<f:attribute name="field"
+							value="#{bundle['geral.label.dataInicio']}" />
+						<f:converter converterId="br.gov.caixa.gitecsa.DateConverter" />
+					</p:calendar>
+				</h:outputLabel>
+				<!-- end-of: data início -->
+
+				<!-- begin-of: data fim -->
+				<h:outputLabel styleClass="label-button"
+					value="#{bundle['geral.label.dataFim']}"
+					title="#{bundle['geral.label.dataFim']}">
+					<!-- <h:outputText styleClass="pesquisaDireta" /> -->
+					<br />
+					<p:calendar id="idDataFim"
+						value="#{relatorioGeralController.dataFim}" pattern="dd/MM/yyyy"
+						locale="pt_BR" size="8" maxlength="10"
+						converter="converter.DataConverterSIRED"
+						onkeyup="maskIt(this, event, '##/##/#####', false, false)"
+						validator="dateValidator">
+						<!-- <f:attribute name="field" value="#{bundle['geral.label.dataFim']}" /> -->
+						<!-- <f:converter converterId="br.gov.caixa.gitecsa.DateConverter" /> -->
+					</p:calendar>
+				</h:outputLabel>
+				<!-- end-of: data fim -->
+
+				<p:outputPanel id="pnlBotoes">
+
+					<!-- begin-of: botão consultar -->
+					<p:commandLink title="#{bundle['MH008']}"
+						styleClass="btnAzul marginTop buttonSelected"
+						update="messages,pnlBotoes,pnlGrades"
+						action="#{relatorioGeralController.localizar()}">
+						<span>#{bundle['geral.button.consultar']}</span>
+					</p:commandLink>
+					<!-- end-of: botão consultar -->
+
+				</p:outputPanel>
+				
+			</fieldset>
+			
+			<p:outputPanel>
+				<b>* Requisições/Remessas onde ocorreram movimentações no período pesquisado.</b>
+			</p:outputPanel>
+
+			<p:outputPanel id="pnlGrades">
+				
+				<p:dataTable value="#{relatorioGeralController.listRequisicao}"
+					var="item" widgetVar="listas" id="tblRequisicao"
+					emptyMessage="#{bundle['MI017']}"
+					rendered="#{relatorioGeralController.listRequisicao.size() > 0 }"
+					paginator="false" rows="10"
+					sortBy="base"
+					sortFunction="#{relatorioGeralController.sort}"
+					
+					styleClass="estilo-border-dotted zebr" 
+					tableStyleClass="tablefixa"
+					rowStyleClass="#{empty rowIx or rowIx mod 2 ne 0 ? 'even-row' : 'odd-row'}"
+					
+					rowIndexVar="rowIx"
+					paginatorPosition="bottom"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					currentPageReportTemplate="#{bundle['geral.crud.exibindo']} {startRecord} #{bundle['geral.crud.ate']} {endRecord}  #{bundle['geral.crud.de']} {totalRecords}  #{bundle['geral.crud.registros']} "
+					rowsPerPageTemplate="5,10,25,50">
+					
+					<f:facet name="header">
+						<h3>REQUISIÇÃO</h3>
+					</f:facet>
+					
+					<p:column sortBy="base" 
+						styleClass="noBackGroundImage" style="text-align: center;"
+						sortFunction="#{relatorioGeralController.sort}">
+						<h:outputText value="#{item.base}" />
+						<f:facet name="header">
+							<h:outputText value="BASE" />
+						</f:facet>
+					</p:column>
+
+					<p:column sortBy="numAbertas"
+						styleClass="noBackGroundImage" style="text-align: center;"
+						sortFunction="#{relatorioGeralController.sort}">
+						<h:outputText value="#{item.numAbertas}" />
+						<f:facet name="header">
+							<h:outputText value="ABERTAS" title="#{bundle['MH119']}" />
+						</f:facet>
+					</p:column>
+					
+					<p:column sortBy="numFechadas"
+						styleClass="noBackGroundImage" style="text-align: center;"
+						sortFunction="#{relatorioGeralController.sort}">
+						<h:outputText value="#{item.numFechadas}" />
+						<f:facet name="header">
+							<h:outputText value="FECHADAS" title="#{bundle['MH120']}" />
+						</f:facet>
+					</p:column>
+					
+					<p:column sortBy="numRecuperadas"
+						styleClass="noBackGroundImage" style="text-align: center;"
+						sortFunction="#{relatorioGeralController.sort}">
+						<h:outputText value="#{item.numRecuperadas}" />
+						<f:facet name="header">
+							<h:outputText value="QTD.REC." title="#{bundle['MH121']}" />
+						</f:facet>
+					</p:column>
+					
+					<p:column sortBy="numNaoLocalizadas"
+						styleClass="noBackGroundImage" style="text-align: center;"
+						sortFunction="#{relatorioGeralController.sort}">
+						<h:outputText value="#{item.numNaoLocalizadas}" />
+						<f:facet name="header">
+							<h:outputText value="QTD.Ñ.LOC." title="#{bundle['MH122']}" />
+						</f:facet>
+					</p:column>
+					
+					<p:column sortBy="numOutras"
+						styleClass="noBackGroundImage" style="text-align: center;"
+						sortFunction="#{relatorioGeralController.sort}">
+						<h:outputText value="#{item.numOutras}" />
+						<f:facet name="header">
+							<h:outputText value="TOTAL OUTROS" title="#{bundle['MH123']}" />
+						</f:facet>
+					</p:column>
+					
+					<p:columnGroup type="footer">
+						<p:row>
+							<p:column styleClass="textCenter noBackGroundImage" footerText="TOTAL GERAL"></p:column>
+							<p:column styleClass="textCenter noBackGroundImage" footerText="#{relatorioGeralController.totalRequisicao.numAbertas}" />
+							<p:column styleClass="textCenter noBackGroundImage" footerText="#{relatorioGeralController.totalRequisicao.numFechadas}" />
+							<p:column styleClass="textCenter noBackGroundImage" footerText="#{relatorioGeralController.totalRequisicao.numRecuperadas}" />
+							<p:column styleClass="textCenter noBackGroundImage" footerText="#{relatorioGeralController.totalRequisicao.numNaoLocalizadas}" />
+							<p:column styleClass="textCenter noBackGroundImage" footerText="#{relatorioGeralController.totalRequisicao.numOutras}" />
+						</p:row>
+					</p:columnGroup>
+
+				</p:dataTable>
+				
+				<br/>
+				
+				<!-- begin-of: Resumo de Remessas -->
+				
+				<p:dataTable value="#{relatorioGeralController.listRemessa}"
+					var="item" widgetVar="listas" id="tblRemessa"
+					emptyMessage="#{bundle['MI017']}"
+					rendered="#{relatorioGeralController.listRemessa.size() > 0 }"
+					paginator="false" rows="10"
+					sortBy="base"
+					sortFunction="#{relatorioGeralController.sort}"
+					
+					styleClass="estilo-border-dotted zebr" 
+					tableStyleClass="tablefixa"
+					rowStyleClass="#{empty rowIx or rowIx mod 2 ne 0 ? 'even-row' : 'odd-row'}"
+					
+					rowIndexVar="rowIx"
+					paginatorPosition="bottom"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					currentPageReportTemplate="#{bundle['geral.crud.exibindo']} {startRecord} #{bundle['geral.crud.ate']} {endRecord}  #{bundle['geral.crud.de']} {totalRecords}  #{bundle['geral.crud.registros']} "
+					rowsPerPageTemplate="5,10,25,50">
+					
+					<f:facet name="header">
+						<h3>REMESSA</h3>
+					</f:facet>
+					
+					<p:column sortBy="base" 
+						styleClass="noBackGroundImage" style="text-align: center;"
+						sortFunction="#{relatorioGeralController.sort}">
+						<h:outputText value="#{item.base}" />
+						<f:facet name="header">
+							<h:outputText value="BASE" />
+						</f:facet>
+					</p:column>
+					
+					<p:column sortBy="numRemessas"
+						styleClass="noBackGroundImage" style="text-align: center;"
+						sortFunction="#{relatorioGeralController.sort}">
+						<h:outputText value="#{item.numRemessas}" />
+						<f:facet name="header">
+							<h:outputText value="QTD. REM." title="#{bundle['MH124']}" />
+						</f:facet>
+					</p:column>
+
+					<p:column sortBy="numAbertas"
+						styleClass="noBackGroundImage" style="text-align: center;"
+						sortFunction="#{relatorioGeralController.sort}">
+						<h:outputText value="#{item.numAbertas}" />
+						<f:facet name="header">
+							<h:outputText value="ABERT." title="#{bundle['MH125']}" />
+						</f:facet>
+					</p:column>
+
+					<p:column sortBy="numAgendadas"
+						styleClass="noBackGroundImage" style="text-align: center;"
+						sortFunction="#{relatorioGeralController.sort}">
+						<h:outputText value="#{item.numAgendadas}" />
+						<f:facet name="header">
+							<h:outputText value="AGEND." title="#{bundle['MH126']}" />
+						</f:facet>
+					</p:column>
+					
+					<p:column sortBy="numRecebidas"
+						styleClass="noBackGroundImage" style="text-align: center;"
+						sortFunction="#{relatorioGeralController.sort}">
+						<h:outputText value="#{item.numRecebidas}" />
+						<f:facet name="header">
+							<h:outputText value="RECEB." title="#{bundle['MH127']}" />
+						</f:facet>
+					</p:column>
+					
+					<p:column sortBy="numConferidas"
+						styleClass="noBackGroundImage" style="text-align: center;"
+						sortFunction="#{relatorioGeralController.sort}">
+						<h:outputText value="#{item.numConferidas}" />
+						<f:facet name="header">
+							<h:outputText value="CONFER." title="#{bundle['MH128']}" />
+						</f:facet>
+					</p:column>
+					
+					<p:column sortBy="numFechadas" 
+						styleClass="noBackGroundImage" style="text-align: center;"
+						sortFunction="#{relatorioGeralController.sort}">
+						<h:outputText value="#{item.numFechadas}" />
+						<f:facet name="header">
+							<h:outputText value="FECH." title="#{bundle['MH129']}" />
+						</f:facet>
+					</p:column>
+					
+					<p:column sortBy="numItens" 
+						styleClass="noBackGroundImage" style="text-align: center;"
+						sortFunction="#{relatorioGeralController.sort}">
+						<h:outputText value="#{item.numItens}" />
+						<f:facet name="header">
+							<h:outputText value="QTD.ITENS" title="#{bundle['MH130']}" />
+						</f:facet>
+					</p:column>
+					
+					<p:column sortBy="numRemessasDentroPrazo" 
+						styleClass="noBackGroundImage" style="text-align: center;"
+						sortFunction="#{relatorioGeralController.sort}">
+						<h:outputText value="#{item.numRemessasDentroPrazo}" />
+						<f:facet name="header">
+							<h:outputText value="REMESSA NO PRAZO" title="#{bundle['MH131']}" />
+						</f:facet>
+					</p:column>
+
+					<p:columnGroup type="footer">
+						<p:row>
+							<p:column styleClass="textCenter noBackGroundImage" footerText="TOTAL GERAL"></p:column>
+							<p:column styleClass="textCenter noBackGroundImage" footerText="#{relatorioGeralController.totalRemessa.numRemessas}" />
+							<p:column styleClass="textCenter noBackGroundImage" footerText="#{relatorioGeralController.totalRemessa.numAbertas}" />
+							<p:column styleClass="textCenter noBackGroundImage" footerText="#{relatorioGeralController.totalRemessa.numAgendadas}" />
+							<p:column styleClass="textCenter noBackGroundImage" footerText="#{relatorioGeralController.totalRemessa.numRecebidas}" />
+							<p:column styleClass="textCenter noBackGroundImage" footerText="#{relatorioGeralController.totalRemessa.numConferidas}" />
+							<p:column styleClass="textCenter noBackGroundImage" footerText="#{relatorioGeralController.totalRemessa.numFechadas}" />
+							<p:column styleClass="textCenter noBackGroundImage" footerText="#{relatorioGeralController.totalRemessa.numItens}" />
+							<p:column styleClass="textCenter noBackGroundImage" footerText="#{relatorioGeralController.totalRemessa.numRemessasDentroPrazo}" />
+						</p:row>
+					</p:columnGroup>
+
+				</p:dataTable>
+				
+				<p:outputPanel styleClass="clear" />
+
+			</p:outputPanel>
+
+		</h:form>
+
+	</ui:define>
+
+</ui:composition>

@@ -1,0 +1,841 @@
+<ui:composition template="/WEB-INF/templates/template.xhtml" xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui">
+
+	<ui:define name="html-head">
+		<h:outputScript library="js" name="jquery.price_format.1.3.js" />
+		<h:outputScript library="js" name="jquery.pesquisa-unidade.js" />
+	</ui:define>
+	
+	<f:metadata>
+		<f:viewParam name="situacao" value="#{requisicaoDocumentoController.situacaoUrlParam}"></f:viewParam>
+	</f:metadata>
+		
+	<!-- Alias para o controller -->
+	<ui:param name="modal" value="#{requisicaoDocumentoController}" />
+
+	<ui:param name="breadcrumbs" value="#{bundle['geral.breadcrumb.requisicao']},#{bundle['requisicao.consulta.tituloPagina']}" />
+
+	<ui:define name="content-main-page">
+	
+		<o:form id="formConsulta" style="width: 100%">
+
+			<p:messages id="messages" showDetail="false" />
+
+			<h3 class="titlePage">#{bundle['requisicao.consulta.tituloPagina.descricao']}</h3>
+
+			<fieldset class="filtro">
+
+				<h:panelGroup id="modalPainelCad06">
+					<!-- begin-of: filtros -->
+					<h:panelGroup id="pnlGrid">
+						<!-- begin-of: 1º linha -->
+						<h:panelGrid columns="6">
+
+							<!-- begin-of: nº requisição -->
+							<h:outputLabel styleClass="label-button" value="#{bundle['requisicao.label.codigoRequisicao']}" title="#{bundle['MH009']}">
+								<br />
+								<p:inputText id="numeroRequisicoes" value="#{requisicaoDocumentoController.filtroRequisicao.numeroRequisicoes}" maxlength="100" style="width:90px;"
+									onchange="overSomenteNumerosSeparadosPorVirgula(this);" onkeypress="return somenteNumerosSeparadosPorVirgula(event);">
+								</p:inputText>
+							</h:outputLabel>
+							<!-- end-of: nº requisição -->
+
+							<!-- begin-of: matricula usuário -->
+							<h:outputLabel styleClass="label-button" value="#{bundle['geral.label.usuario']}" title="#{bundle['requisicao.consulta.filtro.usuario.hint']}">
+								<br />
+								<p:inputMask id="matriculaUsuario" styleClass="filtro-opcional" value="#{requisicaoDocumentoController.filtroRequisicao.matriculaUsuario}"
+									disabled="#{requisicaoDocumentoController.isPerfilGeral()}" mask="a999999" maxlength="7" style="width:50px;">
+								</p:inputMask>
+							</h:outputLabel>
+							<!-- end-of: matricula usuário -->
+
+							<!-- begin-of: data início -->
+							<h:outputLabel styleClass="label-button" value="#{bundle['geral.label.dataInicio']}" title="#{bundle['requisicao.consulta.filtro.dataInicio.hint']}">
+								<h:outputText styleClass="pesquisaDireta" />
+								<br />
+								<p:calendar id="dataInicio" styleClass="filtro-opcional" value="#{requisicaoDocumentoController.filtroRequisicao.dataInicio}"
+									requiredMessage="#{bundle['requisicao.consulta.data.obrigatorio']}" pattern="dd/MM/yyyy" size="8" maxlength="10"
+									onkeyup="maskIt(this, event, '##/##/#####', false, false)" validator="dateValidator">
+									<f:attribute name="field" value="#{bundle['geral.label.dataInicio']}" />
+									<f:converter converterId="br.gov.caixa.gitecsa.DateConverter" />
+								</p:calendar>
+							</h:outputLabel>
+							<!-- end-of: data início -->
+
+							<!-- begin-of: data fim -->
+							<h:outputLabel styleClass="label-button" value="#{bundle['geral.label.dataFim']}" title="#{bundle['requisicao.consulta.filtro.dataFim.hint']}">
+								<br />
+								<p:calendar id="dataFim" styleClass="filtro-opcional" value="#{requisicaoDocumentoController.filtroRequisicao.dataFim}" pattern="dd/MM/yyyy"
+									locale="pt_BR" size="8" maxlength="10" onkeyup="maskIt(this, event, '##/##/#####', false, false)" validator="dateValidator">
+									<f:attribute name="field" value="#{bundle['geral.label.dataFim']}" />
+									<f:converter converterId="br.gov.caixa.gitecsa.DateConverter" />
+								</p:calendar>
+							</h:outputLabel>
+							<!-- end-of: data fim -->
+
+							<!-- begin-of: unidade solicitante -->
+							<h:outputLabel styleClass="label-button" value="#{bundle['geral.label.unidadeSolicitante']}" title="#{bundle['MH096']}">
+								<br />
+								<h:inputText id="cgcUnidade" styleClass="filtro-opcional input-cgc-unidade"
+									value="#{requisicaoDocumentoController.filtroRequisicao.unidadeSolicitante.id}" maxlength="4" style="width:30px; margin-right: 3px;"
+									onkeypress="return somenteNumero(event)" onchange="overSomenteNumeros(this);">
+									<f:converter converterId="javax.faces.Long" />
+									<p:ajax event="blur" listener="#{requisicaoDocumentoController.pesquisarUnidadeSolicitante()}" update="nomeUnidade messages" process="cgcUnidade" />
+								</h:inputText>
+
+								<h:inputText id="nomeUnidade" value="#{requisicaoDocumentoController.filtroRequisicao.unidadeSolicitante.nome}"
+									styleClass="input-disabled input-readonly filtro-opcional" maxlength="100" style="width:245px;" disabled="true">
+								</h:inputText>
+							</h:outputLabel>
+							<!-- end-of: unidade solicitante -->
+
+							<!-- begin-of: avaliação -->
+							<h:outputLabel styleClass="label-button" value="#{bundle['requisicao.consulta.label.avaliacao']}"
+								title="#{bundle['requisicao.consulta.filtro.avaliacao.hint']}">
+								<br />
+								<h:selectOneMenu styleClass="filtro-opcional" value="#{requisicaoDocumentoController.filtroRequisicao.motivo}" style="min-width:100px"
+									converter="omnifaces.SelectItemsConverter">
+									<f:selectItem itemLabel="#{bundle['geral.select.label.todas'].toUpperCase()}" noSelectionOption="true" />
+									<f:selectItems value="#{requisicaoDocumentoController.listMotivoAvaliacao}" var="item" itemValue="#{item}" itemLabel="#{item.deMotivoAvaliacao}" />
+								</h:selectOneMenu>
+							</h:outputLabel>
+							<!-- end-of: avaliação -->
+
+						</h:panelGrid>
+						<!-- end-of: 1º linha -->
+
+						<!-- begin-of: 2º linha -->
+						<h:panelGrid columns="2">
+
+							<!-- begin-of: situação -->
+							<h:outputLabel styleClass="label-button" value="#{bundle['geral.label.situacao']}" title="#{bundle['requisicao.consulta.filtro.situacao.hint']}">
+								<br />
+								<h:selectOneMenu styleClass="filtro-opcional filtro-situacao" value="#{requisicaoDocumentoController.filtroRequisicao.situacao}" style="min-width:100px"
+									converter="omnifaces.SelectItemsConverter">
+									<f:selectItem itemLabel="#{bundle['geral.select.label.todas'].toUpperCase()}" noSelectionOption="true" />
+									<f:selectItem itemLabel="#{bundle['geral.select.label.pendente.caixa'].toUpperCase()}" noSelectionOption="true" />
+									<f:selectItem itemLabel="#{bundle['geral.select.label.pendente.atendimento'].toUpperCase()}" noSelectionOption="true" />
+									<f:selectItems value="#{requisicaoDocumentoController.listSituacaoRequisicao}" var="item" itemValue="#{item}" itemLabel="#{item.label}" />
+								</h:selectOneMenu>
+							</h:outputLabel>
+							<!-- end-of: situação -->
+
+							<!-- begin-of: base -->
+							<p:outputPanel rendered="#{requisicaoDocumentoController.isPermitidoAlterarBaseUnidade()}">
+								<h:outputLabel styleClass="label-button" value="#{bundle['base.label.base']}" title="#{bundle['requisicao.consulta.filtro.base.hint']}">
+									<br />
+									<h:selectOneMenu styleClass="filtro-opcional" value="#{requisicaoDocumentoController.filtroRequisicao.base}" style="min-width:90px"
+										converter="omnifaces.SelectItemsConverter">
+										<f:selectItem itemLabel="#{bundle['geral.select.label.todas'].toUpperCase()}" noSelectionOption="true" />
+										<f:selectItems value="#{requisicaoDocumentoController.listBase}" var="item" itemValue="#{item}" itemLabel="#{item.nome}" />
+									</h:selectOneMenu>
+								</h:outputLabel>
+							</p:outputPanel>
+							<!-- end-of: base -->
+
+						</h:panelGrid>
+						<!-- end-of: 2º linha -->
+					</h:panelGroup>
+					<!-- end-of: filtro -->
+				</h:panelGroup>
+
+				<p:outputPanel id="pnlBotoes">
+
+					<!-- begin-of: botão consultar -->
+					<p:commandLink title="#{bundle['MH008']}" styleClass="btnAzul marginTop buttonSelected btn-dep-cgc-unidade" update="messages,pnlGrid,pnlBotoes"
+						process="@form" actionListener="#{requisicaoDocumentoController.localizar()}" oncomplete="applyStylesResultsDataTable();">
+						<span>#{bundle['geral.button.consultar']}</span>
+					</p:commandLink>
+					<!-- end-of: botão consultar -->
+
+					<!-- begin-of: botão limpar -->
+					<p:commandLink title="#{bundle['MH012']}" styleClass="btnLaranja marginTopField" update="@form" process="@form"
+						actionListener="#{requisicaoDocumentoController.limparCamposFiltros()}">
+						<span>#{bundle['geral.button.limpar']}</span>
+					</p:commandLink>
+					<!-- end-of: botão limpar -->
+
+					<!-- begin-of: botão exportar -->
+					<p:commandLink id="btnExportar" title="#{bundle['MH010']}" styleClass="btnLaranja marginTop buttonSelected btn-dep-cgc-unidade" process="@form"
+						ajax="false" onclick="PrimeFaces.monitorDownload(showStatus, hideStatus);"
+						disabled="#{requisicaoDocumentoController.listRequisicaoModel == null or (requisicaoDocumentoController.listRequisicaoModel.rowCount == 0)}">
+						<p:fileDownload value="#{requisicaoDocumentoController.exportar()}" />
+						<span>#{bundle['geral.button.exportar']}</span>
+					</p:commandLink>
+					<!-- end-of: botão exportar -->
+
+				</p:outputPanel>
+			</fieldset>
+
+			<p:outputPanel id="pnlResultados">
+
+				<p:outputPanel>
+
+					<!-- begin-of: minhas requisições -->
+					<p:outputPanel id="panelMinhasRequisicoes" rendered="#{requisicaoDocumentoController.apenasMinhasRequisicoes}">
+						<fieldset class="secaoFloat float-message filtro msgInformacao" style="width: 920px">
+							<h:outputFormat value="#{bundle['MI027']}">
+								<f:param value="#{requisicaoDocumentoController.filtroRequisicao.numeroRequisicoes}" />
+							</h:outputFormat>
+						</fieldset>
+						<br />
+					</p:outputPanel>
+					<!-- end-of: minhas requisições -->
+
+					<!-- begin-of: resultados -->
+					<p:dataTable id="tabela" value="#{requisicaoDocumentoController.listRequisicaoModel}"
+						rendered="#{requisicaoDocumentoController.listRequisicaoModel ne null}" lazy="true" varStatus="size" var="requisicao" type="unordered" itemType="none"
+						paginator="true" rows="10" paginatorPosition="bottom"
+						paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+						currentPageReportTemplate="#{bundle['geral.crud.exibindo']} {startRecord} #{bundle['geral.crud.ate']} {endRecord}  #{bundle['geral.crud.de']} {totalRecords}  #{bundle['geral.crud.registros']} "
+						rowsPerPageTemplate="5,10,25,50,100,200,300,400,500" emptyMessage="#{bundle['MA010']}">
+
+						<!-- COD. REQUISIÇÃO -->
+						<p:column style="width:85px">
+							<f:facet name="header">
+								<h:outputText value="COD. REQUISIÇÃO" />
+							</f:facet>
+							<b><p:commandLink title="Clique aqui para acessar a Requisição" styleClass="image-link info-link"
+									actionListener="#{requisicaoDocumentoController.visualizarRequisicao(requisicao)}" update=":modalInfoId" value="#{requisicao.codigoRequisicao}" /></b>
+						</p:column>
+
+						<!-- UNIDADE SOLICITANTE -->
+						<p:column style="width:163px">
+							<f:facet name="header">
+								<h:outputText value="UNID. SOLICITANTE" />
+							</f:facet>
+							<h:outputText value="#{requisicao.unidadeSolicitante.descricaoCompleta}" />
+						</p:column>
+
+						<!-- DATA DE ABERTURA -->
+						<p:column style="width:79px">
+							<f:facet name="header">
+								<h:outputText value="DT. ABERTURA" />
+							</f:facet>
+							<h:outputText value="#{requisicao.dataHoraAberturaFormatada}" />
+						</p:column>
+
+						<!-- PRAZO -->
+						<p:column style="width:71px">
+							<f:facet name="header">
+								<h:outputText value="PRAZO" />
+							</f:facet>
+							<h:outputText value="#{requisicao.prazoAtendimento}">
+								<f:convertDateTime dateStyle="short" locale="pt_BR" />
+							</h:outputText>
+						</p:column>
+
+						<!-- DOCUMENTO -->
+						<p:column style="width:160px">
+							<f:facet name="header">
+								<h:outputText value="DOCUMENTO" />
+							</f:facet>
+							<h:outputText value="#{requisicao.documento.nome}" />
+						</p:column>
+
+						<!-- SITUAÇÃO -->
+						<p:column style="width:102px">
+							<f:facet name="header">
+								<h:outputText value="SITUAÇÃO" />
+							</f:facet>
+							<h:outputText value="#{requisicao.tramiteRequisicaoAtual.situacaoRequisicao.nome}" />
+						</p:column>
+
+						<!-- FORMATO -->
+						<p:column style="width:94px">
+							<f:facet name="header">
+								<h:outputText value="FORMATO" />
+							</f:facet>
+							<h:outputText styleClass="letras-maiusculas" value="#{requisicao.formato.descricao}" />
+						</p:column>
+
+						<!-- OCORRÊNCIA -->
+						<p:column style="width:94px">
+							<f:facet name="header">
+								<h:outputText value="OCORRÊNCIA" />
+							</f:facet>
+							<h:outputText styleClass="letras-maiusculas"
+								value="#{empty requisicao.tramiteRequisicaoAtual.ocorrencia ? '-' : requisicao.tramiteRequisicaoAtual.ocorrencia.nome}" />
+						</p:column>
+
+						<!-- AÇÕES -->
+						<p:column style="width:95px; white-space:nowrap;">
+							<f:facet name="header">
+								<h:outputText value="AÇÕES" />
+							</f:facet>
+							
+							<!-- begin-of: cancelar rascunho -->
+							<p:commandLink title="#{bundle['MH133']}" styleClass="image-link" rendered="#{requisicaoDocumentoController.hasBotaoCancelarRascunho(requisicao)}"
+								actionListener="#{requisicaoDocumentoController.confirmarCancelarRascunho(requisicao)}" update=":modalCancelarRascunhoId">
+								<img src="#{request.contextPath}/resources/imagens/icon_excluir.png" />
+							</p:commandLink>
+							<!-- end-of: cancelar rascunho -->
+							
+							<!-- begin-of: download justificativa -->
+							<p:commandLink title="#{bundle['MH135']}" styleClass="image-link" onclick="PrimeFaces.monitorDownload(showStatus, hideStatus);"
+								rendered="#{requisicaoDocumentoController.hasBotaoDownloadJustificativa(requisicao)}"
+								update=":formConsulta:messages" ajax="false">
+								<p:fileDownload value="#{requisicaoDocumentoController.downloadJustificativa(requisicao)}" />
+								<img src="#{request.contextPath}/resources/imagens/icon_download_1.png" />
+							</p:commandLink>
+							<!-- end-of: download justificativa -->
+							
+							<!-- begin-of: tratar -->
+							<p:commandLink title="#{bundle['MH016']}" styleClass="image-link" rendered="#{requisicaoDocumentoController.hasBotaoTratar(requisicao)}"
+								actionListener="#{requisicaoDocumentoController.confirmarTratamentoRequisicao(requisicao)}" update=":modalTratarId">
+								<img class="atualizar btnModalTratarRequisicao" src="#{request.contextPath}/resources/imagens/img_trans.gif" width="1" height="1" />
+							</p:commandLink>
+							<!-- end-of: tratar -->
+
+							<!-- begin-of: download -->
+							<p:commandLink title="Clique aqui para baixar o documento" styleClass="image-link" onclick="PrimeFaces.monitorDownload(showStatus, hideStatus);"
+								ajax="false" rendered="#{requisicaoDocumentoController.hasBotaoDownload(requisicao)}">
+								<p:fileDownload value="#{requisicaoDocumentoController.downloadDocumento(requisicao)}" />
+								<img class="icon-download" src="#{request.contextPath}/resources/imagens/img_trans.gif" width="1" height="1" />
+							</p:commandLink>
+							<!-- end-of: download -->
+
+							<!-- begin-of: avaliação -->
+							<p:commandLink title="Clique aqui para avaliar a requisição" styleClass="btnModalAvaliar1 image-link"
+								rendered="#{requisicaoDocumentoController.hasBotaoAvaliar(requisicao)}"
+								actionListener="#{requisicaoDocumentoController.visualizarAvaliacaoRequisicao(requisicao)}" update=":modalAvaliacaoId">
+								<img src="#{request.contextPath}/resources/imagens/estrelaVazia.png" />
+							</p:commandLink>
+							<!-- end-of: avaliação -->
+
+							<!-- begin-of: exibir avaliação -->
+							<p:commandLink title="Clique aqui para ver a avaliação da requisição" styleClass="btnModalAvaliar1 image-link"
+								rendered="#{requisicaoDocumentoController.hasBotaoVisualizarAvaliacao(requisicao)}"
+								actionListener="#{requisicaoDocumentoController.visualizarAvaliacaoRequisicao(requisicao)}" update=":modalAvaliacaoId">
+								<img src="#{request.contextPath}/resources/imagens/estrelaCheia.png" />
+							</p:commandLink>
+							<!-- end-of: exibir avaliação -->
+
+							<!-- begin-of: editar -->
+							<h:commandLink title="Clique aqui para editar o documento" styleClass="image-link"
+								rendered="#{requisicaoDocumentoController.hasBotaoRascunho(requisicao)}" action="#{requisicaoDocumentoController.editar(requisicao)}">
+								<img class="icon-editar" src="#{request.contextPath}/resources/imagens/img_trans.gif" width="1" height="1" />
+							</h:commandLink>
+							<!-- end-of: editar -->
+
+							<!-- begin-of: autorizar -->
+							<p:commandLink title="Clique aqui para autorizar/cancelar a requisição" styleClass="image-link"
+								rendered="#{requisicaoDocumentoController.hasBotaoAutorizar(requisicao)}" update=":modalAutorizarId"
+								actionListener="#{requisicaoDocumentoController.confirmarAutorizacaoRequisicao(requisicao)}">
+								<img class="btnModalAprovaRequisicao icon-autorizar" src="#{request.contextPath}/resources/imagens/img_trans.gif" width="1" height="1" />
+							</p:commandLink>
+							<!-- end-of: autorizar -->
+
+							<!-- begin-of: visualizar cancelamento -->
+							<p:commandLink title="Clique aqui para exibir o motivo de cancelamento da requisição" styleClass="image-link"
+								rendered="#{requisicaoDocumentoController.hasBotaoVisualizarCancelamento(requisicao)}" update=":modalAutorizarId"
+								actionListener="#{requisicaoDocumentoController.confirmarAutorizacaoRequisicao(requisicao)}">
+								<img class="btnModalAprovaRequisicao icon-cancelada" src="#{request.contextPath}/resources/imagens/img_trans.gif" width="1" height="1" />
+							</p:commandLink>
+							<!-- end-of: visualizar cancelamento -->
+
+							<!-- begin-of: clonar -->
+							<p:commandLink title="Clique aqui para clonar a requisição" styleClass="image-link"
+								action="#{requisicaoDocumentoController.confirmarClonagemRequisicao(requisicao)}" process="@this" update=":modalClonarId">
+								<img class="icon-duplicar btnModalClonarRequisicao" src="#{request.contextPath}/resources/imagens/img_trans.gif" width="1" height="1" />
+							</p:commandLink>
+							<!-- end-of: clonar -->
+							
+							<!-- begin-of: histórico -->
+							<p:commandLink title="#{bundle['MH007']}" styleClass="image-link"
+								actionListener="#{requisicaoDocumentoController.visualizarHistoricoTramite(requisicao)}" update=":modalHistoricoId">
+								<img class="icon-informacoes btnModalHistoricoReq" src="#{request.contextPath}/resources/imagens/img_trans.gif" width="1" height="1" />
+							</p:commandLink>
+							<!-- end-of: histórico -->
+
+						</p:column>
+
+					</p:dataTable>
+					<!-- end-of: resultados -->
+
+				</p:outputPanel>
+			</p:outputPanel>
+		</o:form>
+
+		<!-- begin-of: modals -->
+
+		<!-- Foram modificadas apenas as chamadas dos métodos do bean. Definições de interface  -->
+		<!-- continuam as mesmas do legado conforme proposta da OS. Necessário refatorar para elimitar problemas de apresentação. -->
+
+		<!-- begin-of: modal período -->
+		<p:dialog id="dataNaoInformada" widgetVar="mdlDtNaoInformada" styleClass="ui-dialog-background" modal="true" header="Atenção" width="500px" draggable="true"
+			resizable="false" position="center">
+			<h:form id="confirmarForm">
+				<span class="atencao2" style="margin-top: -2px !important;" />
+				<h:outputLabel style="margin-left: 40px; max-width: 60px; font-weight: bold !important;" value="#{bundle['MA013']}">
+				</h:outputLabel>
+				<br></br>
+				<p:commandLink id="btnConfirmar" styleClass="btnLaranja marginTop buttonSelected" update=":formConsulta" oncomplete="mdlDtNaoInformada.hide()"
+					actionListener="#{requisicaoDocumentoController.localizarPorPeriodoPadrao()}">
+					<span><h:outputText style="width: 1; height: 1;" value="Sim" /></span>
+				</p:commandLink>
+				<p:commandLink id="btnNaoConfirmar" styleClass="btnAzul marginTop buttonSelected"
+					actionListener="#{requisicaoDocumentoController.informarDataInicioObrigatoria()}" oncomplete="mdlDtNaoInformada.hide()">
+					<span><h:outputText style="width: 1; height: 1;" value="Não" /></span>
+				</p:commandLink>
+				<p:spacer height="30px" />
+			</h:form>
+		</p:dialog>
+		<!-- end-of: modal período -->
+
+		<!-- begin-of: modal histórico -->
+		<p:dialog header="#{bundle['requisicao.consulta.title.titloHistorico']} #{requisicaoDocumentoController.requisicaoSelecionada.codigoRequisicao} "
+			closable="true" id="modalHistoricoId" widgetVar="mdlHistorico" width="550" height="400" styleClass="ui-dialog-background" modal="true" resizable="false" position="center"
+			onHide="document.formHistorico.reset();">
+			<h:form id="formHistorico">
+				
+				<h:panelGrid id="gridDataTable" columns="1" width="100%">
+					<p:dataTable id="dataTable" var="obj" widgetVar="historicoRequiscao" value="#{requisicaoDocumentoController.listTramiteRequisicao}"
+						paginatorPosition="bottom" styleClass="estilo-border-dotted zebr" rowSelectMode="single" rowIndexVar="rowIx" 
+						emptyMessage="#{bundle['MA010']}" paginator="false">
+						
+						<f:facet name="header">
+							HISTÓRICO
+						</f:facet>
+						
+						<p:column sortBy="#{obj.situacaoRequisicao.nome}" filterBy="#{obj.situacaoRequisicao.nome}" filterStyle="display:none; visibility:hidden;"
+							style="text-align:left; width: 0px;" styleClass="noBackGroundImage" width="12%">
+							<f:facet name="header">
+								<h:outputText value="#{bundle['requisicao.consulta.historico.title.evento']}" />
+							</f:facet>
+							<h:outputText value="#{obj.situacaoRequisicao.nome}" />
+						</p:column>
+						<p:column sortBy="#{obj.dataHora}" filterBy="#{obj.dataHora}" filterStyle="display:none; visibility:hidden;" style="text-align:left; width: 0px;"
+							styleClass="noBackGroundImage" width="12%">
+							<o:importConstants type="br.gov.caixa.gitecsa.sired.enumerator.SituacaoRequisicaoEnum" />
+							<f:facet name="header">
+								<h:outputText value="#{bundle['geral.label.dataHora.maiusculas']}" />
+							</f:facet>
+							<h:outputText
+								rendered="#{!SituacaoRequisicaoEnum.ATENDIDA.getId().equals(obj.situacaoRequisicao.id) and !SituacaoRequisicaoEnum.REATENDIDA.getId().equals(obj.situacaoRequisicao.id)}"
+								value="#{obj.dataHora}">
+								<f:convertDateTime dateStyle="long" pattern="dd/MM/yyyy HH:mm" locale="pt_BR" />
+							</h:outputText>
+							<h:outputText
+								rendered="#{SituacaoRequisicaoEnum.ATENDIDA.getId().equals(obj.situacaoRequisicao.id) or SituacaoRequisicaoEnum.REATENDIDA.getId().equals(obj.situacaoRequisicao.id)}"
+								value="#{obj.dataHoraAtendimento}">
+								<f:convertDateTime dateStyle="long" pattern="dd/MM/yyyy HH:mm" locale="pt_BR" />
+							</h:outputText>
+						</p:column>
+						<p:column sortBy="#{obj.codigoUsuario}" filterBy="#{obj.codigoUsuario}" filterStyle="display:none; visibility:hidden;"
+							style="text-align:left; width: 0px;" styleClass="noBackGroundImage" width="12%">
+							<f:facet name="header">
+								<h:outputText value="#{bundle['geral.label.usuario.maiusculas']}" />
+							</f:facet>
+							<h:outputText value="#{obj.codigoUsuario}">
+							</h:outputText>
+						</p:column>
+					</p:dataTable>
+					
+					<br/>
+					
+					<p:dataTable id="dataTableAuditoria" var="obj" widgetVar="auditoriaRequiscao" value="#{requisicaoDocumentoController.listAuditoria}"
+						paginatorPosition="bottom" styleClass="estilo-border-dotted zebr" rowSelectMode="single" rowIndexVar="rowIx" 
+						emptyMessage="#{bundle['MA010']}" paginator="false">
+						
+						<f:facet name="header">
+							AUDITORIA
+						</f:facet>
+						
+						<p:column sortBy="#{obj.descricao}" filterBy="#{obj.descricao}" filterStyle="display:none; visibility:hidden;"
+							style="text-align:left; width: 0px;" styleClass="noBackGroundImage" width="12%">
+							<f:facet name="header">
+								<h:outputText value="#{bundle['geral.label.descricao.maiusculas']}" />
+							</f:facet>
+							<h:outputText value="#{obj.descricao}" />
+						</p:column>
+						<p:column sortBy="#{obj.dataHoraOcorrencia}" filterBy="#{obj.dataHoraOcorrencia}" filterStyle="display:none; visibility:hidden;" style="text-align:left; width: 0px;"
+							styleClass="noBackGroundImage" width="12%">
+							<f:facet name="header">
+								<h:outputText value="#{bundle['geral.label.dataHora.maiusculas']}" />
+							</f:facet>
+							<h:outputText value="#{obj.dataHoraOcorrencia}">
+								<f:convertDateTime dateStyle="long" pattern="dd/MM/yyyy HH:mm" locale="pt_BR" />
+							</h:outputText>
+						</p:column>
+						<p:column sortBy="#{obj.codigoUsuario}" filterBy="#{obj.codigoUsuario}" filterStyle="display:none; visibility:hidden;"
+							style="text-align:left; width: 0px;" styleClass="noBackGroundImage" width="12%">
+							<f:facet name="header">
+								<h:outputText value="#{bundle['geral.label.usuario.maiusculas']}" />
+							</f:facet>
+							<h:outputText value="#{obj.codigoUsuario}">
+							</h:outputText>
+						</p:column>
+					</p:dataTable>
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+		<!-- end-of: modal histórico -->
+
+		<!-- begin-of: modal avaliações -->
+		<p:dialog header="Avaliação da Requisicao Cód. #{requisicaoDocumentoController.requisicaoSelecionada.codigoRequisicao}" id="modalAvaliacaoId"
+			widgetVar="mdlAvaliacao" styleClass="ui-dialog-background" modal="true" dynamic="true" resizable="false" position="center" onHide="giveFocusRemote();">
+			<h:form id="formAvaliacao">
+				<p:messages id="mdlMessage" />
+
+				<h:panelGrid columns="3">
+
+					<!-- begin-of: motivo -->
+					<h:outputLabel styleClass="label-button" value="Avaliação">
+						<h:outputText styleClass="pesquisaDireta" />
+						<br />
+						<h:selectOneMenu disabled="#{!empty requisicaoDocumentoController.avaliacaoRequisicaoSelecionada.id}"
+							styleClass="#{!empty requisicaoDocumentoController.avaliacaoRequisicaoSelecionada.id ? 'select-disabled' : 'select'}"
+							value="#{requisicaoDocumentoController.avaliacaoRequisicaoSelecionada.motivoAvaliacao}" converter="omnifaces.SelectItemsConverter">
+							<f:selectItems value="#{requisicaoDocumentoController.listMotivoAvaliacao}" var="item" itemLabel="#{item.deMotivoAvaliacao}" itemValue="#{item}" />
+						</h:selectOneMenu>
+					</h:outputLabel>
+					<!-- end-of: motivo -->
+
+					<!-- begin-of: ações -->
+					<h:outputLabel styleClass="label-button" value="Ações">
+						<h:outputText styleClass="pesquisaDireta" />
+						<br />
+						<o:importConstants type="br.gov.caixa.gitecsa.sired.enumerator.SimNaoEnum" />
+						<h:selectOneMenu required="true" styleClass="#{!empty requisicaoDocumentoController.avaliacaoRequisicaoSelecionada.id ? 'select-disabled' : 'select'}"
+							disabled="#{!empty requisicaoDocumentoController.avaliacaoRequisicaoSelecionada.id || !empty requisicaoDocumentoController.avaliacaoRequisicaoSelecionada.icReabertura}"
+							value="#{requisicaoDocumentoController.avaliacaoRequisicaoSelecionada.icReabertura}">
+							<f:selectItem itemLabel="Fechar a requisição" itemValue="#{SimNaoEnum.NAO}" />
+							<f:selectItem itemLabel="Reabrir a requisição" itemValue="#{SimNaoEnum.SIM}" />
+						</h:selectOneMenu>
+					</h:outputLabel>
+					<!-- end-of: ações -->
+
+					<!-- begin-of: matricula -->
+					<h:outputLabel styleClass="label-button" value="Usuário">
+						<br />
+						<p:inputMask mask="a999999" style="width: 50px; text-align:left;" maxlength="7" disabled="true" styleClass="ui-inputfield-disabled"
+							value="#{requisicaoDocumentoController.avaliacaoRequisicaoSelecionada.codigoUsuario}">
+						</p:inputMask>
+					</h:outputLabel>
+					<!-- end-of: matricula -->
+
+				</h:panelGrid>
+
+
+				<h:panelGrid columns="3">
+					<!-- begin-of: quantidade solicitada -->
+					<h:outputLabel styleClass="label-button" value="Quantidade Solicitada">
+						<br />
+						<p:inputText id="qtdSolic" disabled="true" style="width:50px;" value="#{requisicaoDocumentoController.requisicaoSelecionada.qtSolicitadaDocumento}" />
+					</h:outputLabel>
+					<!-- end-of: quantidade solicitada -->
+					<!-- begin-of: quantidade disponibilizada -->
+					<h:outputLabel styleClass="label-button" value="Quantidade Disponibilizada">
+						<br />
+						<p:inputText id="qtdDisp" disabled="true" style="width:50px;"
+							value="#{requisicaoDocumentoController.requisicaoSelecionada.tramiteRequisicaoAtual.qtdDisponibilizadaDocumento}" />
+					</h:outputLabel>
+					<!-- end-of: quantidade disponibilizada -->
+					<!-- begin-of: tipo de suporte -->
+					<h:outputLabel styleClass="label-button" value="Tipo de Suporte">
+						<br />
+						<p:inputText id="suporte" disabled="true" style="text-align:left; width:100px; "
+							value="#{!empty requisicaoDocumentoController.requisicaoSelecionada.tramiteRequisicaoAtual.suporte ? 
+								requisicaoDocumentoController.requisicaoSelecionada.tramiteRequisicaoAtual.suporte.nome : ''}" />
+					</h:outputLabel>
+					<!-- end-of: tipo de suporte -->
+				</h:panelGrid>
+
+				<h:panelGrid columns="1">
+					<!-- begin-of: comentario -->
+					<h:outputLabel styleClass="label-button" value="Comentário">
+						<br />
+						<h:inputTextarea value="#{requisicaoDocumentoController.avaliacaoRequisicaoSelecionada.observacao}" cols="80" rows="5"
+							style="text-align: left; white-space: pre-wrap;" onchange="limitarTextArea(this,200)" onmouseout="limitarTextArea(this,200)"
+							onkeyup="limitarTextArea(this,200)" maxlength="200" disabled="#{!empty requisicaoDocumentoController.avaliacaoRequisicaoSelecionada.id}" />
+					</h:outputLabel>
+					<!-- end-of: comentario -->
+				</h:panelGrid>
+
+				<h:panelGrid columns="2" rendered="#{!empty requisicaoDocumentoController.avaliacaoRequisicaoSelecionada.id}">
+					<h:outputLabel value="Data Hora:" styleClass="label-button" />
+					<h:outputLabel value="#{requisicaoDocumentoController.avaliacaoRequisicaoSelecionada.dataHora}" styleClass="label-button">
+						<f:convertDateTime pattern="dd/MM/yyyy HH:mm" type="both" locale="pt_BR" />
+					</h:outputLabel>
+				</h:panelGrid>
+
+				<p:commandLink rendered="#{empty requisicaoDocumentoController.avaliacaoRequisicaoSelecionada.id}" styleClass="btnLaranja marginTop buttonSelected"
+					process="formAvaliacao" actionListener="#{requisicaoDocumentoController.avaliarRequisicao()}" update="mdlMessage">
+					<span>Gravar</span>
+				</p:commandLink>
+
+				<p:commandLink styleClass="btnAzul marginTop buttonSelected" rendered="#{empty requisicaoDocumentoController.avaliacaoRequisicaoSelecionada.id}"
+					onclick="mdlAvaliacao.hide();">
+					<span>Cancelar</span>
+				</p:commandLink>
+			</h:form>
+		</p:dialog>
+		<!-- end-of: modal avaliações -->
+
+		<!-- begin-of: modal autorizar -->
+		<p:dialog widgetVar="mdlAutorizar" id="modalAutorizarId"
+			header="#{requisicaoDocumentoController.isRequisicaoCancelada(requisicaoDocumentoController.requisicaoSelecionada) ? 'Requisição Cód. '.concat(requisicaoDocumentoController.requisicaoSelecionada.codigoRequisicao.toString()).concat(' Cancelada')  : 'Autorizar Requisição Cód. '.concat(requisicaoDocumentoController.requisicaoSelecionada.codigoRequisicao.toString()) }"
+			modal="true" width="385" resizable="false">
+			<h:form id="frmModalAutorizar">
+
+				<p:messages id="mdlAutorizarMessage" />
+
+				<o:importConstants type="br.gov.caixa.gitecsa.sired.enumerator.SituacaoRequisicaoEnum" />
+				<p:outputPanel rendered="#{!requisicaoDocumentoController.requisicaoCancelada(requisicaoDocumentoController.requisicaoSelecionada)}">
+					<table>
+						<tr>
+							<td><b> <h:outputFormat value="Deseja autorizar a Requisição Código {0}?">
+										<f:param value="#{requisicaoDocumentoController.requisicaoSelecionada.codigoRequisicao.toString()}" />
+									</h:outputFormat>
+							</b></td>
+						</tr>
+						<tr>
+							<td>
+								<div class="wrap" align="center">
+									<h:commandLink styleClass="btnAzul marginTop btnRequisicaoAprovada" action="#{requisicaoDocumentoController.autorizarRequisicao()}"
+										title="#{bundle['MH063']}">
+										<f:param name="situacao" value="#{requisicaoDocumentoController.situacaoUrlParam}"/>
+										<span>Autorizar Requisição</span>
+									</h:commandLink>
+
+									<p:commandLink disabled="#{requisicaoDocumentoController.confirmarCancelamento}" styleClass="btnLaranja marginTop btnFecharModalN"
+										title="#{bundle['MH064']}" update="frmModalAutorizar">
+										<span>Cancelar Requisição...</span>
+										<f:param name="situacao" value="#{requisicaoDocumentoController.situacaoUrlParam}"/>
+										<f:setPropertyActionListener target="#{requisicaoDocumentoController.confirmarCancelamento}" value="true" />
+									</p:commandLink>
+								</div>
+							</td>
+						</tr>
+					</table>
+				</p:outputPanel>
+
+				<p:outputPanel id="pnlMotivoCancelamento" rendered="#{requisicaoDocumentoController.confirmarCancelamento}">
+					<br />
+					<h:outputLabel styleClass="label-button" value="Usuário">
+						<p:inputMask styleClass="consultaUsuario" value="#{requisicaoDocumentoController.usuarioAutenticado.nuMatricula}" mask="a999999" maxlength="7"
+							disabled="true">
+						</p:inputMask>
+					</h:outputLabel>
+
+					<h:outputLabel value="Motivo de cancelamento" styleClass="label-button">
+						<h:outputText styleClass="pesquisaDireta" />
+						<br />
+						<p:inputTextarea value="#{requisicaoDocumentoController.motivoCancelamento}" style="text-align: left; white-space: pre-wrap;"
+							disabled="#{requisicaoDocumentoController.isRequisicaoCancelada(requisicaoDocumentoController.requisicaoSelecionada)}"
+							onchange="limitarTextArea(this,200)" onmouseout="limitarTextArea(this,200)" onkeyup="limitarTextArea(this,200)" styleClass="comentarioCancelamento" />
+					</h:outputLabel>
+
+					<p:commandLink styleClass="btnLaranja marginTop btnFecharModalN" actionListener="#{requisicaoDocumentoController.cancelarRequisicao()}"
+						title="#{bundle['MH006']}" rendered="#{!requisicaoDocumentoController.requisicaoCancelada(requisicaoDocumentoController.requisicaoSelecionada)}">
+						<span>Confirmar Cancelamento da Requisição</span>
+						<f:param name="situacao" value="#{requisicaoDocumentoController.situacaoUrlParam}"/>
+					</p:commandLink>
+
+					<h:commandLink styleClass="btnLaranja marginTop btnFecharModalN" onclick="mdlAutorizar.hide(); return false;" title="#{bundle['MH070']}">
+						<span>Fechar</span>
+					</h:commandLink>
+				</p:outputPanel>
+			</h:form>
+		</p:dialog>
+		<!-- end-of: modal autorizar -->
+
+		<!-- begin-of: modal tratar -->
+		<p:dialog widgetVar="mdlTratar" id="modalTratarId"
+			header="Deseja tratar a Requisição Código #{requisicaoDocumentoController.requisicaoSelecionada.codigoRequisicao}?" modal="true" width="480" height="90"
+			resizable="false">
+			<h:form>
+				<table>
+					<tr>
+						<td class="icon-atencao" style="padding-right: 10px;"></td>
+						<td><b>#{bundle['MI011']}</b></td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							<div class="wrap" align="center">
+								<h:commandLink styleClass="btnAzul marginTop btnRequisicaoAprovada" action="#{requisicaoDocumentoController.tratarRequisicao()}">
+									<span>Sim</span>
+									<f:param name="situacao" value="#{requisicaoDocumentoController.situacaoUrlParam}"/>
+								</h:commandLink>
+								<h:commandLink styleClass="btnLaranja marginTop btnFecharModalN" onclick="mdlTratar.hide(); return false;">
+									<span>Não</span>
+								</h:commandLink>
+							</div>
+						</td>
+					</tr>
+				</table>
+			</h:form>
+		</p:dialog>
+		<!-- end-of: modal tratar -->
+		
+		<!-- begin-of: modal clonar -->
+		<p:dialog widgetVar="mdlClonar" id="modalClonarId"
+			header="Deseja clonar a Requisição Cód. #{requisicaoDocumentoController.requisicaoSelecionada.codigoRequisicao}?" modal="true" width="480" height="90"
+			resizable="false">
+			<h:form>
+				<table>
+					<tr>
+						<td class="icon-atencao" style="padding-right: 10px;"></td>
+						<td><b>Confirma a clonagem do item?</b></td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							<div class="wrap" align="center">
+								<h:commandLink styleClass="btnAzul marginTop btnClonar" action="#{requisicaoDocumentoController.clonarRequisicao()}">
+									<span>Sim</span>
+								</h:commandLink>
+								<h:commandLink styleClass="btnLaranja marginTop btnFecharModalN" onclick="mdlClonar.hide(); return false;">
+									<span>Não</span>
+								</h:commandLink>
+							</div>
+						</td>
+					</tr>
+				</table>
+			</h:form>
+		</p:dialog>
+		<!-- end-of: modal clonar -->
+
+		<!-- begin-of: modal info -->
+		<ui:include src="/includes/modalInfoRequisicao.xhtml" />
+		<!-- end-of: modal info -->
+
+		<!-- begin-of: modal alerta unidade -->
+		<p:dialog id="alertaUnidade" widgetVar="mdlAlertaUnidade" styleClass="ui-dialog-background" header="Atenção" modal="true" width="480" resizable="false"
+			draggable="true">
+			<p:ajax event="close" listener="#{requisicaoDocumentoController.limparNotificacaoUnidade()}" />
+			<h:form>
+				<table>
+					<tr>
+						<td class="icon-atencao" style="padding-right: 10px;"></td>
+						<td><b>#{requisicaoDocumentoController.notificaoUnidadeNaoPermitida}</b></td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							<div class="wrap" align="center">
+								<p:commandLink id="btnConfirmar" styleClass="btnAzul marginTop buttonSelected" onclick="mdlAlertaUnidade.hide(); return false;">
+									<span><h:outputText style="width: 1; height: 1;" value="Ok" /></span>
+								</p:commandLink>
+								<p:spacer height="30px" />
+							</div>
+						</td>
+					</tr>
+				</table>
+			</h:form>
+
+		</p:dialog>
+		<!-- end-of: modal alerta unidade -->
+		
+		<p:dialog widgetVar="mdlCancelarRascunho" id="modalCancelarRascunhoId"
+			header="Cancelamento Cód. #{requisicaoDocumentoController.requisicaoSelecionada.codigoRequisicao}?" 
+			modal="true" width="400" resizable="false">
+			<h:form prependId="false">
+				<h:panelGroup layout="block">
+					<b>Confirma o cancelamento do item?</b>
+				</h:panelGroup>
+				<h:panelGrid columns="2">
+					<h:commandLink styleClass="btnAzul marginTop" action="#{requisicaoDocumentoController.cancelarRascunho()}"
+						title="#{bundle['MH133']}">
+						<span>Sim</span>
+						<f:param name="situacao" value="#{requisicaoDocumentoController.situacaoUrlParam}"/>
+					</h:commandLink>
+					
+					<h:commandLink styleClass="btnLaranja marginTop" onclick="mdlCancelarRascunho.hide(); return false;"
+						title="#{bundle['MH134']}">
+						<span>Não</span>
+					</h:commandLink>
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+		<!-- end-of: modals -->
+
+		<p:ajaxStatus oncomplete="applyStylesResultsDataTable();toggleEditable($('#formConsulta\\:numeroRequisicoes'));" />
+		
+		<h:form>
+			<p:remoteCommand name="rmcSetAgrupamento" action="#{requisicaoDocumentoController.setAgrupamentoSituacaoFromRemoteCommand()}" />
+		</h:form>
+
+		<script type="text/javascript">
+			/**
+			 * Habilita/desabilita os filtros de acordo com o preenchimento do campo nº requisição
+			 */
+			$(document).on('keyup', '#formConsulta\\:numeroRequisicoes',
+					function() {
+						// Chamado sempre que um número de requisição for informado. Ao utilizar $(documento).on(...), 
+						// os eventos do jQuery não são perdidos ao realizar update em um componente JSF, ao contrário do $(document).ready().
+						toggleEditable($(this));
+			}).ready(function(e) {
+				// Utilizado para a tela "Minhas Requisições" que já deve iniciar com os campos desabilitados. 
+				toggleEditable($('#formConsulta\\:numeroRequisicoes'));
+				applyStylesResultsDataTable();
+				$('.filtro-situacao option:eq(0)').prop('selected', true);
+			});
+
+			var toggleEditable = function(component) {
+
+				var state = (!component.val()) ? false : true;
+
+				// InputText
+				$('input.filtro-opcional:not(.input-readonly)').prop(
+						'disabled', state);
+				toggleEditableClass(
+						$('input.filtro-opcional:not(.input-readonly)'),
+						'input-disabled');
+
+				// Calendar
+				$('span.filtro-opcional input').prop('disabled', state);
+				toggleEditableClass($('span.filtro-opcional input'),
+						'input-disabled');
+
+				// SelectOneMenu
+				$('select.filtro-opcional').prop('disabled', state);
+				toggleEditableClass($('select.filtro-opcional'),
+						'select-disabled');
+			};
+
+			var toggleEditableClass = function(component, className) {
+
+				if (component.prop('disabled')) {
+					component.addClass(className);
+				} else {
+					component.removeClass(className);
+				}
+			};
+
+			var applyStylesResultsDataTable = function() {
+
+				$('#formConsulta\\:tabela table[role=grid]').prop('class',
+						'zebra gridPesquisar').css('border',
+						'1px dotted rgb(102, 102, 102)');
+
+				$('#formConsulta\\:tabela_head tr th[role=columnheader]').prop(
+						'class', 'borderLeft marginLeft center').first()
+						.removeClass('borderLeft');
+
+				$('#formConsulta\\:tabela_data tr td[role=gridcell]')
+						.prop('class',
+								'borderLeft marginLeft center btnInsDocumento')
+						.first().removeClass('borderLeft');
+
+				$(
+						'#formConsulta\\:tabela_data tr.ui-datatable-empty-message td')
+						.attr('style',
+								'color: #F00 !important; font-size: 12px !important; font-weight: bold;');
+			}
+
+			$(document).on('change', '.filtro-situacao', function () {
+				var valor = $(this).find('option:selected').text();
+				valor = valor.replace(/\s/g, '_');
+				
+				if (valor === 'PEND_CAIXA' || valor === 'PEND_ATENDIMENTO') {
+					rmcSetAgrupamento([{name:'agrupamento', value: valor}]);
+				} else {
+					rmcSetAgrupamento([{name:'agrupamento', value: ''}]);
+				}
+			});
+		</script>
+
+	</ui:define>
+</ui:composition>

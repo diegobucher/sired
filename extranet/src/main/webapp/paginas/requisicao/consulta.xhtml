@@ -1,0 +1,614 @@
+<ui:composition template="/WEB-INF/templates/template_sem_menu.xhtml" xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui">
+
+	<ui:define name="html-head">
+		<h:outputScript library="js" name="jquery.price_format.1.3.js" />
+		<h:outputScript library="js" name="consulta-requisicao.js" />
+		<h:outputScript library="js" name="jquery.form.min.js" />
+		<h:outputScript library="js" name="jquery.pesquisa-unidade.js" />
+	</ui:define>
+	
+	<ui:param name="modal" value="#{terceirizadaRequisicaoController}" />
+	
+	<ui:define name="breadcrumb">
+		<h:form id="formBreadcrumb">
+			<div id="wrapAuxiliar">
+				<ul class="breadcrumb-sistema">
+					<li>#{bundle['geral.breadcrumb.voce.esta.em']}</li>
+					<li><h:commandLink value="#{bundle['geral.breadcrumb.requisicao']}" styleClass="buttonSelected"
+							action="/paginas/requisicao/consulta.xhtml?faces-redirect=true" /></li>
+					<li>#{bundle['requisicao.atendimento.lote.tituloPagina.descricao']}</li>
+				</ul>
+			</div>
+		</h:form>
+	</ui:define>
+
+	<ui:define name="content-main-page">
+
+		<h:form id="formConsulta">
+			<p:focus id="focusConsulta" context="formConsulta" />
+			<p:messages id="messages" showDetail="false" escape="false" />
+
+			<h3 class="titlePage">#{bundle['requisicao.atendimento.lote.tituloPagina']}</h3>
+
+			<ui:include src="/paginas/requisicao/include-panel-consulta.xhtml" />
+
+			<p:outputPanel id="pnlAtendimentoLote" style="display:none;">
+				<p:fieldset styleClass="filtro" id="panelAtendimento">
+					<h:panelGrid columns="1">
+						<h:outputLabel value="Selecione o arquivo CSV para atendimento em lote:" styleClass="label-button" />
+						<!-- begin-of: upload -->
+						<p:outputPanel id="pnlUploadCSV">
+							<table>
+								<tr>
+									<td><input type="file" id="arquivo" name="arquivo" accept=".csv,.txt" class="marginTop" style="width: 400px; margin-right: 20px;" /></td>
+									<td>
+										<a href="#" id="btnEnviarArqAtendimento" class="btnAzul marginBottom" title="#{bundle['MH090']}">
+											<span>#{bundle['geral.button.enviar_arquivo']}</span>
+										</a>
+									</td>
+								</tr>
+							</table>
+						</p:outputPanel>
+						<!-- end-of: upload -->
+					</h:panelGrid>
+				</p:fieldset>
+			</p:outputPanel>
+
+			<p:dataTable id="tabela" value="#{terceirizadaRequisicaoController.listRequisicaoModel}"
+				rendered="#{terceirizadaRequisicaoController.listRequisicaoModel ne null}" lazy="true" varStatus="size" var="requisicao" type="unordered" itemType="none"
+				paginator="true" rows="10" paginatorPosition="bottom"
+				paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+				currentPageReportTemplate="#{bundle['geral.crud.exibindo']} {startRecord} #{bundle['geral.crud.ate']} {endRecord}  #{bundle['geral.crud.de']} {totalRecords}  #{bundle['geral.crud.registros']} "
+				rowsPerPageTemplate="5,10,25,50" emptyMessage="#{bundle['MI022']}">
+
+				<!-- COD. REQUISIÇÃO -->
+				<p:column style="width:60px">
+					<f:facet name="header">
+						<h:outputText value="#{bundle['requisicao.consulta.title.numRequisicao']}" />
+					</f:facet>
+					<b><p:commandLink title="Clique aqui para acessar a Requisição" styleClass="image-link info-link"
+							actionListener="#{terceirizadaRequisicaoController.visualizarRequisicao(requisicao)}" update=":modalInfoId" value="#{requisicao.codigoRequisicao}" /></b>
+				</p:column>
+
+				<!-- DATA DE ABERTURA -->
+				<p:column style="width:70px">
+					<f:facet name="header">
+						<h:outputText value="#{bundle['geral.label.dataAbertura']}" />
+					</f:facet>
+					<h:outputText value="#{requisicao.dataHoraAberturaFormatada}" />
+				</p:column>
+
+				<!-- PRAZO -->
+				<p:column style="width:70px">
+					<f:facet name="header">
+						<h:outputText value="#{bundle['requisicao.consulta.title.prazo']}" />
+					</f:facet>
+					<h:outputText value="#{requisicao.prazoAtendimento}">
+						<f:convertDateTime dateStyle="short" locale="pt_BR" />
+					</h:outputText>
+				</p:column>
+
+				<!-- DOCUMENTO -->
+				<p:column style="width:100px">
+					<f:facet name="header">
+						<h:outputText value="#{bundle['geral.label.documentoU']}" />
+					</f:facet>
+					<h:outputText value="#{requisicao.documento.nome}" />
+				</p:column>
+
+				<!-- UNIDADE SOLICITANTE -->
+				<p:column style="width:100px">
+					<f:facet name="header">
+						<h:outputText value="#{bundle['geral.label.unidadeSolicitanteU']}" />
+					</f:facet>
+					<h:outputText value="#{requisicao.unidadeSolicitante.descricaoCompleta}" />
+				</p:column>
+
+				<!-- DEMANDA -->
+				<p:column style="width:70px">
+					<f:facet name="header">
+						<h:outputText value="#{bundle['requisicao.consulta.title.demanda']}" />
+					</f:facet>
+					<h:outputText value="#{requisicao.requisicaoDocumento.tipoDemanda.nome}" />
+				</p:column>
+
+				<!-- SITUAÇÃO -->
+				<p:column style="width:80px">
+					<f:facet name="header">
+						<h:outputText value="#{bundle['requisicao.consulta.title.situacao']}" />
+					</f:facet>
+					<h:outputText value="#{requisicao.tramiteRequisicaoAtual.situacaoRequisicao.nome}" />
+				</p:column>
+
+				<!-- OCORRÊNCIA -->
+				<p:column style="width:80px">
+					<f:facet name="header">
+						<h:outputText value="#{bundle['requisicao.consulta.title.ocorrencia']}" />
+					</f:facet>
+					<h:outputText value="#{requisicao.tramiteRequisicaoAtual.ocorrencia.nome}" />
+				</p:column>
+
+				<!-- AÇÕES -->
+				<p:column style="width:95px; white-space:nowrap;">
+					<f:facet name="header">
+						<h:outputText value="#{bundle['requisicao.consulta.title.acao']}" />
+					</f:facet>
+
+					<p:commandLink id="idAtenderRequisicao" styleClass="image-link" process="@form" title="Clique aqui para atender a requisição"
+						actionListener="#{terceirizadaRequisicaoController.onAtenderRequisicao(requisicao)}"
+						rendered="#{terceirizadaRequisicaoController.habilitaAtenderRequisicao(requisicao)}" update=":modalAtendimentoID :formConsulta:messages">
+						<img class="icon-atender" src="#{request.contextPath}/resources/imagens/img_trans.gif" width="1" height="1" />
+					</p:commandLink>
+
+					<p:commandLink id="idDownload" styleClass="image-link" update=":formConsulta:messages" title="Clique aqui para baixar o documento" process="@form"
+						ajax="false" onclick="PrimeFaces.monitorDownload(showStatus, hideStatus);" rendered="#{!empty requisicao.tramiteRequisicaoAtual.arquivoDisponibilizado}">
+						<p:fileDownload value="#{terceirizadaRequisicaoController.fazerDownload(requisicao)}" />
+						<img class="icon-download" src="#{request.contextPath}/resources/imagens/img_trans.gif" width="1" height="1" />
+					</p:commandLink>
+
+					<p:commandLink id="idMotivoReabertura" styleClass="image-link" title="Clique aqui para ver o motivo de reabertura da requisição"
+						actionListener="#{terceirizadaRequisicaoController.onMotivoReabertura(requisicao)}"
+						rendered="#{terceirizadaRequisicaoController.habilitaMotivoReabertura(requisicao)}" update=":modalMotivoReaberturaId :formConsulta:messages">
+						<img class="icon-motivo" src="#{request.contextPath}/resources/imagens/img_trans.gif" width="1" height="1" />
+					</p:commandLink>
+
+					<p:commandLink id="idVisualizarHistorico" styleClass="image-link" title="Clique aqui para ver o histórico da requisição"
+						actionListener="#{terceirizadaRequisicaoController.onVisualizarHistorico(requisicao)}" update=":modalHistoricoId :formConsulta:messages">
+						<img class="icon-informacoes" src="#{request.contextPath}/resources/imagens/img_trans.gif" width="1" height="1" />
+					</p:commandLink>
+				</p:column>
+			</p:dataTable>
+
+			<p:dataTable id="tblRelatorios" value="#{terceirizadaRequisicaoController.listRelatorioAtendimentoLote}"
+				rendered="#{terceirizadaRequisicaoController.listRelatorioAtendimentoLote ne null}" lazy="true" varStatus="size" var="arquivoLote" type="unordered"
+				itemType="none" paginator="true" rows="10" paginatorPosition="bottom"
+				paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+				currentPageReportTemplate="#{bundle['geral.crud.exibindo']} {startRecord} #{bundle['geral.crud.ate']} {endRecord}  #{bundle['geral.crud.de']} {totalRecords}  #{bundle['geral.crud.registros']} "
+				rowsPerPageTemplate="5,10,25,50" emptyMessage="#{bundle['MI022']}">
+
+				<!-- DATA/HORA ENVIO -->
+				<p:column style="width:60px">
+					<f:facet name="header">
+						<h:outputText value="DATA/HORA ENVIO" />
+					</f:facet>
+					<h:outputText value="#{arquivoLote.dataEnvioArquivo}">
+						<f:convertDateTime pattern="dd/MM/yyyy HH:mm" locale="pt_BR" />
+					</h:outputText>
+				</p:column>
+
+				<!-- ARQUIVO -->
+				<p:column style="width:70px">
+					<f:facet name="header">
+						<h:outputText value="ARQUIVO" />
+					</f:facet>
+					<h:outputText value="#{arquivoLote.nome}" />
+				</p:column>
+
+				<!-- USUARIO -->
+				<p:column style="width:70px">
+					<f:facet name="header">
+						<h:outputText value="USUÁRIO" />
+					</f:facet>
+					<h:outputText value="#{arquivoLote.codigoUsuario}" />
+				</p:column>
+
+				<!-- RELATORIO -->
+				<p:column style="width:95px; white-space:nowrap;">
+
+					<f:facet name="header">
+						<h:outputText value="RELATÓRIO" />
+					</f:facet>
+
+					<p:outputPanel rendered="#{arquivoLote.concluido.id eq 2}">
+						<img class="icon-falha" src="#{request.contextPath}/resources/imagens/img_trans.gif" width="1" height="1" title="#{bundle['MH109']}" />
+					</p:outputPanel>
+
+					<p:outputPanel rendered="#{arquivoLote.concluido.id eq 1}">
+						<img class="icon-processando" src="#{request.contextPath}/resources/imagens/img_trans.gif" width="1" height="1" title="#{bundle['MH108']}" />
+					</p:outputPanel>
+
+					<p:commandLink id="idDownload" styleClass="image-link" update=":formConsulta:messages" title="#{bundle['MH111']}" process="@form" ajax="false"
+						onclick="PrimeFaces.monitorDownload(showStatus, hideStatus);" rendered="#{arquivoLote.concluido.id eq 0}">
+						<p:fileDownload value="#{terceirizadaRequisicaoController.fazerDownloadRelatorio(arquivoLote)}" />
+						<img class="icon-download" src="#{request.contextPath}/resources/imagens/img_trans.gif" width="1" height="1" />
+					</p:commandLink>
+
+				</p:column>
+			</p:dataTable>
+
+		</h:form>
+
+		<!-- MODAL HISTORICO -->
+		<p:dialog id="modalHistoricoId" widgetVar="modalHistorico" style="max-height: 550px;" styleClass="ui-dialog-background" modal="true" dynamic="true"
+			width="820px" draggable="true" resizable="false" position="center" closeOnEscape="true"
+			header="#{bundle['requisicao.consulta.historico.modal.header']} #{terceirizadaRequisicaoController.requisicaoSelecionada.codigoRequisicao}">
+			<h:form id="formHistorico">
+				<h:panelGrid id="gridDataTable" columns="1" width="100%">
+					<p:dataTable id="dataTable" var="obj" widgetVar="historicoRequiscao" value="#{terceirizadaRequisicaoController.listaTramiteRequisicao}"
+						paginatorPosition="bottom" styleClass="estilo-border-dotted zebr" rowSelectMode="single" rowIndexVar="rowIx"
+						emptyMessage="Nenhum registro correspondente encontrado" paginator="false" rows="10" paginatorAlwaysVisible="true"
+						paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+						currentPageReportTemplate="Exibindo {startRecord} até {endRecord} de {totalRecords} registros "
+						rowStyleClass="#{empty rowIx or rowIx mod 2 ne 0 ? 'even-row' : 'odd-row'}" rowsPerPageTemplate="5,10,25,50">
+
+						<p:column style="text-align:left; width: 0px;" styleClass="noBackGroundImage" width="12%">
+							<f:facet name="header">
+								<h:outputText value="#{bundle['requisicao.consulta.historico.title.evento']}" />
+							</f:facet>
+							<h:outputText value="#{obj.situacaoRequisicao.nome}" />
+						</p:column>
+						<p:column style="text-align:left; width: 0px;" styleClass="noBackGroundImage" width="12%">
+							<f:facet name="header">
+								<h:outputText value="#{bundle['geral.label.dataHora']}" />
+							</f:facet>
+							<h:outputText value="#{terceirizadaRequisicaoController.getDataFormatadaTramite(obj)}" />
+						</p:column>
+						<p:column style="text-align:left; width: 0px;" styleClass="noBackGroundImage" width="12%">
+							<f:facet name="header">
+								<h:outputText value="#{bundle['geral.label.usuarioAbertura']}" />
+							</f:facet>
+							<h:outputText value="#{obj.codigoUsuario}">
+							</h:outputText>
+						</p:column>
+					</p:dataTable>
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+		<!-- MODAL CONSULTA -->
+		<p:dialog header="Motivo da Reabertura da Requisição Cód. #{terceirizadaRequisicaoController.requisicaoSelecionada.codigoRequisicao}"
+			id="modalMotivoReaberturaId" widgetVar="modalMotivoReabertura" styleClass="ui-dialog-background" modal="true" dynamic="true" resizable="false"
+			position="center" onHide="giveFocusRemote();">
+			<h:form id="formAvaliacao">
+				<h:panelGrid columns="2">
+					<h:outputLabel styleClass="label-button" value="Avaliação">
+						<br />
+						<h:inputText value="#{terceirizadaRequisicaoController.avaliacaoSelecionada.motivoAvaliacao.deMotivoAvaliacao}" style="width: 500px;" disabled="true" />
+					</h:outputLabel>
+					<!--
+					<h:outputLabel styleClass="label-button" value="Ações">
+						<br />
+						<h:inputText value="#{terceirizadaRequisicaoController.avaliacaoSelecionada.icReabertura.descricao}" 
+							disabled="true" />
+					</h:outputLabel>
+					  -->
+				</h:panelGrid>
+
+				<h:panelGrid columns="1">
+					<h:outputLabel styleClass="label-button" value="Comentário">
+						<br />
+						<h:inputTextarea value="#{terceirizadaRequisicaoController.avaliacaoSelecionada.observacao}"
+							style="width: 500px; text-align: left; white-space: pre-wrap;" onchange="limitarTextArea(this,500)" onmouseout="limitarTextArea(this,500)"
+							onkeyup="limitarTextArea(this,500)" maxlength="500" cols="90" rows="8" disabled="true" />
+					</h:outputLabel>
+				</h:panelGrid>
+
+				<p:commandLink styleClass="btnAzul marginTop buttonSelected" onclick="modalMotivoReabertura.hide();">
+					<span>Fechar</span>
+				</p:commandLink>
+			</h:form>
+		</p:dialog>
+
+		<!-- begin-of: modal período -->
+		<p:dialog id="dataNaoInformada" widgetVar="mdlDtNaoInformada" styleClass="ui-dialog-background" modal="true" header="Atenção" width="500px" draggable="true"
+			resizable="false" position="center">
+			<h:form id="confirmarForm">
+				<span class="atencao2" style="margin-top: -2px !important;" />
+				<h:outputLabel style="margin-left: 40px; max-width: 60px; font-weight: bold !important;" value="#{bundle['MA013']}">
+				</h:outputLabel>
+				<br></br>
+				<p:commandLink id="btnConfirmar" styleClass="btnLaranja marginTop buttonSelected" update=":formConsulta" oncomplete="mdlDtNaoInformada.hide()"
+					actionListener="#{terceirizadaRequisicaoController.localizarPorPeriodoPadrao()}">
+					<span><h:outputText style="width: 1; height: 1;" value="Sim" /></span>
+				</p:commandLink>
+				<p:commandLink id="btnNaoConfirmar" styleClass="btnAzul marginTop buttonSelected"
+					actionListener="#{terceirizadaRequisicaoController.informarDataInicioObrigatoria()}" oncomplete="mdlDtNaoInformada.hide()">
+					<span><h:outputText style="width: 1; height: 1;" value="Não" /></span>
+				</p:commandLink>
+				<p:spacer height="30px" />
+			</h:form>
+		</p:dialog>
+		<!-- end-of: modal período -->
+
+		<p:dialog id="modalAtendimentoID" widgetVar="modalAtendimento" styleClass="ui-dialog-background" modal="true" dynamic="true" draggable="true"
+			closeOnEscape="true" resizable="false" position="center" width="470"
+			header="#{bundle['requisicao.consulta.title.atendimento_requisicao']} #{terceirizadaRequisicaoController.requisicaoSelecionada.codigoRequisicao}">
+
+			<p:outputPanel id="pnlModalAtendimento">
+
+				<!-- begin-of: Form Atendimento -->
+				<h:form id="cadastrarForm" rendered="#{terceirizadaRequisicaoController.isFormAtendimentoVisivel()}">
+
+					<p:messages id="msg" showDetail="false" />
+
+					<p:focus id="focusCadastro" for="cadastrarForm" />
+
+					<h:outputLabel value="#{bundle['requisicao.label.ocorrencia.atendimento']}" styleClass="label-button">
+						<h:outputText styleClass="pesquisaDireta" />
+						<h:selectOneMenu id="idOcorrencia" styleClass="select" value="#{terceirizadaRequisicaoController.tramiteRequisicao.ocorrencia.id}"
+							converter="omnifaces.SelectItemsConverter">
+							<f:selectItems value="#{terceirizadaRequisicaoController.ocorrenciasAtendimento}" var="ocorrencia" itemValue="#{ocorrencia.valor}"
+								itemLabel="#{ocorrencia.label}" />
+							<p:ajax event="change" process="@form" update="@form" listener="#{terceirizadaRequisicaoController.onChangeOcorrenciaAtendimento()}" />
+						</h:selectOneMenu>
+					</h:outputLabel>
+
+					<br />
+					<br />
+
+					<h:outputLabel value="#{bundle['requisicao.label.quantidade.solicitada']}" styleClass="label-button">
+						<h:inputText maxlength="4" disabled="true" id="qtdSolicitada" value="#{terceirizadaRequisicaoController.requisicaoSelecionada.qtSolicitadaDocumento}"
+							style="width: 50px; margin-left: 5px; text-align: right;" styleClass="input-disabled">
+						</h:inputText>
+					</h:outputLabel>
+
+					<br />
+					<br />
+
+					<h:panelGroup id="groupTipoQtd">
+						<h:outputLabel value="#{bundle['requisicao.label.quantidade.disponibilizada']}" styleClass="label-button" for="idQtdDisponibilizada">
+							<h:inputText maxlength="4" id="idQtdDisponibilizada" value="#{terceirizadaRequisicaoController.tramiteRequisicao.qtdDisponibilizadaDocumento}"
+								onkeypress="return somenteNumero(event);" onchange="overSomenteNumeros(this);" style="width: 50px; margin-left: 5px; text-align: right;"
+								styleClass="input">
+								<p:ajax event="change" update="qtdeMsg" />
+							</h:inputText>
+
+							<p:spacer width="10px" />
+
+							<h:outputText id="qtdeMsg" style="font-size: 11px;" value="#{terceirizadaRequisicaoController.obterMensagemQuantidade()}" styleClass="label-red" />
+						</h:outputLabel>
+					</h:panelGroup>
+
+					<br />
+					<br />
+
+					<h:panelGroup id="groupTipoSuporte">
+						<h:outputLabel value="#{bundle['requisicao.label.tipo.suporte']}" styleClass="label-button" for="idTipoSuporte">
+							<h:selectOneMenu id="idTipoSuporte" styleClass="select" converter="omnifaces.SelectItemsConverter"
+								value="#{terceirizadaRequisicaoController.tramiteRequisicao.suporte.id}" style="margin-left: 5px;">
+								<f:selectItem itemLabel="Selecione" noSelectionOption="true" />
+								<f:selectItems value="#{terceirizadaRequisicaoController.tipoSuportes}" var="suporte" itemValue="#{suporte.valor}" itemLabel="#{suporte.descricao}" />
+							</h:selectOneMenu>
+						</h:outputLabel>
+					</h:panelGroup>
+
+					<br />
+					<br />
+					
+					<h:outputLabel styleClass="label-button" value="Observação">
+						<br />
+						<h:inputTextarea cols="70" rows="5" style="text-align: left; white-space: pre-wrap;"
+							onkeyup="limitarTextArea(this,200)" maxlength="200"
+							value="#{terceirizadaRequisicaoController.tramiteRequisicao.observacao}" />
+					</h:outputLabel>
+				 
+					<br />
+					<br />
+
+					<h:panelGroup id="groupBotoesAtendimento">
+
+						<!-- Atender -->
+						<p:commandLink id="gravarAtendimento" styleClass="btnAzul marginTop buttonSelected" process="@form" update="msg"
+							rendered="#{terceirizadaRequisicaoController.isBotaoAtenderVisivel()}" actionListener="#{terceirizadaRequisicaoController.atenderRequisicao()}">
+							<span>#{bundle['geral.button.atender']}</span>
+						</p:commandLink>
+
+						<!-- Próximo -->
+						<p:commandLink id="proximoEtapaAtendimento" styleClass="btnAzul marginTop buttonSelected" process="@form" update=":pnlModalAtendimento"
+							actionListener="#{terceirizadaRequisicaoController.onClickBotaoProximo()}" rendered="#{terceirizadaRequisicaoController.isBotaoProximoVisivel()}">
+							<span>#{bundle['geral.button.proximo']}</span>
+						</p:commandLink>
+
+						<p:spacer height="30px" />
+
+						<h:commandLink id="cancelarAtendimento" styleClass="btnLaranja marginTop buttonSelected" onclick="modalAtendimento.hide(); return false;">
+							<span>#{bundle['MI010']}</span>
+						</h:commandLink>
+					</h:panelGroup>
+					<br />
+				</h:form>
+				<!-- end-of: Form Atendimento -->
+
+				<!-- begin-of: Upload de Documentos -->
+				<h:form id="uploadForm" enctype="multipart/form-data" rendered="#{terceirizadaRequisicaoController.isUploadDocumentoVisivel()}">
+
+					<p:messages id="msgUpload" showDetail="false" />
+
+					<p:remoteCommand name="rmcValidarTipoDocumento" update="msgUpload" actionListener="#{terceirizadaRequisicaoController.validarTipoArquivo()}" />
+
+					<p:outputPanel>
+						<p:fileUpload id="documento" mode="simple" skinSimple="true" styleClass="marginTop" style="width: 400px;" value="#{terceirizadaRequisicaoController.file}"
+							allowTypes="/(\.|\/)(pdf|zip)$/">
+						</p:fileUpload>
+					</p:outputPanel>
+
+					<p:outputPanel>
+						<!-- Atender -->
+						<p:commandLink styleClass="btnAzul marginTop buttonSelected" process="@form" ajax="false"
+							actionListener="#{terceirizadaRequisicaoController.atenderRequisicaoDocDigital()}">
+							<span>#{bundle['geral.button.atender']}</span>
+						</p:commandLink>
+
+						<!-- Cancelar -->
+						<h:commandLink styleClass="btnLaranja marginTop buttonSelected" onclick="modalAtendimento.hide(); return false;">
+							<span>#{bundle['MI010']}</span>
+						</h:commandLink>
+						<p:spacer height="30px" />
+					</p:outputPanel>
+					<br />
+				</h:form>
+				<!-- end-of: Upload de Documentos -->
+			</p:outputPanel>
+		</p:dialog>
+
+		<p:dialog header="Atenção" id="modalFormatoInvalidoId" widgetVar="modalFormatoInvalido" styleClass="ui-dialog-background" modal="true" dynamic="true"
+			resizable="false" position="center" onHide="giveFocusRemote();">
+			<h:form id="arquivoInvalidoForm">
+				<span id="atencaoId" class="atencao2" style="margin-top: -2px !important;" />
+				<h:outputFormat style="margin-left: 40px; font-weight: bold !important;" value="#{bundle['MA044']}">
+				</h:outputFormat>
+				<br></br>
+				<p:commandLink styleClass="btnLaranja marginTop buttonSelected" oncomplete="modalFormatoInvalido.hide()">
+					<span><h:outputText style="width: 1; height: 1;" value="OK" /></span>
+				</p:commandLink>
+				<p:spacer height="30px" />
+			</h:form>
+		</p:dialog>
+
+		<p:dialog header="Atenção" id="modalFormatoLoteInvalidoId" widgetVar="modalFormatoLoteInvalido" styleClass="ui-dialog-background" modal="true" dynamic="true"
+			resizable="false" position="center" onHide="giveFocusRemote();">
+			<h:form id="arquivoLoteInvalidoForm">
+				<span id="atencaoId" class="atencao2" style="margin-top: -2px !important;" />
+				<h:outputFormat style="margin-left: 40px; font-weight: bold !important;" value="Formato do arquivo de lotes inválido" />
+				<br></br>
+				<p:commandLink styleClass="btnLaranja marginTop buttonSelected" oncomplete="modalFormatoLoteInvalido.hide()">
+					<span><h:outputText style="width: 1; height: 1;" value="OK" /></span>
+				</p:commandLink>
+				<p:spacer height="30px" />
+			</h:form>
+		</p:dialog>
+
+		<p:dialog header="Atenção" id="modalArquivoNaoEncontradoId" widgetVar="modalArquivoNaoEncontrado" styleClass="ui-dialog-background" modal="true"
+			dynamic="true" resizable="false" position="center" onHide="giveFocusRemote();">
+			<h:form id="formatoInvalidoForm">
+				<span id="atencaoId" class="atencao2" style="margin-top: -2px !important;" />
+				<h:outputFormat style="margin-left: 40px; font-weight: bold !important;" value="#{bundle['MI034']}">
+				</h:outputFormat>
+				<br></br>
+				<p:commandLink styleClass="btnLaranja marginTop buttonSelected" oncomplete="modalArquivoNaoEncontrado.hide()">
+					<span><h:outputText style="width: 1; height: 1;" value="OK" /></span>
+				</p:commandLink>
+				<p:spacer height="30px" />
+			</h:form>
+		</p:dialog>
+
+		<p:dialog header="Atenção" id="modalConteudoInvalidoId" widgetVar="modalConteudoInvalido" styleClass="ui-dialog-background" modal="true" dynamic="true"
+			resizable="false" position="center" onHide="giveFocusRemote();">
+			<h:form id="conteudoInvalidoForm">
+				<span class="atencao2" style="margin-top: -2px !important;" />
+				<h:outputFormat style="margin-left: 40px; font-weight: bold !important;"
+					value="#{bundle['geral.message.validation.arquivo.conteudo.requisicao.lote.invalido']}">
+				</h:outputFormat>
+				<br></br>
+				<p:commandLink styleClass="btnLaranja marginTop buttonSelected" oncomplete="modalConteudoInvalido.hide()">
+					<span><h:outputText style="width: 1; height: 1;" value="OK" /></span>
+				</p:commandLink>
+				<p:spacer height="30px" />
+			</h:form>
+		</p:dialog>
+
+		<p:dialog header="#{bundle['MI030.header']}" id="modalEnviarArquivoId" widgetVar="modalEnviarArquivo" onShow="onShowModalEnviarArquivo()"
+			styleClass="ui-dialog-background" modal="true" dynamic="true" resizable="false" position="center" onHide="giveFocusRemote();">
+			<h:form id="enviarArquivoForm">
+				<span id="atencaoId" class="atencao2" style="margin-top: -2px !important;" />
+				<span id="resumoAtendimento" style="margin-left: 40px; font-weight: bold !important;"> Foi(ram) identificado(s) 0 item(ns) nesse lote para
+					importação. Confirma atendimento(s)? </span>
+				<br></br>
+				<a id="enviarArquivoForm:btnEnviarArquivo" href="#" class="ui-commandlink ui-widget btnLaranja marginTop buttonSelected"
+					onclick="modalEnviarArquivo.hide(); showStatus(); return false;"> <span><span style="width: 1; height: 1;">Sim</span></span>
+				</a>
+				<p:commandLink id="btnNaoEnviarArquivo" update=":formConsulta:pnlUploadCSV" styleClass="btnAzul marginTop buttonSelected" oncomplete="modalEnviarArquivo.hide()">
+					<span><h:outputText style="width: 1; height: 1;" value="Não" /></span>
+				</p:commandLink>
+				<p:spacer height="30px" />
+			</h:form>
+		</p:dialog>
+
+		<!-- begin-of: modal info -->
+		<ui:include src="/includes/modalInfoRequisicao.xhtml" />
+		<!-- end-of: modal info -->
+
+		<p:ajaxStatus oncomplete="applyStylesResultsDataTable();toggleEditable($('#formConsulta\\:numeroRequisicoes'));" />
+
+		<h:form id="frmRemoteCommands">
+			<p:remoteCommand name="rmcShowMessage" action="#{terceirizadaRequisicaoController.showMessageFromRemoteCommand()}" update=":formConsulta" />
+			<p:remoteCommand name="rmcDownloadLog" action="#{terceirizadaRequisicaoController.downloadLogAtendimento()}" update=":formConsulta" />
+		</h:form>
+
+		<script type="text/javascript">
+
+		var opened = null;
+
+		var abrirJanelaUpload = function () {
+			var width = 500, height = 230, 
+			     left = ($(window).width()/2) - (width/2), 
+			      top = ($(window).height()/2) - (height/2);
+		      
+			opened = window.open('#{request.contextPath}/paginas/requisicao/atendimento-em-lote.xhtml', 'Atendimento em Lote', 'location=no, menubar=no, toolbar=no, scrollbars=no, width=' + width + ', height=' + height + ', top=' + top + ', left=' + left);
+
+			closeAllMessages();
+			
+			if (!opened || opened.closed || typeof opened.closed == 'undefined') {
+				alert('Para realizar o atendimento em lotes, é necessário desativar o bloqueador de pop-ups do seu navegador.');
+			} else if (window.focus) {
+                opened.focus();
+         	}
+		}
+				
+		var prepareUploadAjax = function () {
+	
+			$('#formConsulta').prop('action', '#{request.contextPath}/upload/atendimento-em-lote')
+			.prop('enctype','multipart/form-data')
+			.ajaxForm({
+				dataType: 'json',
+				beforeSubmit: formUploadIsValid,
+			    beforeSend: function() {
+			    	showStatus(true);
+			    },
+			    error: function () {
+			    	var m = [{message:'#{bundle['MA012']}', type:'error'}];
+			    	rmcShowMessage([{name:'messages', value: JSON.stringify(m)}]);
+				},
+				complete: function(xhr) {
+					var messages = [];
+					var response = JSON.parse(xhr.responseText);
+
+					if (response.error) {
+						messages.push({message: response.error, type:'error'});
+					} else {
+						messages.push({message:'#{bundle['MS040']}', type:'info'});
+						if (response.hasErrors) {
+							var m = '#{bundle['ME014']}';
+							
+							m = m.replace('{0}', '#{request.contextPath}');
+							m = m.replace('{1}', response.log);
+							
+							messages.push({message: m, type:'warning'});
+						}
+					}
+
+					rmcShowMessage([{name:'messages', value: JSON.stringify(messages)}]);
+					hideStatus(false);
+				}
+			});
+		}
+
+		var formUploadIsValid = function () {
+
+			if (!$('#arquivo').fieldValue()[0]) {
+				var m = [{message:'#{bundle['MA045']}', type:'error'}];
+				rmcShowMessage([{name:'messages', value: JSON.stringify(m)}]);
+				return false;
+			}
+
+			var file = $('#arquivo')[0].files[0]
+
+			if (!/(\.txt|\.csv)$/.test(file.name.toLowerCase())) {
+				var m = [{message:'#{bundle['ME021']}', type:'error'}];
+				rmcShowMessage([{name:'messages', value: JSON.stringify(m)}]);
+				return false;
+			}
+			
+			if (file.size == 0) {
+				var m = [{message:'#{bundle['MI033']}', type:'error'}];
+				rmcShowMessage([{name:'messages', value: JSON.stringify(m)}]);
+				return false;
+			}
+
+			return true;
+		}
+		</script>
+	</ui:define>
+</ui:composition>

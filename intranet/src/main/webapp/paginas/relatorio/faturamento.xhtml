@@ -1,0 +1,580 @@
+<ui:composition template="/WEB-INF/templates/template.xhtml" xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+	<ui:define name="html-head">
+		<h:outputScript library="js" name="jquery.price_format.1.3.js" />
+		<script type="text/javascript">
+			function exportarJS(){
+				limparFiltro();
+				PrimeFaces.monitorDownload(showStatus, hideStatus);
+				atualizarFiltro();
+			}
+			function limparFiltro(){
+				var valor = $('.globalFilterClass').val();
+				$('.globalFilterClass').val('');
+				listaFaturamentos.filter();
+				$('#hiddenPesquisar').val(valor);
+			}
+			function atualizarFiltro(){
+				var valor = $('#hiddenPesquisar').val(); 
+				$('.globalFilterClass').val(valor);
+				listaFaturamentos.filter();
+				$('#hiddenPesquisar').val('');
+			}
+		</script>
+
+	</ui:define>
+	
+	<!-- Alias para o controller -->
+	<ui:param name="modal" value="#{requisicaoDocumentoController}" />
+	
+	<ui:param name="breadcrumbs" value="#{bundle['geral.breadcrumb.relatorio']},#{bundle['relatorio.faturamento.tituloPagina']}" />
+
+	<ui:define name="content-main-page">
+		<h:form id="formConsulta">
+			<input type="hidden" id="hiddenPesquisar" />
+			<p:focus id="focusConsulta" context="formConsulta" />
+			<p:messages id="messages" showDetail="false" />
+			<h3 class="titlePage">#{bundle['relatorio.faturamento.tituloPagina.descricao']}</h3>
+
+			<fieldset class="filtro">
+				<h:outputLabel value="#{bundle['geral.label.dataInicio']}" styleClass="label-button">
+					<h:outputText value="" styleClass="pesquisaDireta" />
+					<br />
+					<p:calendar id="idDataInicio" size="10" value="#{relatorioFaturamentoController.relatorioVisitor.dataInicio}" pattern="dd/MM/yyyy" locale="pt_BR"
+						converter="converter.DataConverterSIRED" maxlength="10" onkeyup="maskIt(this,event,'##/##/#####',false,false)">
+					</p:calendar>
+				</h:outputLabel>
+
+				<h:outputLabel value="#{bundle['geral.label.dataFim']}" styleClass="label-button">
+					<br />
+					<p:calendar id="idDataFim" size="10" value="#{relatorioFaturamentoController.relatorioVisitor.dataFim}" pattern="dd/MM/yyyy" locale="pt_BR"
+						converter="converter.DataConverterSIRED" maxlength="10" onkeyup="maskIt(this,event,'##/##/#####',false,false)">
+					</p:calendar>
+				</h:outputLabel>
+
+				<h:outputLabel value="Tipo" styleClass="label-button">
+					<h:outputText value="" styleClass="pesquisaDireta" />
+					<br />
+					<h:selectOneMenu id="selectTipo" value="#{relatorioFaturamentoController.tipoRelatorio}" converter="omnifaces.SelectItemsConverter">
+						<f:selectItems value="#{relatorioFaturamentoController.listTipoRelatorio}" var="tipo" itemValue="#{tipo}" itemLabel="#{tipo.label}" />
+						<f:ajax event="change" render="botoesExportar" />
+					</h:selectOneMenu>
+				</h:outputLabel>
+
+				<h:outputLabel value="#{bundle['base.label.base']}" styleClass="label-button" rendered="#{relatorioFaturamentoController.perfilAcessoBase}">
+					<h:outputText value="" styleClass="pesquisaDireta" />
+					<br />
+					<h:selectOneMenu id="selectBase" value="#{relatorioFaturamentoController.relatorioVisitor.base}" converter="omnifaces.SelectItemsConverter">
+						<f:selectItem itemLabel="Selecione" noSelectionOption="true" />
+						<f:selectItems value="#{relatorioFaturamentoController.litaBases}" var="base" itemValue="#{base}" itemLabel="#{base.nome}" />
+					</h:selectOneMenu>
+				</h:outputLabel>
+
+				<p:commandLink title="#{bundle['MH008']}" styleClass="btnLaranja marginTop buttonSelected" style="margin-top:24px !important; margin-right: 8px;"
+					actionListener="#{relatorioFaturamentoController.localizar}" id="btnLocalizar" update="painelConsultaItens messages btnExportar btnExportarAB btnExportarC">
+					<span>#{bundle['geral.button.consultar']}</span>
+				</p:commandLink>
+
+				<p:outputPanel id="botoesExportar">
+										
+					<!-- begin-of: botão exportar -->
+					<p:commandLink id="btnExportar" title="#{bundle['MH010']}" styleClass="btnAzul marginTop buttonSelected" process="@form"
+						ajax="false" onclick="PrimeFaces.monitorDownload(showStatus, hideStatus);" style="margin-top: 24px !important; margin-right: 8px;"
+						rendered="#{relatorioFaturamentoController.isRelatorioRequisicao()}" disabled="#{relatorioFaturamentoController.listaFiltro.size()==0}">
+						<p:fileDownload value="#{relatorioFaturamentoController.exportar()}" />
+						<span>#{bundle['geral.button.exportar']}</span>
+					</p:commandLink>
+					<!-- end-of: botão exportar -->
+
+					<!-- Exportar Tipo AB -->
+					<p:commandLink styleClass="btnAzul marginTop buttonSelected" onclick="PrimeFaces.monitorDownload(showStatus, hideStatus);"
+						rendered="#{relatorioFaturamentoController.isRelatorioRemessaAB()}" title="#{bundle['MH010']}" ajax="false"
+						disabled="#{empty relatorioFaturamentoController.listRemessaRelFaturamentoAB}" id="btnExportarAB" style="margin-top: 24px !important; margin-right: 8px;">
+						<span>#{bundle['geral.button.exportar']}</span>
+						<p:dataExporter type="xls" target=":frmRelatorioTipoAB:tblRelatorioTipoAB" fileName="#{bundle['relatorio.faturamento.nome.relatorio']}"
+							postProcessor="#{relatorioFaturamentoController.preExportarRemessaTipoAB}" />
+					</p:commandLink>
+
+					<!-- Exportar Tipo C -->
+					<p:commandLink styleClass="btnAzul marginTop buttonSelected" onclick="PrimeFaces.monitorDownload(showStatus, hideStatus);"
+						rendered="#{relatorioFaturamentoController.isRelatorioRemessaC()}" title="#{bundle['MH010']}" ajax="false"
+						disabled="#{empty relatorioFaturamentoController.listRemessaRelFaturamentoTipoC}" id="btnExportarC" style="margin-top: 24px !important; margin-right: 8px;">
+						<span>#{bundle['geral.button.exportar']}</span>
+						<p:dataExporter type="xls" target=":frmRelatorioTipoC:tblRelatorioTipoC" fileName="#{bundle['relatorio.faturamento.nome.relatorio']}"
+							postProcessor="#{relatorioFaturamentoController.preExportarRemessaTipoC}" />
+					</p:commandLink>
+
+				</p:outputPanel>
+
+			</fieldset>
+
+			<h:panelGrid id="painelConsultaItens">
+				<h:panelGrid id="painelConsultaNoItens"
+					rendered="#{relatorioFaturamentoController.pesquisaRealizada and relatorioFaturamentoController.listaFaturamento.size() == 0}">
+					#{bundle['MI017']}
+				</h:panelGrid>
+
+				<h:panelGrid id="painelConsulta"
+					rendered="#{relatorioFaturamentoController.pesquisaRealizada and relatorioFaturamentoController.listaFaturamento.size() > 0}">
+					
+					<p:dataTable value="#{relatorioFaturamentoController.listaFaturamento}" var="faturamento" widgetVar="listaFaturamentos" id="dataTableCrud" rows="10"
+						emptyMessage="#{bundle['MI017']}" rendered="#{relatorioFaturamentoController.listaFaturamento.size() > 0 }" paginator="true"
+						filteredValue="#{relatorioFaturamentoController.listaFiltro}" sortBy="base.nome" sortFunction="#{relatorioFaturamentoController.sortByString}"
+						styleClass="estilo-border-dotted zebr" paginatorPosition="bottom" tableStyleClass="tablefixa"
+						rowStyleClass="#{empty rowIx or rowIx mod 2 ne 0 ? 'even-row' : 'odd-row'}" rowIndexVar="rowIx"
+						paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+						currentPageReportTemplate="#{bundle['geral.crud.exibindo']} {startRecord} #{bundle['geral.crud.ate']} {endRecord}  #{bundle['geral.crud.de']} {totalRecords}  #{bundle['geral.crud.registros']} "
+						rowsPerPageTemplate="5,10,25,50">
+
+						<f:facet name="header">
+							<p:outputPanel style="text-align:right; margin-right:-10px" styleClass="ui-widget-auxiliar">
+								<h:outputText value="#{bundle['geral.label.pesquisar']}" escape="false" />
+								<h:inputText id="globalFilter" value="#{relatorioFaturamentoController.filtroPesquisar}" onkeyup="listaFaturamentos.filter();" style="width:150px;"
+									maxlength="255" styleClass="semClear globalFilterClass">
+									<p:ajax event="keyup" update=":#{p:component('btnExportar')}" global="false" />
+								</h:inputText>
+							</p:outputPanel>
+						</f:facet>
+
+						<p:column filterBy="base.nome" filterStyle="display:none; visibility:hidden;"
+							style="width:8%; padding: 4px 4px !important;" styleClass="noBackGroundImage center">
+							<h:outputText value="#{faturamento.base.nome}" />
+							<f:facet name="header">
+								<h:outputText value="#{bundle['base.label.baseMaiusculas']}" />
+							</f:facet>
+						</p:column>
+
+						<p:column filterBy="requisicao.codigoRequisicao" filterStyle="display:none; visibility:hidden;"
+							style="width:10%; padding: 4px 4px !important; text-align: center;" styleClass="noBackGroundImage">
+							<f:facet name="header">
+								<h:outputText value="#{bundle['relatorio.faturamento.n.requisicao']}" title="#{bundle['relatorio.faturamento.n.requisicao.hint']}" />
+							</f:facet>
+							<b><p:commandLink title="Clique aqui para acessar a Requisição" styleClass="image-link info-link"
+									actionListener="#{requisicaoDocumentoController.visualizarRequisicao(faturamento.requisicao)}" 
+									update=":modalInfoId" value="#{faturamento.requisicao.codigoRequisicao}" /></b>
+						</p:column>
+
+						<p:column id="colSuporte" sortBy="suporte.nome" sortFunction="#{relatorioFaturamentoController.sortByString}" 
+							filterBy="suporte.nome" filterStyle="display:none; visibility:hidden;"
+							style="width:10%; padding: 4px 4px !important; text-align: center; white-space: nowrap;" styleClass="noBackGroundImage">
+							<f:facet name="header">
+								<h:outputText value="#{bundle['relatorio.faturamento.suporteU']}" />
+							</f:facet>
+							<h:outputText value="#{faturamento.suporte.nome}" />
+						</p:column>
+
+						<p:column filterBy="documento.nome" filterStyle="display:none; visibility:hidden;"
+							style="width:21%; padding: 4px 4px !important;" styleClass="gri-alfanumericos noBackGroundImage">
+							<f:facet name="header">
+								<h:outputText value="#{bundle['geral.label.documento.maiusculas']}" />
+							</f:facet>
+							<h:outputText value="#{faturamento.documento.nome}" />
+						</p:column>
+
+						<p:column filterBy="dataAberturaFormatada" filterStyle="display:none; visibility:hidden;"
+							style="width:8%; padding: 4px 4px !important;" styleClass="noBackGroundImage center">
+							<h:outputText value="#{faturamento.dataAberturaFormatada}" />
+							<f:facet name="header">
+								<h:outputText value="#{bundle['relatorio.faturamento.abertura']}" />
+							</f:facet>
+<!-- 							<f:facet name="footer">
+								<h:outputText value="TOTAL GERAL" />
+							</f:facet> -->
+						</p:column>
+
+						<p:column filterBy="qtdSolicitada" filterStyle="display:none; visibility:hidden;"
+							style="width:10%; padding: 4px 4px !important;" styleClass="gri-numericos noBackGroundImage">
+							<h:outputText value="#{faturamento.qtdSolicitada}" />
+							<f:facet name="header">
+								<h:outputText value="#{bundle['geral.title.qtdSolicitada']}" title="#{bundle['MH044']}" />
+							</f:facet>
+							<f:facet name="footer">
+								<h:outputText value="#{relatorioFaturamentoController.qtdTotalSolicitada}" />
+							</f:facet>
+						</p:column>
+
+						<p:column filterBy="qtdDisponibilizada" filterStyle="display:none; visibility:hidden;"
+							style="width:9%; padding: 4px 4px !important;" styleClass="gri-numericos noBackGroundImage">
+							<h:outputText value="#{faturamento.qtdDisponibilizada}" />
+							<f:facet name="header">
+								<h:outputText value="#{bundle['geral.title.qtdDisponivel']}" title="#{bundle['MH045']}" />
+							</f:facet>
+							<f:facet name="footer">
+								<h:outputText value="#{relatorioFaturamentoController.qtdTotalDisponibilizada}" />
+							</f:facet>
+						</p:column>
+
+						<p:column filterBy="qtdDispNoPrazo" filterStyle="display:none; visibility:hidden;"
+							style="width:11%; padding: 4px 4px !important;" styleClass="gri-numericos noBackGroundImage">
+							<h:outputText value="#{faturamento.qtdDispNoPrazo}" />
+							<f:facet name="header">
+								<h:outputText value="#{bundle['relatorio.faturamento.qtd.dispo.prazo']}" title="#{bundle['MH047']}" />
+							</f:facet>
+							<f:facet name="footer">
+								<h:outputText value="#{relatorioFaturamentoController.qtdTotalDisponibilizadaNoPrazo}" />
+							</f:facet>
+						</p:column>
+
+						<p:column filterBy="qtdNaoLocalizada" filterStyle="display:none; visibility:hidden;"
+							style="width:10%; padding: 4px 4px !important;" styleClass="gri-numericos noBackGroundImage">
+							<h:outputText value="#{faturamento.qtdNaoLocalizada}" />
+							<f:facet name="header">
+								<h:outputText value="#{bundle['geral.title.qtdNaoLocalizada']}" title="#{bundle['MH046']}" />
+							</f:facet>
+							<f:facet name="footer">
+								<h:outputText value="#{relatorioFaturamentoController.qtdTotalNaoLocalizada}" />
+							</f:facet>
+						</p:column>
+
+						<p:column filterBy="idlpFormatado" filterStyle="display:none; visibility:hidden;"
+							style="width:8%; padding:4px 4px !important;" styleClass="gri-numericos noBackGroundImage">
+							<h:outputText value="#{faturamento.idlpFormatado}" />
+							<f:facet name="header">
+								<h:outputText value="#{bundle['relatorio.faturamento.idlp']}" title="#{bundle['MH048']}" />
+							</f:facet>
+							<f:facet name="footer">
+								<h:outputText value="#{relatorioFaturamentoController.idlpTotalFormatado}" />
+							</f:facet>
+						</p:column>
+
+						<p:column filterBy="idnlFormatado" filterStyle="display:none; visibility:hidden;"
+							style="width:8%; padding: 4px 4px !important;" styleClass="gri-numericos noBackGroundImage">
+							<h:outputText value="#{faturamento.idnlFormatado}"/>
+							<f:facet name="header">
+								<h:outputText value="#{bundle['relatorio.faturamento.idnl']}" title="#{bundle['MH049']}" />
+							</f:facet>
+							<f:facet name="footer">
+								<h:outputText value="#{relatorioFaturamentoController.idnlTotalFormatado}" />
+							</f:facet>
+						</p:column>
+						
+						<p:summaryRow>
+							<p:column colspan="5" style="padding: 4px 4px !important; text-align:center" styleClass="noBackGroundImage">
+								<h:outputText value="SUB-TOTAL" />
+							</p:column>
+							
+							<p:column style="width:10%; padding: 4px 4px !important;" styleClass="gri-numericos noBackGroundImage">
+								<h:outputText value="#{relatorioFaturamentoController.calcSubtotalQtdSolicitada(faturamento)}" />
+							</p:column>
+							
+							<p:column style="width:10%; padding: 4px 4px !important;" styleClass="gri-numericos noBackGroundImage">
+								<h:outputText value="#{relatorioFaturamentoController.calcSubtotalQtdDisponibilizada(faturamento)}" />
+							</p:column>
+							
+							<p:column style="width:10%; padding: 4px 4px !important;" styleClass="gri-numericos noBackGroundImage">
+								<h:outputText value="#{relatorioFaturamentoController.calcSubtotalQtdDisponibilizadaNoPrazo(faturamento)}" />
+							</p:column>
+							
+							<p:column style="width:10%; padding: 4px 4px !important;" styleClass="gri-numericos noBackGroundImage">
+								<h:outputText value="#{relatorioFaturamentoController.calcSubtotalQtdNaoLocalizada(faturamento)}" />
+							</p:column>
+							
+							<p:column style="width:10%; padding: 4px 4px !important;" styleClass="gri-numericos noBackGroundImage">
+								<h:outputText value="#{relatorioFaturamentoController.calcSubtotalIDLP(faturamento)}">
+									<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+								</h:outputText>
+							</p:column>
+							
+							<p:column style="width:10%; padding: 4px 4px !important;" styleClass="gri-numericos noBackGroundImage">
+								<h:outputText value="#{relatorioFaturamentoController.calcSubtotalIDLN(faturamento)}">
+									<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+								</h:outputText>
+							</p:column>
+							
+						</p:summaryRow>
+
+						<p:columnGroup type="footer" id="columnFooter">
+							<p:row>
+								<p:column id="colunaTotal" footerText="TOTAL GERAL" style="padding: 4px 4px !important; text-align:center;" colspan="5" styleClass="noBackGroundImage" />
+								<p:column id="colunaTotalPapel" styleClass="noBackGroundImage"
+									style="padding: 4px 4px !important; text-align:right; border-left: 1px dotted #666 !important;"
+									footerText="#{relatorioFaturamentoController.qtdTotalSolicitada}" />
+								<p:column styleClass="noBackGroundImage" style="padding: 4px 4px !important; text-align:right; border-left: 1px dotted #666 !important;"
+									footerText="#{relatorioFaturamentoController.qtdTotalDisponibilizada}" />
+								<p:column styleClass="noBackGroundImage" style="padding: 4px 4px !important; text-align:right; border-left: 1px dotted #666 !important;"
+									footerText="#{relatorioFaturamentoController.qtdTotalDisponibilizadaNoPrazo}" />
+								<p:column styleClass="noBackGroundImage" style="padding: 4px 4px !important; text-align:right; border-left: 1px dotted #666 !important;"
+									footerText="#{relatorioFaturamentoController.qtdTotalNaoLocalizada}" />
+								<p:column styleClass="noBackGroundImage" style="padding: 4px 4px !important; text-align:right; border-left: 1px dotted #666 !important;"
+									footerText="#{relatorioFaturamentoController.idlpTotalFormatado}" />
+								<p:column styleClass="noBackGroundImage" style="padding: 4px 4px !important; text-align:right; border-left: 1px dotted #666 !important;"
+									footerText="#{relatorioFaturamentoController.idnlTotalFormatado}" />
+							</p:row>
+						</p:columnGroup>
+
+					</p:dataTable>
+				</h:panelGrid>
+			</h:panelGrid>
+		</h:form>
+
+		<!-- RELATÓRIO TIPO C - GRID -->
+		<h:form id="frmRelatorioTipoC">
+			<!-- begin-of: relatório tipo c -->
+			<h:panelGrid id="painelConsultaNoItensTipoC"
+				rendered="#{relatorioFaturamentoController.pesquisaRealizada and relatorioFaturamentoController.listRemessaRelFaturamentoTipoC.size() == 0}">
+				#{bundle['MI017']}
+			</h:panelGrid>
+
+			<p:dataTable id="tblRelatorioTipoC" value="#{relatorioFaturamentoController.listRemessaRelFaturamentoTipoC}"
+				rendered="#{relatorioFaturamentoController.listRemessaRelFaturamentoTipoC.size() > 0}" lazy="true" varStatus="size" var="remessa" type="unordered" itemType="none"
+				paginator="true" rows="10" styleClass="estilo-border-dotted zebr" tableStyleClass="tablefixa"
+				rowStyleClass="#{empty rowIx or rowIx mod 2 ne 0 ? 'even-row' : 'odd-row'}" rowIndexVar="rowIx" paginatorPosition="bottom"
+				paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+				currentPageReportTemplate="#{bundle['geral.crud.exibindo']} {startRecord} #{bundle['geral.crud.ate']} {endRecord}  #{bundle['geral.crud.de']} {totalRecords}  #{bundle['geral.crud.registros']} "
+				rowsPerPageTemplate="5,10,25,50" emptyMessage="#{bundle['MI017']}">
+
+				<!-- RELATÓRIO TIPO C - COLUNA BASE -->
+				<p:column style="width:90px" styleClass="noBackGroundImage center">
+					<f:facet name="header">
+						<h:outputText value="BASE" title="#{bundle['MH118']}" />
+					</f:facet>
+					<h:outputText styleClass="center" value="#{remessa.empresaContrato.base.nome}" />
+				</p:column>
+
+				<!-- RELATÓRIO TIPO C - COLUNA DT.ABERTURA -->
+				<p:column style="width:100px; text-align:center;" styleClass="noBackGroundImage center">
+					<f:facet name="header">
+						<h:outputText value="DT.ABERTURA" title="#{bundle['MH114']}" />
+					</f:facet>
+					<h:outputText style="text-align:center;" styleClass="center" value="#{remessa.dataHoraAbertura}">
+						<f:convertDateTime pattern="dd/MM/yyyy" locale="pt_BR" />
+					</h:outputText>
+				</p:column>
+
+				<!-- RELATÓRIO TIPO C - COLUNA DT.FECHAMENTO -->
+				<p:column style="width:100px; text-align:center;" styleClass="noBackGroundImage center">
+					<f:facet name="header">
+						<h:outputText value="DT.FECHAMENTO" title="#{bundle['MH115']}" />
+					</f:facet>
+					<h:outputText styleClass="center" value="#{remessa.tramiteRemessaAtual.dataTramiteRemessa}">
+						<f:convertDateTime pattern="dd/MM/yyyy" locale="pt_BR" />
+					</h:outputText>
+
+					<f:facet name="footer">
+						<h:outputText value="TOTAL GERAL" />
+					</f:facet>
+				</p:column>
+
+				<!-- RELATÓRIO TIPO C - COLUNA Nº REM. -->
+				<p:column style="width:40px; text-align:right;" styleClass="noBackGroundImage center">
+					<f:facet name="header" style="text-align:center;" >
+						<h:outputText value="Nº REM." title="#{bundle['MH113']}" style="text-align:center;" />
+					</f:facet>
+					<h:outputText styleClass="center" value="#{remessa.id}" />
+
+					<f:facet name="footer">
+						<h:outputText value="#{relatorioFaturamentoController.getTotalListRemessaRelFaturamentoTipoC()}" />
+					</f:facet>
+				</p:column>
+
+				<!-- RELATÓRIO TIPO C - COLUNA UND. SOLIC. -->
+				<p:column style="width:170px;" styleClass="noBackGroundImage center">
+					<f:facet name="header">
+						<h:outputText value="UND. SOLIC." title="#{bundle['MH112']}" />
+					</f:facet>
+					<h:outputText styleClass="center" value="#{remessa.unidadeSolicitante.descricaoCompleta}" />
+					
+					<f:facet name="footer">
+						<h:outputText value="#{relatorioFaturamentoController.totalUnidSolicitantes}" />
+					</f:facet>
+				</p:column>
+
+				<!-- RELATÓRIO TIPO C - COLUNA NOVOS MOVIMENTOS -->
+				<p:column style="width:100px; text-align:center;" styleClass="noBackGroundImage center">
+					<f:facet name="header">
+						<h:outputText value="NOVOS MOVIMENTOS" title="#{bundle['MH105']}" />
+					</f:facet>
+					<h:outputText styleClass="center" value="#{remessa.novosMovimentos}" />
+
+					<f:facet name="footer">
+						<h:outputText value="#{relatorioFaturamentoController.totalNovosMovimentos}" />
+					</f:facet>
+				</p:column>
+
+				<!-- RELATÓRIO TIPO C - COLUNA INSERÇÕES (ATÉ 90 DIAS) -->
+				<p:column style="width:80px; text-align:center;" styleClass="noBackGroundImage center">
+					<f:facet name="header">
+						<h:outputText value="INSERÇÕES (ATÉ 90 DIAS)" title="#{bundle['MH106']}" />
+					</f:facet>
+					<h:outputText styleClass="center" value="#{remessa.movimentosUltimos90Dias}" />
+
+					<f:facet name="footer">
+						<h:outputText value="#{relatorioFaturamentoController.totalMovimentosUltimos90Dias}" />
+					</f:facet>
+				</p:column>
+
+				<!-- RELATÓRIO TIPO C - COLUNA INSERÇÕES (APÓS 90 DIAS) -->
+				<p:column style="width:80px; text-align:center;" styleClass="noBackGroundImage center">
+					<f:facet name="header">
+						<h:outputText value="INSERÇÕES (APÓS 90 DIAS)" title="#{bundle['MH107']}" />
+					</f:facet>
+					<h:outputText styleClass="center" value="#{remessa.movimentosApos90Dias}" />
+
+					<f:facet name="footer">
+						<h:outputText value="#{relatorioFaturamentoController.totalMovimentosApos90Dias}" />
+					</f:facet>
+				</p:column>
+
+				<!-- RELATÓRIO TIPO C - GRID RODAPÉ -->
+				<p:columnGroup type="footer">
+					<p:row  style="text-align:center;">
+						<p:column footerText="TOTAL GERAL" colspan="3" styleClass="noBackGroundImage" style="text-align:right;" />
+						<p:column footerText="#{relatorioFaturamentoController.getTotalListRemessaRelFaturamentoTipoC()}" styleClass="noBackGroundImage" style="text-align:center;" />
+						<p:column footerText="#{relatorioFaturamentoController.totalUnidSolicitantes}" styleClass="noBackGroundImage" style="text-align:center;" />
+						<p:column footerText="#{relatorioFaturamentoController.totalNovosMovimentos}" styleClass="noBackGroundImage" style="text-align:center;" />
+						<p:column footerText="#{relatorioFaturamentoController.totalMovimentosUltimos90Dias}" styleClass="noBackGroundImage" style="text-align:center;" />
+						<p:column footerText="#{relatorioFaturamentoController.totalMovimentosApos90Dias}" styleClass="noBackGroundImage" style="text-align:center;" />
+					</p:row>
+				</p:columnGroup>
+			</p:dataTable>
+			<!-- end-of: relatório tipo c -->
+		</h:form>
+
+		<!-- RELATÓRIO TIPO AB - GRID -->
+		<h:form id="frmRelatorioTipoAB">
+			<h:panelGrid id="painelConsultaNoItensTipoAB"
+				rendered="#{relatorioFaturamentoController.pesquisaRealizada and relatorioFaturamentoController.listRemessaRelFaturamentoAB.size() == 0}">
+				#{bundle['MI017']}
+			</h:panelGrid>
+			<!-- begin-of: relatório tipo ab -->
+			<p:dataTable id="tblRelatorioTipoAB" value="#{relatorioFaturamentoController.listRemessaRelFaturamentoAB}"
+				rendered="#{relatorioFaturamentoController.listRemessaRelFaturamentoAB.size() > 0}" lazy="true" varStatus="size" var="remessa" type="unordered" itemType="none"
+				paginator="true" rows="10" styleClass="estilo-border-dotted zebr" tableStyleClass="tablefixa"
+				rowStyleClass="#{empty rowIx or rowIx mod 2 ne 0 ? 'even-row' : 'odd-row'}" rowIndexVar="rowIx" paginatorPosition="bottom"
+				paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+				currentPageReportTemplate="#{bundle['geral.crud.exibindo']} {startRecord} #{bundle['geral.crud.ate']} {endRecord}  #{bundle['geral.crud.de']} {totalRecords}  #{bundle['geral.crud.registros']} "
+				rowsPerPageTemplate="5,10,25,50" emptyMessage="#{bundle['MI017']}">
+
+				<!-- RELATÓRIO TIPO AB - COLUNA BASE -->
+				<p:column style="width:70px" styleClass="noBackGroundImage center">
+					<f:facet name="header">
+						<h:outputText value="BASE" title="#{bundle['MH118']}" />
+					</f:facet>
+					<h:outputText styleClass="center" value="#{remessa.noBase}" />
+				</p:column>
+
+				<!-- RELATÓRIO TIPO AB - COLUNA Nº REM. -->
+				<p:column style="width:40px; text-align:right;" styleClass="noBackGroundImage center">
+					<f:facet name="header">
+						<h:outputText value="Nº REM." title="#{bundle['MH113']}" />
+					</f:facet>
+					<h:outputText value="#{remessa.id}" />
+				</p:column>
+
+				<!-- RELATÓRIO TIPO AB - COLUNA UND. SOLIC. -->
+				<p:column style="width:160px" styleClass="noBackGroundImage center">
+					<f:facet name="header">
+						<h:outputText value="UND. SOLIC." title="#{bundle['MH112']}" />
+					</f:facet>
+					<h:outputText styleClass="center" value="#{remessa.nuUnidade} - #{remessa.noUnidade}" />
+				</p:column>
+
+				<!-- RELATÓRIO TIPO AB - COLUNA ABERT. -->
+				<p:column style="width:70px; text-align:center;" styleClass="noBackGroundImage center">
+					<f:facet name="header">
+						<h:outputText value="ABERT." title="#{bundle['MH114']}" />
+					</f:facet>
+					<h:outputText styleClass="center" value="#{remessa.dataHoraAbertura}">
+						<f:convertDateTime pattern="dd/MM/yyyy" locale="pt_BR" />
+					</h:outputText>
+				</p:column>
+
+				<!-- RELATÓRIO TIPO AB - COLUNA AGEND. -->
+				<p:column style="width:70px; text-align:center;" styleClass="noBackGroundImage center">
+					<f:facet name="header">
+						<h:outputText value="AGEND." title="#{bundle['MH086']}" />
+					</f:facet>
+					<h:outputText styleClass="center" value="#{remessa.dataHoraAgendamento}">
+						<f:convertDateTime pattern="dd/MM/yyyy" locale="pt_BR" />
+					</h:outputText>
+				</p:column>
+
+				<!-- RELATÓRIO TIPO AB - COLUNA RECEBIDA -->
+				<p:column style="width:70px; text-align:center;" styleClass="noBackGroundImage center">
+					<f:facet name="header">
+						<h:outputText value="RECEBIDA" title="#{bundle['MH116']}" />
+					</f:facet>
+					<h:outputText styleClass="center" value="#{remessa.dataHoraRecebimento}">
+						<f:convertDateTime pattern="dd/MM/yyyy" locale="pt_BR" />
+					</h:outputText>
+				</p:column>
+
+				<!-- RELATÓRIO TIPO AB - COLUNA CONFERIDA -->
+				<p:column style="width:70px; text-align:center;" styleClass="noBackGroundImage center">
+					<f:facet name="header">
+						<h:outputText value="CONFERIDA" title="#{bundle['MH117']}" />
+					</f:facet>
+					<h:outputText styleClass="center" value="#{remessa.dataHoraConferencia}">
+						<f:convertDateTime pattern="dd/MM/yyyy" locale="pt_BR" />
+					</h:outputText>
+					
+					<f:facet name="footer">
+						<h:outputText value="TOTAL GERAL" />
+					</f:facet>
+				</p:column>
+
+				<!-- RELATÓRIO TIPO AB - COLUNA FECHADA -->
+				<p:column style="width:70px; text-align:center;" styleClass="noBackGroundImage center">
+					<f:facet name="header">
+						<h:outputText value="FECHADA" title="#{bundle['MH115']}" />
+					</f:facet>
+					<h:outputText styleClass="center" value="#{remessa.dataHoraFechamento}">
+						<f:convertDateTime pattern="dd/MM/yyyy" locale="pt_BR" />
+					</h:outputText>
+
+					<f:facet name="footer">
+						<h:outputText value="#{relatorioFaturamentoController.totalFechamentos}" />
+					</f:facet>
+				</p:column>
+
+				<!-- RELATÓRIO TIPO AB - COLUNA QTD. ITENS -->
+				<p:column style="width:60px; text-align:center;" styleClass="noBackGroundImage center">
+					<f:facet name="header">
+						<h:outputText value="QTD. ITENS" title="#{bundle['MH042']}" />
+					</f:facet>
+					<h:outputText value="#{remessa.qtdCaixa}" />
+
+					<f:facet name="footer">
+						<h:outputText value="#{relatorioFaturamentoController.totalQtdCaixa}" />
+					</f:facet>
+				</p:column>
+
+				<!-- RELATÓRIO TIPO AB - COLUNA REMESSA NO PRAZO -->
+				<p:column style="width:60px; text-align:center;" styleClass="noBackGroundImage center">
+					<f:facet name="header">
+						<h:outputText value="REMESSA NO PRAZO" title="#{bundle['MH055']}" />
+					</f:facet>
+					<h:outputText styleClass="center" value="#{remessa.isDentroPrazo(relatorioFaturamentoController.pzColeta) ? 'SIM' : 'NÃO'}" />
+
+					<f:facet name="footer">
+						<h:outputText value="#{relatorioFaturamentoController.totalRemessaNoPrazo}/#{relatorioFaturamentoController.totalRemessaForaPrazo}" />
+					</f:facet>
+				</p:column>
+
+				<!-- RELATÓRIO TIPO AB - GRID RODAPÉ -->
+				<p:columnGroup type="footer">
+					<p:row>
+						<p:column footerText="TOTAL GERAL" colspan="7" styleClass="noBackGroundImage" style="text-align:right;" />
+
+						<!-- <p:column footerText="#{relatorioFaturamentoController.totalAgendamentos}" styleClass="noBackGroundImage" style="text-align:center;" />
+						<p:column footerText="#{relatorioFaturamentoController.totalRecebimentos}" styleClass="noBackGroundImage" style="text-align:center;" />
+						<p:column footerText="#{relatorioFaturamentoController.totalConferencias}" styleClass="noBackGroundImage" style="text-align:center;" /> -->
+						<p:column footerText="#{relatorioFaturamentoController.totalFechamentos}" styleClass="noBackGroundImage" style="text-align:center;" />
+						<p:column footerText="#{relatorioFaturamentoController.totalQtdCaixa}" styleClass="noBackGroundImage" style="text-align:center;" />
+						<p:column footerText="#{relatorioFaturamentoController.totalRemessaNoPrazo}/#{relatorioFaturamentoController.totalRemessaForaPrazo}"
+							styleClass="noBackGroundImage" style="text-align:center;" />
+					</p:row>
+				</p:columnGroup>
+			</p:dataTable>
+			<!-- end-of: relatório tipo ab -->
+		</h:form>
+		
+		<!-- begin-of: modal info -->
+		<ui:include src="/includes/modalInfoRequisicao.xhtml" />
+		<!-- end-of: modal info -->
+		
+	</ui:define>
+
+</ui:composition>

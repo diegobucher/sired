@@ -1,0 +1,121 @@
+<ui:composition template="/WEB-INF/templates/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+	<ui:define name="html-head">
+		<h:outputScript library="js" name="jquery.price_format.1.3.js" />
+		<h:outputScript library="js" name="duaListConfig.js" />
+	</ui:define>
+
+	<ui:param name="breadcrumbs" value="#{bundle['geral.breadcrumb.cadastro']},#{bundle['geral.label.grupoDocumentos']}" />
+
+	<ui:define name="content-main-page">
+
+		<h:form id="formConsulta">
+			<p:focus id="focusConsulta" for="formConsulta" />
+			
+			<p:messages id="messages" showDetail="false" />
+			
+			<h3 class="titlePage">#{bundle['grupo.cadastro.campos']}:#{' '}
+				<h:outputText value="#{grupoController.instance.nome}"/>
+			</h3>
+
+			<p:spacer height="15px" />
+			
+			<p:outputPanel id="pnlListaCampos">
+				<p:dataTable value="#{grupoController.listaCampos}" var="campo" widgetVar="campos" id="dataTableCrudCampos"
+					rows="50" emptyMessage="#{bundle['MA010']}"
+					rendered="#{grupoController.listaCampos != null and (grupoController.listaCampos.size() > 0)}"
+					sortBy="nome" 
+					tableStyleClass="tablefixa"
+					rowStyleClass="#{empty rowIx or rowIx mod 2 ne 0 ? 'even-row' : 'odd-row'}" rowIndexVar="rowIx"
+					styleClass="estilo-border-dotted zebr" >						
+			
+					<p:column style="width:5%"
+						styleClass="gri-codigos noBackGroundImage">
+						<h:selectBooleanCheckbox id="chk" value="#{campo.checkBox}" styleClass="check">
+							<p:ajax event="change" update="dataTableCrudCampos" process="dataTableCrudCampos" listener="#{grupoController.limparCampo(campo)}" global="false"/>
+						</h:selectBooleanCheckbox>
+					</p:column>
+					
+					<p:column style="width:25%;" styleClass="gri-codigos noBackGroundImage">
+						<h:outputText value="#{campo.descricao}"/>
+						<f:facet name="header">
+							<h:outputText value="#{bundle['grupoCampos.label.campos']}" />
+						</f:facet>
+					</p:column>
+
+					<p:column style="width:20%"
+						styleClass="gri-codigos noBackGroundImage">
+						<h:inputText value="#{campo.legenda}" styleClass="#{!campo.checkBox ? 'select-disabled' : ''}"
+							maxlength="50" size="15" id="textLegenda" disabled="#{campo.checkBox == false}" />
+						<f:facet name="header">
+							<h:outputText value="#{bundle['grupoCampos.label.legenda']}" />
+						</f:facet>
+					</p:column>
+
+					<p:column style="width:20%"
+						styleClass="gri-codigos noBackGroundImage">
+						<h:inputText value="#{campo.mensagem}" styleClass="#{!campo.checkBox ? 'select-disabled' : ''}"
+							maxlength="100" size="15" id="textMensagem" disabled="#{campo.checkBox == false}" />
+						<f:facet name="header">
+							<h:outputText value="#{bundle['grupoCampos.label.mensagem']}" />
+						</f:facet>
+					</p:column>
+
+					<p:column style="width:15%"
+						styleClass="gri-codigos noBackGroundImage">
+						<h:selectBooleanCheckbox id="obrigatorio" disabled="#{campo.checkBox == false}"
+							value="#{campo.obrigatorio}" styleClass="check"/>
+						<f:facet name="header">
+							<h:outputText value="#{bundle['grupoCampos.label.obrigatorio']}" />
+						</f:facet>
+					</p:column>
+
+					<p:column style="width:15%"
+						styleClass="gri-codigos noBackGroundImage">
+						<h:selectOneMenu id="selectTipoDocumento" styleClass="#{!campo.checkBox ? 'select-disabled' : ''}"
+							style="margin-right: 20px; width: 90px;" disabled="#{campo.checkBox == false}"
+							value="#{campo.ordem}" immediate="true" converter="javax.faces.Integer">
+							<f:selectItem itemLabel="Selecione"  noSelectionOption="true" />
+							<f:selectItems
+								value="#{grupoController.getOrdem(campo)}" 
+								var="ordem" itemValue="#{ordem.intValue()}" itemLabel="#{ordem.intValue()}">
+							</f:selectItems>
+							<p:ajax event="change" process="dataTableCrudCampos" update="dataTableCrudCampos" global="false"/>
+						</h:selectOneMenu>
+						<f:facet name="header">
+							<h:outputText value="#{bundle['grupoCampos.label.ordem']}" />
+						</f:facet>
+					</p:column>
+				</p:dataTable>
+			</p:outputPanel>
+
+			<h:panelGrid columns="3">
+				<p:commandLink title="#{bundle['MH011']}"
+					action="#{grupoController.salvarCampos}"
+					styleClass="btnLaranja marginTop buttonSelected"
+					id="btnGravar">
+					<span>#{bundle['geral.button.gravar']}</span>
+				</p:commandLink>
+
+				<p:commandLink title="#{bundle['MH028']}"
+					actionListener="#{grupoController.limparCampos}"
+					update=":formConsulta:dataTableCrudCampos"
+					styleClass="btnLaranja marginTop buttonSelected">
+					<span>#{bundle['geral.button.limpar']}</span>
+				</p:commandLink>
+
+				<p:commandLink title="#{bundle['MH013']}"
+					action="#{grupoController.voltar}"
+					styleClass="btnAzul marginTop buttonSelected">
+					<span>#{bundle['MI010']}</span>
+				</p:commandLink>
+			</h:panelGrid>
+		</h:form>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,248 @@
+<ui:composition template="/WEB-INF/templates/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+	<ui:define name="html-head">
+		<h:outputScript library="js" name="jquery.price_format.1.3.js" />
+		<script type="text/javascript">
+			function exportarJS(){
+				limparFiltro();
+				PrimeFaces.monitorDownload(showStatus, hideStatus);
+				atualizarFiltro();
+			}
+			function limparFiltro(){
+				var valor = $('.globalFilterClass').val();
+				$('.globalFilterClass').val('');
+				listaPendencias.filter();
+				$('#hiddenPesquisar').val(valor);
+			}
+			function atualizarFiltro(){
+				var valor = $('#hiddenPesquisar').val(); 
+				$('.globalFilterClass').val(valor);
+				listaPendencias.filter();
+				$('#hiddenPesquisar').val('');
+			}
+		</script>
+	</ui:define>
+	
+	<!-- Alias para o controller -->
+	<ui:param name="modal" value="#{requisicaoDocumentoController}" />
+	
+	<ui:param name="breadcrumbs" value="#{bundle['geral.breadcrumb.relatorio']},#{bundle['relatorio.pendencia.tituloPagina']}" />
+
+	<ui:define name="content-main-page">
+		<h:form id="formConsulta">
+			<input type="hidden" id="hiddenPesquisar"/>
+			<p:focus id="focusConsulta" context="formConsulta" />
+			<p:messages id="messages" showDetail="false" />
+			<h3 class="titlePage">#{bundle['relatorio.pendencia.tituloPagina.descricao']}</h3>
+
+			<fieldset class="filtro">
+
+				<h:panelGrid
+					columns="#{relatorioPendenciaController.perfilAcessoBase ? 6 : 5}"
+					id="modalPainelCad06">
+					<h:outputLabel value="#{bundle['geral.label.dataInicio']}"
+						styleClass="label-button">
+						<h:outputText value="" styleClass="pesquisaDireta" />
+						<br></br>
+						<p:calendar id="idDataInicio" size="10"
+							value="#{relatorioPendenciaController.relatorioVisitor.dataInicio}"
+							pattern="dd/MM/yyyy" locale="pt_BR"
+							converter="converter.DataConverterSIRED" maxlength="10"
+							onkeyup="maskIt(this,event,'##/##/#####',false,false)">
+						</p:calendar>
+					</h:outputLabel>
+
+					<h:outputLabel value="#{bundle['geral.label.dataFim']}"
+						styleClass="label-button">
+						<br></br>
+						<p:calendar id="idDataFim" size="10"
+							value="#{relatorioPendenciaController.relatorioVisitor.dataFim}"
+							pattern="dd/MM/yyyy" locale="pt_BR"
+							converter="converter.DataConverterSIRED" maxlength="10"
+							onkeyup="maskIt(this,event,'##/##/#####',false,false)">
+						</p:calendar>
+					</h:outputLabel>
+
+					<h:outputLabel value="#{bundle['requisicao.label.demanda']}"
+						styleClass="label-button" for="idDemanda">
+						<br></br>
+						<h:selectOneMenu id="idDemanda"
+							converter="omnifaces.SelectItemsConverter"
+							value="#{relatorioPendenciaController.relatorioVisitor.tipoDemanda.nome}"
+							style="width: 100%;">
+							<f:selectItem itemLabel="TODAS" noSelectionOption="true" />
+							<f:selectItems
+								value="#{relatorioPendenciaController.descricaoTiposDeDemanda}"
+								var="demanda" itemValue="#{demanda}" itemLabel="#{demanda}" />
+						</h:selectOneMenu>
+					</h:outputLabel>
+
+					<h:outputLabel
+						rendered="#{relatorioPendenciaController.perfilAcessoBase}"
+						value="#{bundle['base.label.base']}"
+						styleClass="label-button" for="idBase">
+						<br></br>
+						<h:selectOneMenu id="idBase"
+							converter="omnifaces.SelectItemsConverter"
+							value="#{relatorioPendenciaController.relatorioVisitor.base}"
+							style="width: 100%;">
+							<f:selectItem itemLabel="TODAS" noSelectionOption="true" />
+							<f:selectItems value="#{relatorioPendenciaController.listaBases}"
+								var="base" itemValue="#{base}" itemLabel="#{base.nome}" />
+						</h:selectOneMenu>
+					</h:outputLabel>
+
+					<p:commandLink title="#{bundle['MH008']}"
+						styleClass="btnLaranja marginTop buttonSelected"
+						style="margin-right: 8px;"
+						actionListener="#{relatorioPendenciaController.localizar}"
+						id="btnLocalizar"
+						update="painelConsultaItens messages btnExportar">
+						<span>#{bundle['geral.button.consultar']}</span>
+					</p:commandLink>
+
+					<p:commandLink styleClass="btnAzul marginTop buttonSelected"
+						onclick="exportarJS();"
+						title="#{bundle['MH010']}" ajax="false"
+						disabled="#{relatorioPendenciaController.desabilitarBotaoExportar}"
+						id="btnExportar" style="margin-right: 8px;">
+						<span>#{bundle['geral.button.exportar']}</span>
+						<p:dataExporter type="xls" target="dataTableCrud"
+							fileName="#{bundle['relatorio.pendencia.nome.relatorio']}"
+							postProcessor="#{relatorioPendenciaController.preExportar}" />
+					</p:commandLink>
+
+				</h:panelGrid>
+
+			</fieldset>
+
+			<!-- TABELA COM OS RESULTADOS DA CONSULTA -->
+			<h:panelGrid id="painelConsultaItens">
+				<h:panelGrid id="painielConsultaNoItens"
+					rendered="#{relatorioPendenciaController.pesquisaRealizada &amp;&amp; relatorioPendenciaController.listaPendencia.size() == 0}">
+				#{bundle['MI017']}
+			</h:panelGrid>
+			
+				<h:panelGrid id="painielConsulta"
+					rendered="#{relatorioPendenciaController.pesquisaRealizada and !(empty relatorioPendenciaController.listaPendencia)}">
+
+					<p:dataTable value="#{relatorioPendenciaController.listaPendencia}"
+						var="pendencia" widgetVar="listaPendencias" id="dataTableCrud"
+						rows="10" emptyMessage="#{bundle['MI017']}"
+						rendered="#{relatorioPendenciaController.listaPendencia.size() > 0 }"
+						paginator="true"
+						filteredValue="#{relatorioPendenciaController.listaFiltro}"
+						sortBy="noBase"
+						sortFunction="#{relatorioPendenciaController.sortByString}"
+						styleClass="estilo-border-dotted zebr" paginatorPosition="bottom"
+						tableStyleClass="tablefixa"
+						rowStyleClass="#{empty rowIx or rowIx mod 2 ne 0 ? 'even-row' : 'odd-row'}"
+						rowIndexVar="rowIx" 
+						paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+						currentPageReportTemplate="#{bundle['geral.crud.exibindo']} {startRecord} #{bundle['geral.crud.ate']} {endRecord}  #{bundle['geral.crud.de']} {totalRecords}  #{bundle['geral.crud.registros']} "
+						rowsPerPageTemplate="5,10,25,50">
+
+						<f:facet name="header">
+							<p:outputPanel style="text-align:right; margin-right:-10px"
+								styleClass="ui-widget-auxiliar">
+								<h:outputText value="#{bundle['geral.label.pesquisar']}"
+									escape="false" />
+								<h:inputText id="globalFilter"
+									value="#{relatorioPendenciaController.filtroPesquisar}"
+									onkeyup="listaPendencias.filter();" style="width:150px;"
+									maxlength="255" styleClass="semClear globalFilterClass">
+									<p:ajax event="keyup"
+										update=":#{p:component('btnExportar')}"
+										global="false" />
+								</h:inputText>
+							</p:outputPanel>
+						</f:facet>
+
+						<p:column filterBy="noBase" filterStyle="display:none; visibility:hidden;" sortBy="noBase" style="width:12%; text-align: center;"
+							sortFunction="#{relatorioPendenciaController.sortByString}" styleClass="center noBackGroundImage">
+							<h:outputText value="#{pendencia.noBase}" styleClass="center" />
+							<f:facet name="header">
+								<h:outputText value="#{bundle['base.label.baseMaiusculas']}" />
+							</f:facet>
+						</p:column>
+
+						<p:column filterBy="codigoRequisicao" filterStyle="display:none; visibility:hidden;" sortBy="idRequisicao"
+							style="width:18%; text-align: center;" styleClass="center noBackGroundImage">
+							
+							<f:facet name="header">
+								<h:outputText
+									value="#{bundle['requisicao.label.codigoRequisicao.maiusculas']}" />
+							</f:facet>
+							<b><p:commandLink title="Clique aqui para acessar a Requisição" styleClass="image-link info-link"
+									actionListener="#{requisicaoDocumentoController.visualizarRequisicao(relatorioPendenciaController.getRequisicaoPendencia(pendencia.codigoRequisicao))}" 
+									update=":modalInfoId" value="#{pendencia.codigoRequisicao}" /></b>
+									
+							<f:facet name="footer">
+								<h:outputText value="TOTAL DE DOCUMENTOS EM ATRASO" />
+							</f:facet>
+						</p:column>
+
+						<p:column filterBy="nomeDemanda" filterStyle="display:none; visibility:hidden;" sortBy="nomeDemanda"
+							sortFunction="#{relatorioPendenciaController.sortByString}" style="width:15%; text-align: center;" styleClass="center noBackGroundImage">
+							<h:outputText value="#{pendencia.nomeDemanda}" />
+							<f:facet name="header">
+								<h:outputText value="#{bundle['requisicao.label.demanda.maiusculas']}" />
+							</f:facet>
+						</p:column>
+
+						<p:column filterBy="dataHoraRegistroFormatada" filterStyle="display:none; visibility:hidden;" sortBy="dataHoraRegistroFormatada"
+							sortFunction="#{relatorioPendenciaController.sortByString}" style="width:13%; text-align: center;" styleClass="center noBackGroundImage">
+							<h:outputText value="#{pendencia.dataHoraRegistroFormatada}" />
+							<f:facet name="header">
+								<h:outputText value="#{bundle['requisicao.consulta.title.abertura']}" />
+							</f:facet>
+						</p:column>
+
+						<p:column filterBy="dataPrazoAtendimentoFormatada" filterStyle="display:none; visibility:hidden;"
+							sortBy="dataPrazoAtendimentoFormatada" sortFunction="#{relatorioPendenciaController.sortByString}"
+							style="width:13%; text-align: center;" styleClass="center noBackGroundImage">
+							<h:outputText
+								value="#{pendencia.dataPrazoAtendimentoFormatada}" />
+							<f:facet name="header">
+								<h:outputText value="#{bundle['relatorio.pendencia.previsao']}" />
+							</f:facet>
+						</p:column>
+
+						<p:column filterBy="atraso" filterStyle="display:none; visibility:hidden;" sortBy="atraso"
+							sortFunction="#{relatorioPendenciaController.sortByInteger}" style="width:16%" styleClass="gri-numericos noBackGroundImage">
+							<h:outputText value="#{pendencia.atraso}" />
+							<f:facet name="header">
+								<h:outputText value="#{bundle['relatorio.pendencia.atraso']}" />
+							</f:facet>
+							<f:facet name="footer">
+								<h:outputText value="#{relatorioPendenciaController.getQtdDocsAtrasados()}" />
+							</f:facet>
+						</p:column>
+
+						<p:columnGroup id="columnFooter" type="footer">
+							<p:row>
+								<p:column footerText="TOTAL DE DOCUMENTOS EM ATRASO"
+									style="text-align:left;"
+									colspan="5" styleClass="noBackGroundImage" />
+								<p:column
+									footerText="#{relatorioPendenciaController.getQtdDocsAtrasados()}"
+									styleClass="noBackGroundImage"
+									style="text-align:right; border-left: 1px dotted #666 !important;" />
+							</p:row>
+						</p:columnGroup>
+					</p:dataTable>
+				</h:panelGrid>
+			</h:panelGrid>
+		</h:form>
+		
+		<!-- begin-of: modal info -->
+		<ui:include src="/includes/modalInfoRequisicao.xhtml" />
+		<!-- end-of: modal info -->
+	</ui:define>
+</ui:composition>

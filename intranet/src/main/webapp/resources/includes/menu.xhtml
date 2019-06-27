@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+<h:form id="formMenuHorizontal">
+	<div id="wrapMenuHor">
+		<div id="menuHorizontal">
+			<ul>
+				<ui:repeat var="item" value="#{controleAcesso.menu.itens}">
+					<li>
+						<h:commandLink rendered="#{!empty item.link}"
+							action="#{controleAcesso.abrirMenu(item.id)}"
+							value="#{item.nome}" styleClass="#{item.styleClass}">
+						</h:commandLink>
+						<ui:fragment rendered="#{empty item.link}">
+						<h:commandLink onclick="return false;"
+							value="#{item.nome}" styleClass="#{item.styleClass}">
+						</h:commandLink>
+						<ul class="dropdown">
+							<ui:repeat var="subItem" value="#{item.subItens}">
+								<li><h:commandLink
+										action="#{controleAcesso.abrirMenu(subItem.id)}"
+										value="#{subItem.nome}" styleClass="#{subItem.styleClass}"></h:commandLink></li>
+							</ui:repeat>
+						</ul></ui:fragment></li>
+				</ui:repeat>
+
+			</ul>
+		</div>
+	</div>
+</h:form>
+
+</html>

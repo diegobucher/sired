@@ -1,0 +1,20 @@
+<!DOCTYPE log4j:configuration PUBLIC "-//log4j/log4j Configuration//EN" "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+	<appender name="consoleAppender" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n" />
+		</layout>
+	</appender>
+	<appender name="RollingAppender" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="/sistemas/SIRED/logs_extranet/sired_extra.log" />
+		<param name="DatePattern" value="'.'yyyy-MM-dd" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="[%p] %d %c %M - %m%n"/>          
+		</layout>
+	</appender>
+	<root>
+		<priority value="DEBUG"/>
+		<!-- <appender-ref ref="consoleAppender" /> -->
+		<appender-ref ref="RollingAppender" />
+	</root>
+</log4j:configuration>

@@ -1,0 +1,295 @@
+<ui:composition template="/WEB-INF/templates/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+	<ui:define name="html-head">
+		<h:outputScript library="js" name="jquery.price_format.1.3.js" />
+		<h:outputScript library="js" name="duaListConfig.js" />
+	</ui:define>
+
+	<ui:param name="breadcrumbs" value="#{bundle['geral.breadcrumb.cadastro']},#{bundle['geral.label.grupoDocumentos']}" />
+
+	<ui:define name="content-main-page">
+
+		<h:form id="formConsulta">
+			<p:focus id="focusConsulta" for="formConsulta" />
+			<p:messages id="messages" showDetail="false" />
+			<h3 class="titlePage">#{bundle['grupo.consulta.cadastro']}</h3>
+
+			<h:panelGroup>
+				<p:commandLink title="#{bundle['MH041']}"
+					styleClass="btnLaranja marginTop buttonSelected"
+					actionListener="#{grupoController.novo()}"
+					onclick="guardarIdComponenteController(this); jQuery('#modalCadastroId .ui-dialog-title').text('#{bundle['grupo.label.novoGrupoDocumentos']}');"
+					oncomplete="modalCadastro.show();" update=":cadastrarForm"
+					id="btnCadastro"  disabled="#{grupoController.perfilConsulta}">
+					<span>#{bundle['grupo.label.novoGrupoDocumentos']}</span>
+				</p:commandLink>
+				
+				<p:commandLink styleClass="btnAzul marginTop buttonSelected"
+					onclick="PrimeFaces.monitorDownload(showStatus, hideStatus)"
+					title="#{bundle['MH010']}" ajax="false" disabled="#{grupoController.listaFiltro.size()==0}" id="btnExportar">
+					<span>#{bundle['geral.button.exportar']}</span>
+					<p:dataExporter type="xls" target="dataTableCrud"
+						fileName="#{bundle['grupo.label.nome.relatorio']}"
+						postProcessor="#{grupoController.preExportar}" />
+				</p:commandLink>
+
+			</h:panelGroup>
+
+			<p:spacer height="30px" />
+
+			<p:outputPanel id="pnlListaResultados">
+				<p:dataTable value="#{grupoController.lista}" var="grupo"
+					widgetVar="grupos" id="dataTableCrud" rows="10"
+					emptyMessage="#{bundle['MA010']}" paginator="true"
+					filteredValue="#{grupoController.listaFiltro}" sortBy="nome"
+					rowStyleClass="#{empty rowIx or rowIx mod 2 ne 0 ? 'even-row' : 'odd-row'}"
+					rowIndexVar="rowIx" styleClass="estilo-border-dotted zebr"
+					paginatorPosition="bottom"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					currentPageReportTemplate="#{bundle['geral.crud.exibindo']} {startRecord} #{bundle['geral.crud.ate']} {endRecord}  #{bundle['geral.crud.de']} {totalRecords}  #{bundle['geral.crud.registros']} "
+					rowsPerPageTemplate="5,10,25,50">
+
+					<f:facet name="header">
+						<p:outputPanel style="text-align:right; margin-right:-10px"
+							styleClass="ui-widget-auxiliar">
+							<h:outputText value="#{bundle['geral.label.pesquisar']}" escape="false" />
+							<h:inputText id="globalFilter" onkeyup="grupos.filter();" style="width:150px;" maxlength="255" styleClass="semClear" >
+								<p:ajax event="keyup" update=":#{p:component('btnExportar')}" global="false" />
+							</h:inputText>
+						</p:outputPanel>
+					</f:facet>
+
+					<!-- INÍCIO COLUNAS QUE SÃO EXPORTADAS PARA O RELATÓRIO MAS NÃO SÃO VISÍVEIS NA TABELA -->
+					<p:column sortFunction="#{grupoController.sortByString}" style=" display:none; visibility:hidden;" styleClass="gri-alfanumericos noBackGroundImage">
+						<h:outputText value="#{grupo.id}" />
+						<f:facet name="header">
+							<h:outputText value="#{bundle['geral.label.codigoDoGrupo']}" />
+						</f:facet>
+					</p:column>
+					<!-- FIM COLUNAS QUE SÃO EXPORTADAS PARA O RELATÓRIO MAS NÃO SÃO VISÍVEIS NA TABELA -->
+					
+					<p:column sortBy="nome"
+						sortFunction="#{grupoController.sortByString}"
+						filterStyle="display:none; visibility:hidden;" filterBy="nome"
+						style="width:30%" styleClass="gri-alfanumericos noBackGroundImage">
+						<h:outputText value="#{grupo.nome}" />
+						<f:facet name="header">
+							<h:outputText value="#{bundle['grupo.label.grupo']}" />
+						</f:facet>
+					</p:column>
+
+					<p:column style="width:20%; display:none; visibility:hidden;">
+						<h:outputText value="#{grupo.descricao}" />
+						<f:facet name="header">
+							<h:outputText value="#{bundle['grupo.label.descricao']}" />
+						</f:facet>
+					</p:column>
+
+					<p:column style="width:7%"
+						styleClass="gri-alfanumericos noBackGroundImage">
+						<h:outputText value="#{grupo.tipoSolicitacao.valor == 0 ? bundle['grupo.label.requisicao'] : bundle['grupo.label.remessa']}" />
+						<f:facet name="header">
+							<h:outputText value="#{bundle['grupo.header.tipo']}" />
+						</f:facet>
+					</p:column>
+
+					<p:column headerText="#{bundle['geral.label.acoes']}"
+						styleClass="noBackGroundImage" style="width:10%"
+						exportable="false">
+						
+						<p:commandLink title="#{bundle['MH098']}"
+							action="#{grupoController.vincularCampo(grupo)}"
+							styleClass="editarDocumento buttonSelected"
+							update=":cadastrarForm">
+						</p:commandLink>
+												
+						<p:commandLink title="#{bundle['MH028']}"
+							actionListener="#{grupoController.edita(grupo)}"
+							styleClass="editar buttonSelected"
+							style="margin-left: 30px;" 
+							oncomplete="modalCadastro.show();jQuery('#modalCadastroId .ui-dialog-title').text('#{bundle['geral.label.grupoDocumentos']}');"
+							update=":cadastrarForm">
+						</p:commandLink>
+						
+						<p:commandLink id="btnExcluir" styleClass="excluir buttonSelected"
+							onclick="modalExcluir.show(); guardarIdComponenteController(this);"
+							title="#{bundle['MH031']}"
+							style="margin-left: 60px;" disabled="#{grupoController.perfilConsulta}">
+							<f:setPropertyActionListener
+								target="#{grupoController.instanceExcluir}" value="#{grupo}" />
+						</p:commandLink>
+						
+					</p:column>
+				</p:dataTable>
+			</p:outputPanel>
+		</h:form>
+
+		<!-- DIALOG CADASTRAR -->
+		<p:dialog header="Cadastro/Alteração" id="modalCadastroId" widgetVar="modalCadastro" styleClass="ui-dialog-background"
+			modal="true" dynamic="true" width="760px" resizable="false"	position="center" onShow="giveFocus('cadastrarForm')"
+			onHide="giveFocusRemote();" >
+			<p:ajax event="close" listener="#{grupoController.reset()}"/>
+			<h:form id="cadastrarForm">
+				<p:focus id="focusCadastro" context="cadastrarForm" />
+				
+				<p:messages id="messagesCadastro" escape="false" showDetail="false" />
+				
+				<fieldset class="filtro">
+					<h:panelGrid columns="2" id="modalPainelCad">
+						<h:panelGrid>	
+							<h:outputLabel 
+								value="#{bundle['grupo.label.nomeGrupo']}"
+								styleClass="label-button">
+								<h:outputText value="" styleClass="pesquisaDireta" />
+							</h:outputLabel>
+	
+							<h:inputText value="#{grupoController.instance.nome}" 
+								maxlength="100" size="75" id="textNome" required="true"
+								requiredMessage="#{grupoController.getRequiredMessage('grupo.label.nomeGrupo')}"  onkeypress="return removeEspacoInicio(event, this);"/>
+						</h:panelGrid>
+	
+						<h:panelGrid style="margin-left: 20px;">
+							<h:outputLabel 
+								value="#{bundle['grupo.label.tipoGrupo']}"
+								styleClass="label-button">
+								<h:outputText value="" styleClass="pesquisaDireta" />
+							</h:outputLabel>
+							
+							<h:selectOneMenu id="selectTipoSolicitacao" 
+								style="width: 100px;"
+								value="#{grupoController.instance.tipoSolicitacao}" 
+								required="true"
+								requiredMessage="#{grupoController.getRequiredMessage('grupo.label.tipoGrupo')}">
+								<f:selectItem itemLabel="Selecione" noSelectionOption="true" />
+								<f:selectItems
+									value="#{grupoController.listaTipoSolicitacao}"
+									var="tipo" itemValue="#{tipo}" itemLabel="#{tipo.descricao}">
+								</f:selectItems>
+							</h:selectOneMenu>
+						</h:panelGrid>	
+					
+						<h:panelGrid>
+							<h:outputLabel 
+								value="#{bundle['grupo.label.descricao']}"
+								styleClass="label-button">
+								<h:outputText value="" styleClass="pesquisaDireta" />
+							</h:outputLabel>
+	
+							<h:inputText value="#{grupoController.instance.descricao}"
+								maxlength="100" size="75" required="true"
+								requiredMessage="#{grupoController.getRequiredMessage('grupo.label.descricao')}"
+								id="textDescricao"  onkeypress="return removeEspacoInicio(event, this);"/>
+						</h:panelGrid>
+						
+						<h:panelGrid style="margin-left: 20px;">
+							<h:outputLabel
+								value="#{bundle['geral.label.situacao']}"
+								styleClass="label-button">
+								<h:outputText value="" styleClass="pesquisaDireta" />
+							</h:outputLabel>
+							
+							<h:selectOneMenu id="selectSituacaoGrupo" 
+								style="width: 100px;"
+								value="#{grupoController.instance.situacao}" converter="omnifaces.SelectItemsConverter" 
+								required="true"
+								requiredMessage="#{grupoController.getRequiredMessage('geral.label.situacao')}">
+								<f:selectItem itemLabel="Selecione" noSelectionOption="true" />
+								<f:selectItems
+									value="#{grupoController.listaSituacaoGrupo}"
+									var="situacao" itemValue="#{situacao}" 
+									itemLabel="#{situacao.descricao}">
+								</f:selectItems>
+							</h:selectOneMenu>
+						</h:panelGrid>
+					</h:panelGrid>
+					
+					<h:panelGrid columns="1" id="modalPainelAssi02">
+						<p:pickList id="pickList" styleClass="caixa-pick-list dualist"
+							removeLabel="#{bundle['MH026']}"
+							removeAllLabel="#{bundle['MH027']}"
+							addLabel="#{bundle['MH024']}"
+							addAllLabel="#{bundle['MH025']}"
+							value="#{grupoController.dualListGrupoDocumento}" var="documento"
+							itemValue="#{documento}" itemLabel="#{documento.nome}"
+							converter="DocumentoConverter">
+
+							<f:facet name="sourceCaption">#{bundle['grupo.label.dual.naoAssociados']}</f:facet>
+							
+							<f:facet name="targetCaption">#{bundle['grupo.label.dual.associados']}</f:facet>
+
+							<p:ajax event="transfer" listener="#{grupoController.ordenarDualList}"  global="false" update="pickList"/>
+						</p:pickList>
+					</h:panelGrid>
+
+					<!-- GRAVAR CANCELAR -->
+					<h:panelGroup>
+						<p:commandLink title="#{bundle['MH011']}"
+							actionListener="#{grupoController.salvar}"
+							styleClass="btnLaranja marginTop buttonSelected"
+							update=":#{p:component('messagesCadastro')} :#{p:component('focusCadastro')}  :#{p:component('btnExportar')}"
+							rendered="#{!grupoController.faseEditar}"  disabled="#{grupoController.perfilConsulta}">
+							<span>#{bundle['geral.button.gravar']}</span>
+						</p:commandLink>
+
+						<p:commandLink title="#{bundle['MH028']}"
+							actionListener="#{grupoController.salvar}"
+							styleClass="btnLaranja marginTop buttonSelected" 
+							update=":#{p:component('messagesCadastro')} :#{p:component('focusCadastro')}  :#{p:component('btnExportar')}"
+							rendered="#{grupoController.faseEditar}"  disabled="#{grupoController.perfilConsulta}">
+							<span>#{bundle['geral.button.alterar']}</span>
+						</p:commandLink>
+
+						<p:commandLink title="#{bundle['MH013']}"
+							styleClass="btnAzul marginTop buttonSelected"
+							onclick="modalCadastro.hide();" process="@this"
+							update=":#{p:component('messages')}">
+							<span>#{bundle['MI010']}</span>
+							<p:resetInput target="@form" />
+						</p:commandLink>		
+					</h:panelGroup>
+				</fieldset>
+			</h:form>
+		</p:dialog>
+
+		<!-- CONFIRMA EXCLUSAO  -->
+		<p:dialog header="#{bundle['grupo.header.exclusao']}"
+			id="modalExcluirId" widgetVar="modalExcluir"
+			styleClass="ui-dialog-background" modal="true" dynamic="true"
+			resizable="false" position="center"
+			onShow="giveFocus('excluirForm:btnExcluir')"
+			onHide="giveFocusRemote();">
+			<h:form id="excluirForm">
+				<span id="atencaoId" class="atencao2"
+					style="margin-top: -2px !important;" />
+
+				<h:outputFormat
+					style="margin-left: 40px; font-weight: bold !important;"
+					value="#{bundle['MA022']}">
+					<f:param value="#{bundle['geral.label.grupoDocumentos']}" />
+				</h:outputFormat>
+				<br></br>
+				<p:commandLink id="btnExcluir"
+					styleClass="btnLaranja marginTop buttonSelected"
+					action="#{grupoController.excluir}"
+					update=":#{p:component('messages')}  :#{p:component('btnExportar')}"
+					oncomplete="modalExcluir.hide()">
+					<span><h:outputText style="width: 1; height: 1;" 
+							value="Sim" /></span>
+				</p:commandLink>
+				<p:commandLink id="btnNaoExcluir"
+					styleClass="btnAzul marginTop buttonSelected"
+					oncomplete="modalExcluir.hide()" update=":#{p:component('messages')}">
+					<span><h:outputText style="width: 1; height: 1;"
+							value="Não" /></span>
+				</p:commandLink>
+				<p:spacer height="30px" />
+			</h:form>
+		</p:dialog>
+	</ui:define>
+</ui:composition>

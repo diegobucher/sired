@@ -1,0 +1,258 @@
+<ui:composition template="/WEB-INF/templates/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+	<ui:define name="html-head">
+		<h:outputScript library="js" name="jquery.price_format.1.3.js" />
+		<h:outputScript library="js" name="duaListConfig.js" />
+	</ui:define>
+
+	<ui:param name="breadcrumbs" value="#{bundle['geral.breadcrumb.cadastro']},#{bundle['perfil.consulta.tituloPagina']}" />
+
+	<ui:define name="content-main-page">
+
+		<h:form id="formConsulta">
+			<p:focus id="focusConsulta" for="formConsulta" />
+			<p:messages id="messages" showDetail="false"  />
+			<h3 class="titlePage">#{bundle['perfil.consulta.cadastro']}</h3>
+
+			<!-- BOTÔES -->
+			<h:panelGroup>
+
+				<p:commandLink title="#{bundle['MH038']}"
+					styleClass="btnLaranja marginTop buttonSelected"
+					actionListener="#{perfilController.novo()}"
+					onclick="guardarIdComponenteController(this); jQuery('#modalCadastroId .ui-dialog-title').text('#{bundle['perfil.label.novoDocumento']}');"
+					oncomplete="modalCadastro.show();" update=":cadastrarForm"
+					id="btnCadastro"
+					disabled="#{documentoController.perfilConsulta}"
+					>
+					<span>#{bundle['perfil.label.novoDocumento']}</span>
+				</p:commandLink>
+
+				<p:commandLink styleClass="btnAzul marginTop buttonSelected"
+					onclick="PrimeFaces.monitorDownload(showStatus, hideStatus)"
+					title="#{bundle['MH010']}" ajax="false" disabled="#{perfilController.listaFiltro.size()==0}" id="btnExportar">
+					<span>#{bundle['geral.button.exportar']}</span>
+					<p:dataExporter type="xls" target="dataTableCrud"
+						fileName="#{bundle['perfil.label.nome.relatorio']}"
+						postProcessor="#{perfilController.preExportar}" />
+				</p:commandLink>
+
+			</h:panelGroup>
+
+			<p:spacer height="30px" />
+
+			<!-- GRID DE CONSULTA -->
+			<p:outputPanel id="pnlListaResultados">
+				<p:dataTable value="#{perfilController.lista}" var="perfil"
+					widgetVar="perfis" id="dataTableCrud" rows="10"
+					emptyMessage="#{bundle['MA010']}" paginator="true"
+					filteredValue="#{perfilController.listaFiltro}" sortBy="descricao"
+					rowStyleClass="#{empty rowIx or rowIx mod 2 ne 0 ? 'even-row' : 'odd-row'}"
+					rowIndexVar="rowIx" styleClass="estilo-border-dotted zebr"
+					paginatorPosition="bottom"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					currentPageReportTemplate="#{bundle['geral.crud.exibindo']} {startRecord} #{bundle['geral.crud.ate']} {endRecord}  #{bundle['geral.crud.de']} {totalRecords}  #{bundle['geral.crud.registros']} "
+					rowsPerPageTemplate="5,10,25,50">
+
+
+					<f:facet name="header">
+						<p:outputPanel style="text-align:right; margin-right:-10px"	styleClass="ui-widget-auxiliar">
+							<h:outputText value="#{bundle['geral.label.pesquisar']}" escape="false" />
+							<h:inputText id="globalFilter" styleClass="semClear" onkeyup="perfis.filter();" style="width:150px;" maxlength="255">
+								<p:ajax event="keyup" update=":#{p:component('btnExportar')}" global="false" />
+							</h:inputText>
+						</p:outputPanel>
+					</f:facet>
+
+					<p:column sortBy="descricao" sortFunction="#{perfilController.sortByString}"	filterStyle="display:none; visibility:hidden;"
+						filterBy="descricao" style="width:25%"	styleClass="gri-alfanumericos noBackGroundImage">
+						<h:outputText value="#{perfil.descricao}" />
+						<f:facet name="header">
+							<h:outputText value="#{bundle['perfil.label.perfil']}" />
+						</f:facet>
+					</p:column>
+
+					<!--  COLUNAS QUE SÃO EXPOSTADAS PARA O RELATÓRIO MAS NÃO ESTAO VISIVEIS NA TABELA -->
+					<p:column style="width:20%; display:none; visibility:hidden;">
+						<h:outputText value="#{perfil.sigla}" />
+						<f:facet name="header">
+							<h:outputText value="#{bundle['perfil.label.sigla']}" />
+						</f:facet>
+					</p:column>
+
+
+					<p:column filterBy="funcionalidadeAsString"
+						filterStyle="display:none; visibility:hidden;"
+						sortBy="funcionalidadeAsString"
+						sortFunction="#{perfilController.sortByString}" style="width:60%"
+						styleClass="gri-alfanumericos noBackGroundImage">
+						<h:outputText value="#{perfil.funcionalidadeAsString}" />
+						<f:facet name="header">
+							<h:outputText value="#{bundle['perfil.label.funcionalidade']}" />
+						</f:facet>
+					</p:column>
+
+					<!-- AÇÕES -->
+
+					<p:column headerText="#{bundle['geral.label.acoes']}"
+						styleClass="noBackGroundImage" style="width:10%"
+						exportable="false">
+						<p:commandLink title="#{bundle['MH028']}"
+							actionListener="#{perfilController.edita(perfil)}"
+							styleClass="editar buttonSelected"
+							oncomplete="modalCadastro.show();guardarIdComponenteController(this); jQuery('#modalCadastroId .ui-dialog-title').text('#{bundle['perfil.consulta.tituloPagina']}');"
+							update=":cadastrarForm">
+						</p:commandLink>
+						<p:commandLink id="btnExcluir" styleClass="excluir buttonSelected"
+							onclick="modalExcluir.show(); guardarIdComponenteController(this);"
+							title="#{bundle['MH031']}"
+							style="margin-left: 30px;"
+							disabled="#{documentoController.perfilConsulta}"
+							>
+							<f:setPropertyActionListener
+								target="#{perfilController.instanceExcluir}" value="#{perfil}" />
+						</p:commandLink>
+					</p:column>
+
+
+				</p:dataTable>
+			</p:outputPanel>
+
+
+		</h:form>
+
+
+		<!-- DIALOG CADASTRAR -->
+		<p:dialog header="Cadastro/Alteração" id="modalCadastroId"
+			widgetVar="modalCadastro" styleClass="ui-dialog-background"
+			modal="true" dynamic="true" width="700px" resizable="false"
+			position="center" onShow="giveFocus('cadastrarForm')"
+			onHide="giveFocusRemote();">
+			<p:ajax event="close" listener="#{perfilController.reset()}"/>
+			<h:form id="cadastrarForm">
+				<p:focus id="focusCadastro" context="cadastrarForm" />
+				<p:messages id="messagesCadastro" escape="false" showDetail="false" />
+				<fieldset class="filtro">
+					<h:panelGrid columns="1" id="modalPainelCad01">
+
+						<h:outputLabel style="margin-right: 20px;"	value="#{bundle['perfil.label.nome']}" styleClass="label-button">
+							<h:outputText value="" styleClass="pesquisaDireta" />
+						</h:outputLabel>
+
+						<h:inputText id="textNomePerfil"
+							value="#{perfilController.instance.descricao}" maxlength="20"	size="113" required="true"
+							requiredMessage="#{perfilController.getRequiredMessage('perfil.label.nome')}"   onkeypress="return removeEspacoInicio(event, this);"/>
+
+						<h:outputLabel style="margin-right: 20px;"
+							value="#{bundle['perfil.label.sigla']}" styleClass="label-button">
+							<h:outputText value="" styleClass="pesquisaDireta" />
+						</h:outputLabel>
+
+						<h:inputText id="textSiglaPerfil"
+							value="#{perfilController.instance.sigla}" maxlength="6"
+							size="12" required="true"
+							requiredMessage="#{perfilController.getRequiredMessage('perfil.label.sigla')}"  onkeypress="return removeEspacoInicio(event, this);"/>
+
+
+					</h:panelGrid>
+					
+					<h:panelGrid columns="1" id="modalPainelAssi02">
+						<p:pickList id="pickList" styleClass="caixa-pick-list dualist"
+							removeLabel="#{bundle['MH026']}"
+							removeAllLabel="#{bundle['MH027']}"
+							addLabel="#{bundle['MH024']}"
+							addAllLabel="#{bundle['MH025']}"
+							value="#{perfilController.dualList}" var="funcionalidade"
+							itemValue="#{funcionalidade}"
+							itemLabel="#{funcionalidade.nomeFuncionalidadePaiFilha}"
+							converter="FuncionalidadeConverter"
+							>
+
+							<f:facet name="sourceCaption">#{bundle['perfil.label.dual.naoAssociados']}</f:facet>
+							<f:facet name="targetCaption">#{bundle['perfil.label.dual.associados']}</f:facet>
+
+							<p:ajax event="transfer" listener="#{perfilController.ordenarDualList}" global="false" update="pickList" />
+
+						</p:pickList>
+
+					</h:panelGrid>
+					
+
+
+					<!-- GRAVAR CANCELAR -->
+					<h:panelGroup>
+						<p:commandLink title="#{bundle['MH011']}"
+							actionListener="#{perfilController.salvar}"
+							styleClass="btnLaranja marginTop buttonSelected"
+							update=":#{p:component('messagesCadastro')} :#{p:component('focusCadastro')} :#{p:component('btnExportar')}  :#{p:component('dataTableCrud')}"
+							ajax="true" rendered="#{!perfilController.faseEditar}">
+							<span>#{bundle['geral.button.gravar']}</span>
+						</p:commandLink>
+
+						<p:commandLink title="#{bundle['MH028']}"
+							actionListener="#{perfilController.salvar}"
+							styleClass="btnLaranja marginTop buttonSelected"
+							update=":#{p:component('messagesCadastro')} :#{p:component('focusCadastro')} :#{p:component('btnExportar')} :#{p:component('dataTableCrud')}"
+							ajax="true" rendered="#{perfilController.faseEditar}" disabled="#{documentoController.perfilConsulta}">
+							<span>#{bundle['geral.button.alterar']}</span>
+						</p:commandLink>
+
+						<p:commandLink title="#{bundle['MH013']}"
+							styleClass="btnAzul marginTop buttonSelected"
+							onclick="modalCadastro.hide();" process="@this"
+							update=":#{p:component('messages')}">
+							<span>#{bundle['MI010']}</span>
+							<p:resetInput target="@form" />
+						</p:commandLink>
+					</h:panelGroup>
+				</fieldset>
+			</h:form>
+		</p:dialog>
+
+
+		
+		<!-- CONFIRMA EXCLUSAO  -->
+		<p:dialog header="#{bundle['perfil.header.exclusao']}"
+			id="modalExcluirId" widgetVar="modalExcluir"
+			styleClass="ui-dialog-background" modal="true" dynamic="true"
+			resizable="false" position="center"
+			onShow="giveFocus('excluirForm:btnExcluir')"
+			onHide="giveFocusRemote();">
+			<h:form id="excluirForm">
+				<span id="atencaoId" class="atencao2"
+					style="margin-top: -2px !important;" />
+
+				<h:outputFormat
+					style="margin-left: 40px; font-weight: bold !important;"
+					value="#{bundle['MA022']}">
+					<f:param value="#{bundle['perfil.consulta.tituloPagina']}" />
+				</h:outputFormat>
+				<br></br>
+				<p:commandLink id="btnExcluir"
+					styleClass="btnLaranja marginTop buttonSelected"
+					action="#{perfilController.excluir}"
+					update=":#{p:component('messages')} :#{p:component('btnExportar')} :#{p:component('dataTableCrud')}"
+					oncomplete="modalExcluir.hide()">
+					<span><h:outputText style="width: 1; height: 1;" title="Sim"
+							value="Sim" /></span>
+				</p:commandLink>
+				<p:commandLink id="btnNaoExcluir"
+					styleClass="btnAzul marginTop buttonSelected"
+					oncomplete="modalExcluir.hide()" update=":#{p:component('messages')}">
+					<span><h:outputText style="width: 1; height: 1;" title="Não"
+							value="Não" /></span>
+				</p:commandLink>
+				<p:spacer height="30px" />
+			</h:form>
+		</p:dialog>
+
+
+
+	</ui:define>
+</ui:composition>

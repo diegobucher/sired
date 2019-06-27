@@ -1,0 +1,1840 @@
+<ui:composition template="/WEB-INF/templates/template_sem_menu.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+	<ui:define name="html-head">
+		<h:outputScript library="js" name="jquery.price_format.1.3.js" />
+		<h:outputScript library="js" name="mantem-remessa.js" />
+
+		<h:outputStylesheet library="css" name="mantem-remessa.css" />
+		<h:outputStylesheet library="css" name="font-awesome.min.css" />
+	</ui:define>
+
+	<ui:define name="breadcrumb">
+		<h:form id="formBreadcrumb">
+			<div id="wrapAuxiliar">
+				<ul class="breadcrumb-sistema">
+					<li>#{bundle['geral.breadcrumb.voce.esta.em']}</li>
+					<li><h:commandLink
+							value="#{bundle['geral.breadcrumb.remessa']}"
+							styleClass="buttonSelected"
+							action="/paginas/remessa/consulta.xhtml?faces-redirect=true" /></li>
+					<li>#{bundle['remessa.consulta.tituloPagina']}</li>
+				</ul>
+			</div>
+		</h:form>
+	</ui:define>
+
+	<ui:define name="content-main-page">
+
+		<h:form id="formConsulta">
+			<p:focus id="focusConsulta" context="formConsulta" />
+			<p:messages id="messages" showDetail="false" />
+			<h3 class="titlePage">#{bundle['remessa.consulta.tituloPagina.descricao']}</h3>
+
+			<fieldset class="filtro">
+
+				<h:panelGrid columns="2" id="modalPainelCad06">
+
+					<!-- NUMERO DA REMESSA -->
+					<h:outputLabel
+						value="#{bundle['remessa.consulta.label.numeroCodigoRemessa']}"
+						styleClass="label-button">
+						<br />
+						<p:inputText maxlength="11" id="numRemessaFiltro"
+							value="#{consultaRemessaController.nuRemessaFiltro}"
+							style="width: 75px; text-align:left;"
+							onchange="overSomenteNumeros(this);"
+							onkeypress="return somenteNumero(event);">
+							<p:ajax event="keyup"
+								listener="#{consultaRemessaController.handleNumeroRemessa()}"
+								update="pnlCamposFiltro" process="numRemessaFiltro"
+								global="false" />
+						</p:inputText>
+					</h:outputLabel>
+
+					<h:panelGrid columns="6" id="pnlCamposFiltro">
+																	
+						<!-- LACRE -->
+						<h:outputLabel value="#{bundle['geral.label.lacreFiltro']}"
+							styleClass="label-button">
+							<br/>
+							<p:inputText maxlength="18" style="width: 75px; text-align:left;"
+								value="#{consultaRemessaController.nuLacreFiltro}"
+								onchange="overSomenteNumeros(this);"
+								onkeypress="return somenteNumero(event);"
+								disabled="#{consultaRemessaController.nuRemessaFiltro > 0}">
+							</p:inputText>
+						</h:outputLabel>
+						
+						<!-- MATRICULA DO USUÁRIO -->
+						<h:outputLabel value="#{bundle['geral.label.usuario']}"
+							styleClass="label-button">
+							<br />
+							<p:inputMask mask="a999999" id="j_username" maxlength="7"
+								style="width: 50px; text-align:left;" placeHolder=""
+								value="#{consultaRemessaController.coUsuarioFiltro}"
+								disabled="#{consultaRemessaController.nuRemessaFiltro > 0}">
+							</p:inputMask>
+						</h:outputLabel>
+
+						<!-- DATA INICIO -->
+						<h:outputLabel value="#{bundle['geral.label.dataInicio']}"
+							styleClass="label-button">
+							<h:outputText styleClass="pesquisaDireta" />
+							<br />
+							<p:calendar id="idDataInicio" size="8" style="margin-right: 0px;"
+								value="#{consultaRemessaController.dataInicioFiltro}"
+								requiredMessage="#{bundle['geral.label.dataInicio']}"
+								pattern="dd/MM/yyyy" locale="pt_BR"
+								converter="converter.DataConverter" maxlength="10"
+								onkeyup="maskIt(this,event,'##/##/#####',false,false)"
+								disabled="#{consultaRemessaController.nuRemessaFiltro > 0}"
+								validator="validator.DataValidator"
+								validatorMessage="Campo #{bundle['geral.label.dataInicio']} inválido.">
+
+							</p:calendar>
+						</h:outputLabel>
+
+						<!-- DATA FIM -->
+						<h:outputLabel value="#{bundle['geral.label.dataFim']}"
+							styleClass="label-button">
+							<br />
+							<p:calendar id="idDataFim" size="8" style="margin-right: 0px;"
+								value="#{consultaRemessaController.dataFimFiltro}"
+								pattern="dd/MM/yyyy" locale="pt_BR"
+								converter="converter.DataConverter" maxlength="10"
+								onkeyup="maskIt(this,event,'##/##/#####',false,false)"
+								disabled="#{consultaRemessaController.nuRemessaFiltro > 0}"
+								validator="validator.DataValidator"
+								validatorMessage="Campo #{bundle['geral.label.dataFim']} inválido.">
+							</p:calendar>
+						</h:outputLabel>
+
+						<!-- UNIDADE SOLICITANTE -->
+						<h:outputLabel value="#{bundle['geral.label.unidadeSolicitante']}"
+							styleClass="label-button">
+							<br />
+							<h:inputText maxlength="4"
+								value="#{consultaRemessaController.codigoUnidadeFiltro}"
+								style="width: 30px; margin-right: 2px;" id="codigoUnidadeFiltro"
+								onkeypress="return somenteNumero(event)"
+								onchange="overSomenteNumeros(this);"
+								disabled="#{consultaRemessaController.nuRemessaFiltro > 0}"
+								styleClass="#{consultaRemessaController.nuRemessaFiltro > 0 ? 'input-disabled': ''}">
+								<p:ajax event="change"
+									listener="#{consultaRemessaController.pesquisarUnidadeSolicitante()}"
+									update="nomeUnidadeSolicitante messages"
+									process="codigoUnidadeFiltro" />
+							</h:inputText>
+							<h:inputText maxlength="100" id="nomeUnidadeSolicitante"
+								value="#{consultaRemessaController.nomeUnidadeFiltro}"
+								style="width: 300px; margin-right: 0px; font-size: 12px !important;"
+								disabled="true" styleClass="input-disabled">
+							</h:inputText>
+						</h:outputLabel>
+
+						<!-- SITUAÇÃO DA REMESSA -->
+						<h:outputLabel value="#{bundle['geral.label.situacao']}"
+							styleClass="label-button">
+							<br />
+							<h:selectOneMenu id="selectAvaliacao"
+								style="margin-right:2px;  width: 210px"
+								disabled="#{consultaRemessaController.nuRemessaFiltro > 0}"
+								value="#{consultaRemessaController.situacaoFiltro}">
+								<f:selectItem itemLabel="PENDENTES" noSelectionOption="true" />
+								<f:selectItems
+									value="#{consultaRemessaController.situacoesRemessaFiltro}"
+									var="situacao" itemValue="#{situacao}"
+									itemLabel="#{situacao.descricao.toUpperCase()}" />
+							</h:selectOneMenu>
+						</h:outputLabel>
+					</h:panelGrid>
+				</h:panelGrid>
+
+				<!-- CONSULTAR -->
+				<p:commandLink title="#{bundle['MH065']}"
+					styleClass="btnAzul marginTop buttonSelected" id="btnLocalizar"
+					actionListener="#{consultaRemessaController.localizar()}"
+					process="formConsulta" update="formConsulta, tabela">
+					<span>#{bundle['geral.button.consultar']}</span>
+				</p:commandLink>
+
+				<!-- LIMPAR -->
+				<h:commandLink title="#{bundle['MH012']}"
+					styleClass="btnLaranja marginTop buttonSelected"
+					action="/paginas/remessa/consulta.xhtml?faces-redirect=true">
+					<span>#{bundle['geral.button.limpar']}</span>
+				</h:commandLink>
+
+				<!-- EXPORTAR -->
+				<p:commandLink styleClass="btnLaranja marginTop buttonSelected"
+					title="#{bundle['MH010']}" ajax="false" global="false"
+					onclick="var myVar = setTimeout(function(){ hideStatus(); clearTimeout(myVar); }, 2000);"
+					actionListener="#{consultaRemessaController.exportarDatagrid()}"
+					disabled="#{consultaRemessaController.listaRemessaModel == null || consultaRemessaController.listaRemessaModel.rowCount == 0}"
+					id="btnExportar">
+					<span>#{bundle['geral.button.export.xls']}</span>
+				</p:commandLink>
+				<p:commandLink styleClass="btnLaranja marginTop buttonSelected"
+					title="#{bundle['MH010']}" ajax="false" global="false"
+					onclick="var myVar = setTimeout(function(){ hideStatus(); clearTimeout(myVar); }, 2000);"
+					actionListener="#{consultaRemessaController.exportarDatagridCsv()}"
+					disabled="#{consultaRemessaController.listaRemessaModel == null || consultaRemessaController.listaRemessaModel.rowCount == 0}"
+					id="btnExportarCsv">
+					<span>#{bundle['geral.button.export.csv']}</span>
+				</p:commandLink>
+			</fieldset>
+
+			<!-- ACCORDION -->
+			<h:panelGrid id="pnlAccordion" style="width: 100%"
+				rendered="#{consultaRemessaController.listaRemessaModel != null and (consultaRemessaController.listaRemessaModel.rowCount > 0)}">
+				<f:facet name="header">
+					<table class="header-table-accordion-requisicao"
+						style="border-right: 1px dotted #666; border-left: 1px dotted #666; border-top: 1px dotted #666;">
+						<tr>
+							<!-- NUMERO DA REMESSA -->
+							<td width="125px"
+								style="border-right: 1px dotted #666; min-width: 125px; width: 125px;"><h:outputText
+									value="#{bundle['remessa.consulta.accordion.header.remessa']}" /></td>
+							<!-- UNIDADE SOLICITANTE -->
+							<td width="450px"
+								style="border-right: 1px dotted #666; width: 450px; min-width: 450px;"><h:outputText
+									value="#{bundle['geral.label.unidadeSolicitanteU']}" /></td>
+							<!-- USUÁRIO DA ABERTURA -->
+							<td width="100px"
+								style="border-right: 1px dotted #666; width: 100px; min-width: 100px;"><h:outputText
+									value="#{bundle['geral.label.usuarioAbertura']}" /></td>
+							<!-- DATA DE ABERTURA -->
+							<td width="90px"
+								style="border-right: 1px dotted #666; min-width: 90px; width: 90px;"><h:outputText
+									value="#{bundle['geral.label.dataAbertura']}" /></td>
+							<!-- DATA DE AGENDAMENTO DO TRAMITE -->
+							<td
+								style="border-right: 1px dotted #666; width: 92px; min-width: 92px;"><h:outputText
+									value="#{bundle['remessa.consulta.accordion.header.dataAgendamento']}" /></td>
+							<!-- SITUAÇÃO DA REMESSA -->
+							<td width="140px"
+								style="border-right: 1px dotted #666; min-width: 140px; width: 140px"><h:outputText
+									value="#{bundle['geral.label.situacaoU']}" /></td>
+							<!-- AÇÕES -->
+							<td style="width: 100%;"><h:outputText
+									value="#{bundle['remessa.consulta.accordion.header.acoes']}" /></td>
+						</tr>
+					</table>
+				</f:facet>
+				<h:column>
+					<div style="width: 100%">
+						<p:dataList id="tabela"
+							value="#{consultaRemessaController.listaRemessaModel}"
+							lazy="true" varStatus="size" var="remessa" type="unordered"
+							itemType="none" paginator="true" rows="10"
+							styleClass="paginated list-style-none" paginatorPosition="bottom"
+							paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+							currentPageReportTemplate="#{bundle['geral.crud.exibindo']} {startRecord} #{bundle['geral.crud.ate']} {endRecord}  #{bundle['geral.crud.de']} {totalRecords}  #{bundle['geral.crud.registros']} "
+							rowsPerPageTemplate="5,10,25,50"
+							emptyMessage="#{bundle['MI022']}">
+
+							<div class="accordion">
+								<!-- accordion do cadastro -->
+								<p:row>
+									<div class="accordion-group">
+										<div class="accordion-heading"
+											style="top: 0px; border-right: 1px dotted #666; border-left: 1px dotted #666; min-height: 0px;">
+											<table>
+												<tr>
+													<!-- NUMERO DA REMESSA -->
+													<td width="125px" align="left"
+														style="border-right: 1px dotted #666; min-width: 125px; word-wrap: break-word;"
+														onclick="clickAccordion(this)">
+														<ui:fragment>
+															<h:outputLabel value="#{remessa.id}"
+																styleClass="label-accordion"
+																style="margin-left:25px; font-weight: bold !important;" />
+														</ui:fragment> <ui:fragment
+															rendered="#{remessa.tipoRemessaMoviMentoDiario}">
+															<h:outputLabel value=" / #{remessa.codigoRemessaTipoC}"
+																styleClass="label-accordion"
+																style="font-weight: bold !important;" />
+														</ui:fragment></td>
+													<!-- UNIDADE SOLICITANTE -->
+													<td width="450px" align="center"
+														style="border-right: 1px dotted #666; width: 450px; min-width: 450px; max-width: 450px; min-height: 0px; word-wrap: break-word;">
+														<div align="left">
+															<h:outputLabel
+																value="#{remessa.unidadeSolicitante.descricaoCompleta}"
+																title="#{remessa.unidadeSolicitante.descricaoCompleta}"
+																styleClass="label-accordion-sem-link" />
+														</div>
+													</td>
+													<!-- USUÁRIO DA ABERTURA -->
+													<td width="100px" align="center"
+														style="border-right: 1px dotted #666; width: 100px; min-width: 100px; max-width: 100px; min-height: 34px; word-wrap: break-word;"><h:outputLabel
+															value="#{remessa.codigoUsuarioAbertura.toUpperCase()}"
+															styleClass="label-accordion-sem-link" /></td>
+													<!-- DATA DE ABERTURA -->
+													<td width="90px" align="center"
+														style="border-right: 1px dotted #666; width: 90px; min-width: 90px; word-wrap: break-word;"><h:outputLabel
+															style="margin-top:0px;"
+															value="#{remessa.dataHoraAberturaFormatada}"
+															styleClass="label-accordion-sem-link" /></td>
+													<!-- DATA DE AGENDAMENTO -->
+													<td align="center"
+														style="border-right: 1px dotted #666; width: 92px; min-width: 92px; min-height: 36px; word-wrap: break-word;"><h:outputLabel
+															value="#{remessa.dataAgendamentoFormatada != null ? remessa.dataAgendamentoFormatada : '--' }"
+															styleClass="label-accordion-sem-link"
+															title="#{bundle['MH086']}" /></td>
+													<!-- SITUAÇÃO DA REMESSA -->
+													<td width="140px" align="center"
+														style="border-right: 1px dotted #666; width: 140px; min-width: 140px; max-width: 140px; min-height: 34px; word-wrap: break-word;"><h:outputLabel
+															value="#{remessa.tramiteRemessaAtual.situacao.nome.toUpperCase()}"
+															styleClass="label-accordion-sem-link"
+															rendered="#{consultaRemessaController.exibirDemaisSituacoesRemessa(remessa)}">
+														</h:outputLabel> <!-- AGENDAR REMESSA ABERTA  --> <p:commandLink
+															rendered="#{consultaRemessaController.exibirSituacaoAberta(remessa)}"
+															title="#{bundle['MH069']}"
+															actionListener="#{consultaRemessaController.prepararAgendamento(remessa)}"
+															value="#{remessa.tramiteRemessaAtual.situacao.nome.toUpperCase()}"
+															styleClass="label-link-situacao"
+															update=":modalAgendamentoId, :formAgendamentoRemessa">
+														</p:commandLink> <!-- RECEBER REMESSA AGENDADA  --> <p:commandLink
+															actionListener="#{consultaRemessaController.prepararAcao(remessa)}"
+															rendered="#{consultaRemessaController.exibirSituacaoAgendada(remessa)}"
+															title="#{bundle['MH068']}"
+															value="#{remessa.tramiteRemessaAtual.situacao.nome.toUpperCase()}"
+															styleClass="label-link-situacao"
+															update=":modalAcoesRemessaId, :formAcaoRemessa">
+														</p:commandLink> <!-- FECHAR REMESSA CONFERIDA || ALTERACAO CONFIRMADA || ALTERACAO DESFEITA -->
+														<p:commandLink
+															rendered="#{consultaRemessaController.exibirSituacaoPossivelFechamento(remessa)}"
+															title="#{bundle['MH073']}"
+															value="#{remessa.tramiteRemessaAtual.situacao.nome.toUpperCase()}"
+															actionListener="#{consultaRemessaController.prepararFechamentoRemessa(remessa)}"
+															update=":modalFechamentoRemessaId, :formFechamentoRemessa"
+															styleClass="label-link-situacao">
+														</p:commandLink> <!-- VISUALIZAR REMESSA INVÁLIDA  --> <p:commandLink
+															rendered="#{consultaRemessaController.exibirSituacaoInvalida(remessa)}"
+															title="#{bundle['MH085']}"
+															value="#{remessa.tramiteRemessaAtual.situacao.nome.toUpperCase()}"
+															actionListener="#{consultaRemessaController.exibirMotivoDevolucaoInvalidacao(remessa)}"
+															update=":modalDevolvidaId, :formRemessaDevolvida"
+															styleClass="label-link-situacao">
+														</p:commandLink> <!-- CONFERIR REMESSA RECEBIDA  --> <p:commandLink
+															actionListener="#{consultaRemessaController.prepararAcao(remessa)}"
+															rendered="#{consultaRemessaController.exibirSituacaoRecebida(remessa)}"
+															title="#{bundle['MH068']}"
+															value="#{remessa.tramiteRemessaAtual.situacao.nome.toUpperCase()}"
+															styleClass="label-link-situacao"
+															update=":modalAcoesRemessaId, :formAcaoRemessa">
+														</p:commandLink> <h:outputLabel
+															value="#{remessa.tramiteRemessaAtual.situacao.nome.toUpperCase()}"
+															rendered="#{consultaRemessaController.exibirSituacaoAlteracoes(remessa)}"
+															styleClass="label-accordion-sem-link" /></td>
+													<!-- AÇÕES -->
+													<td align="center" style="width: 100%;" class="borderLeft marginLeft center ">
+														<div style="width: 100%; text-align: center;">
+															<!-- EDITAR -->
+															<!-- <div style="float: left; margin-left: 5px !important;"> -->
+																<p:commandLink id="idEditarRemessa"
+																	rendered="#{consultaRemessaController.exibirEditarRemessa(remessa)}"
+																	actionListener="#{consultaRemessaController.editarRemessa(remessa)}"
+																	update=":formConsulta:messages"
+																	title="#{bundle['MH140']}">
+																	<span class="fa fa-edit fa-2x corAzulIcone"></span>
+																</p:commandLink>
+															<!-- </div> -->
+															<p:spacer width="15px" />
+															<p:commandLink id="idHistorico"
+																update="@(.ui-dialog),:modalHistoricoId,:formHistorico"
+																style="margin-top:-3px !important; margin-left: -14px !important;"
+																actionListener="#{consultaRemessaController.verHistoricoRemessa(remessa)}"
+																title="#{bundle['remessa.consulta.accordion.hint.historico']}"
+																styleClass="informacoes">
+															</p:commandLink>
+															<!-- <div style="float: left; margin-left: 50px !important;"></div> -->
+														</div>
+													</td>
+												</tr>
+											</table>
+										</div>
+
+
+										<div id="collapse#{size.index}"
+											class="accordion-body collapse">
+											<div class="accordion-inner"
+												style="border-right: 1px dotted #666 !important; border-left: 1px dotted #666 !important;">
+												<h:panelGrid
+													style=" margin-top: -2px; margin-bottom: -2px; margin-left: -2px; width:100%;">
+
+													<!-- REMESSA DE DOCUMENTOS A-B -->
+													<ui:fragment
+														rendered="#{!remessa.tipoRemessaMoviMentoDiario}">
+														<p:dataTable id="dataTableCadastro" var="docAB"
+															style="margin-right: -4px !important;"
+															sortBy="codigoRemessa" widgetVar="remessaDocumento"
+															rowIndexVar="rowIx"
+															value="#{remessa.remessaDocumentosTratados()}"
+															styleClass="estilo-border-dotted" rowSelectMode="single"
+															emptyMessage="Nenhum registro correspondente encontrado"
+															rowStyleClass="#{empty rowIx or rowIx mod 2 ne 0 ? 'even-row' : 'odd-row'}">
+
+															<!-- CAIXA ARQUIVO -->
+															<p:column
+																style="text-align:center; border-left: 1px dotted #666 !important; width: 45px !important;"
+																styleClass="totalColetas">
+																<f:facet name="header">
+																	<h:outputLabel
+																		value="#{bundle['geral.label.caixaArquivo']}"
+																		style="color: white;" />
+																</f:facet>
+																<p:commandLink id="idItem"
+																	update="@(.ui-dialog),:modalRemessaDocumentoID"
+																	actionListener="#{consultaRemessaController.visualizarRemessaDocumento(docAB)}">
+																	<span><h:outputText
+																			value="#{docAB.codigoRemessa}"
+																			style="font-weight: bold !important;"
+																			styleClass="#{docAB.icAlteracaoValida.value == 2 ? 'pintaFonteVermelha' : ''}" /></span>
+																</p:commandLink>
+															</p:column>
+
+															<!-- UNIDADE GERADORA -->
+															<p:column
+																style="border-left: 1px dotted #666 !important; width: 130px !important;"
+																styleClass="celulaConsulta">
+																<f:facet name="header">
+																	<h:outputText style="color: white; text-align:left;"
+																		value="#{bundle['geral.label.unidadeGeradora.maiusculas']}" />
+																</f:facet>
+																<h:outputText
+																	value="#{docAB.unidadeGeradora.descricaoCompleta}"
+																	style="overflow:hidden;"
+																	styleClass="#{docAB.icAlteracaoValida.value == 2 ? 'pintaFonteVermelha' : ''}" />
+															</p:column>
+
+															<!-- DOCUMENTO -->
+															<p:column
+																style="text-align:left; border-left: 1px dotted #666 !important; width: 120px !important;"
+																styleClass="celulaConsulta">
+																<f:facet name="header">
+																	<h:outputText style="color: white;"
+																		value="#{bundle['geral.label.documento.maiusculas']}" />
+																</f:facet>
+																<div>
+																	<h:outputText value="#{docAB.documento.nome}"
+																		style="overflow:hidden;"
+																		styleClass="#{docAB.icAlteracaoValida.value == 2 ? 'pintaFonteVermelha' : ''}" />
+																</div>
+															</p:column>
+
+															<!-- DATA DE GERAÇÃO / PERÍODO -->
+															<p:column
+																style=" text-align:center; border-left: 1px dotted #666 !important; width: 120px !important;"
+																styleClass="celulaConsulta">
+																<f:facet name="header">
+																	<h:outputText style="color: white; text-align:center; "
+																		value="#{bundle['geral.label.dataGeracaoPeriodo']}" />
+																</f:facet>
+																<h:outputLabel style="margin-left: 5px !important; float: right;"
+																		title="#{bundle['MH139']}"
+																		rendered="#{consultaRemessaController.exibirBotaoAlteracao(docAB)}">
+																		<span class="fa fa-exclamation-triangle fa-2x "
+																			style="color: red"></span>
+																	</h:outputLabel>
+																	<h:outputText
+																		value="#{docAB.dataGeracaoPeriodoFormatado}"
+																		style="overflow:hidden; text-align:left;"
+																		styleClass="#{docAB.icAlteracaoValida.value == 2 ? 'pintaFonteVermelha' : ''}" />
+															</p:column>
+															<p:columnGroup type="footer">
+																<p:row>
+																	<p:column colspan="6" styleClass="footerAccordion"
+																		style="background: #808080 !important;" />
+																</p:row>
+															</p:columnGroup>
+														</p:dataTable>
+													</ui:fragment>
+
+													<!-- REMESSA DE DOCUMENTOS C -->
+													<ui:fragment
+														rendered="#{remessa.tipoRemessaMoviMentoDiario}">
+														<p:dataTable id="dtMovDiario" var="itemDiario"
+															style="margin-right: -4px !important;"
+															sortBy="dataMovimento" widgetVar="remessaDocumentoDiario"
+															rowIndexVar="rowIx" value="#{remessa.remessaDTOTratado()}"
+															styleClass="estilo-border-dotted" rowSelectMode="single"
+															emptyMessage="Nenhum registro correspondente encontrado"
+															rowStyleClass="#{empty rowIx or rowIx mod 2 ne 0 ? 'even-row' : 'odd-row'}">
+
+															<!-- DATA DE GERAÇÃO / PERÍODO -->
+															<p:column
+																style="text-align:center; border-left: 1px dotted #666 !important; width: 70px !important;"
+																styleClass="celulaConsulta">
+																<f:facet name="header">
+																	<h:outputText style="color: white;"
+																		value="#{bundle['geral.label.dataGeracaoDiario']}" />
+																</f:facet>
+																<p:commandLink id="idItem"
+																	update="@(.ui-dialog),:modalDetalharRemessaDocumentoID"
+																	actionListener="#{consultaRemessaController.visualizarRemessaDocumentoMovimentoDiario(itemDiario)}">
+																	<h:outputText value="#{itemDiario.dataFormatada}"
+																		style="overflow:hidden;"
+																		styleClass="#{itemDiario.remessaMovimentoAlterado() ? 'pintaFonteVermelha' : ''}
+																		#{itemDiario.remessaMovimentoAdicionado() ? 'pintaFonteVerde' : ''}" />
+																</p:commandLink>
+															</p:column>
+
+															<!-- UNIDADE GERADORA -->
+															<p:column
+																style="border-left: 1px dotted #666 !important; width: 130px !important;"
+																styleClass="celulaConsulta">
+																<f:facet name="header">
+																	<h:outputText style="color: white;"
+																		value="#{bundle['geral.label.unidadeGeradora.maiusculas']}" />
+																</f:facet>
+																<h:outputText value="#{itemDiario.nomeUnidadeFormatada}"
+																	style="overflow:hidden;"
+																	styleClass="#{itemDiario.remessaMovimentoAlterado() ? 'pintaFonteVermelha' : ''}
+																	#{itemDiario.remessaMovimentoAdicionado() ? 'pintaFonteVerde' : ''}" />
+															</p:column>
+
+															<!-- Número de terminais -->
+															<p:column exportable="false"
+																styleClass="totalColetas center"
+																style="text-align:center; width: 74px !important; border-left: 1px dotted #666 !important;">
+																<f:facet name="header">
+																	<h:outputText
+																		value="#{bundle['remessa.headerGrid.numeroTerminais']}"
+																		style="color: #FFF;" />
+																</f:facet>
+																<div>
+																<h:outputLabel style="float: left;"
+																	title="#{bundle['MH139']}"
+																	rendered="#{consultaRemessaController.exibirBotaoAlteracaoTipoC(itemDiario)}">
+																	<span class="fa fa-exclamation-triangle fa-2x "
+																		style="color: red"></span>
+																</h:outputLabel>
+																</div>
+																<div>
+																<h:outputLabel style="float: left;"
+																	title="#{bundle['141']}"
+																	rendered="#{consultaRemessaController.exibirBotaoAdicaoTipoC(itemDiario)}">
+																	<span class="fa fa-plus-circle fa-2x "
+																		style="color: green"></span>
+																</h:outputLabel>
+																</div>
+																<h:outputText
+																	value="#{itemDiario.tamanhoRemessaTratada()}"
+																	style="overflow:hidden;"
+																	styleClass="#{itemDiario.remessaMovimentoAlterado() ? 'pintaFonteVermelha' : ''}
+																	#{itemDiario.remessaMovimentoAdicionado() ? 'pintaFonteVerde' : ''}" />
+															</p:column>
+
+															<p:columnGroup type="footer">
+																<p:row>
+																	<p:column colspan="6" styleClass="footerAccordion"
+																		style="background: #808080 !important;" />
+																</p:row>
+															</p:columnGroup>
+														</p:dataTable>
+													</ui:fragment>
+												</h:panelGrid>
+											</div>
+										</div>
+
+									</div>
+								</p:row>
+							</div>
+						</p:dataList>
+					</div>
+				</h:column>
+			</h:panelGrid>
+
+		</h:form>
+
+
+		<!--  VISUALIZAR MOTIVO DA DEVOLUÇÃO  -->
+		<p:dialog
+			header="#{bundle['geral.label.remessa']} #{consultaRemessaController.remessa.id} - #{bundle['geral.label.situacaoAtual']} #{consultaRemessaController.remessa.tramiteRemessaAtual.situacao.nome}"
+			id="modalDevolvidaId" widgetVar="modalDevolvidaInvalida"
+			styleClass="ui-dialog-background" modal="true" dynamic="true"
+			resizable="false" position="center" onHide="giveFocusRemote();">
+			<h:form id="formRemessaDevolvida">
+				<p:messages id="mdlMessageDevolvida" />
+				<h:panelGrid columns="1" id="modalPainelDevolvida">
+					<h:outputLabel value="#{bundle['geral.label.usuario']}"
+						styleClass="label-button">
+						<br />
+						<p:inputMask id="j_username"
+							style="width: 150px; text-align:left;" disabled="true"
+							value="#{consultaRemessaController.tramiteRemessaVO.codigoUsuario}"
+							placeHolder="">
+						</p:inputMask>
+					</h:outputLabel>
+					<!-- MOTIVO DEVOLUÇÃO -->
+					<h:outputLabel
+						value="#{bundle['remessa.consulta.devolvida.label.comentario']}"
+						styleClass="label-button">
+						<br />
+						<p:inputTextarea
+							value="#{consultaRemessaController.tramiteRemessaVO.observacao}"
+							disabled="true" style="text-align: left; white-space: pre-wrap;"
+							onchange="limitarTextArea(this,200)"
+							onmouseout="limitarTextArea(this,200)"
+							onkeyup="limitarTextArea(this,200)" maxlength="200" cols="90"
+							rows="8">
+						</p:inputTextarea>
+					</h:outputLabel>
+					<!-- DATA HORA -->
+					<h:outputLabel
+						value="#{bundle['remessa.consulta.devolvida.label.dataHora']} #{consultaRemessaController.tramiteRemessaVO.dataTramiteRemessaFormatada}"
+						styleClass="label-button">
+					</h:outputLabel>
+				</h:panelGrid>
+
+				<p:commandLink id="btnFecharDevolvida"
+					oncomplete="modalDevolvidaInvalida.hide()"
+					styleClass="btnLaranja marginTop buttonSelected">
+					<span><h:outputText style="width: 1; height: 1;"
+							title="#{bundle['MH070']}"
+							value="#{bundle['geral.button.fechar']}" /></span>
+				</p:commandLink>
+				<p:spacer height="30px" />
+			</h:form>
+		</p:dialog>
+
+		<!--  AGENDAMENTO DE REMESSA  -->
+		<p:dialog
+			header="#{bundle['geral.label.remessa']} #{consultaRemessaController.remessa.id} - #{bundle['geral.label.situacaoAtual']} #{consultaRemessaController.remessa.tramiteRemessaAtual.situacao.nome}"
+			id="modalAgendamentoId" widgetVar="modalAgendamento"
+			styleClass="ui-dialog-background" modal="true" dynamic="true"
+			width="600px" draggable="true" resizable="false" position="center"
+			onHide="giveFocusRemote();">
+			<h:form id="formAgendamentoRemessa">
+				<p:messages id="messagesAgendamento" />
+				<h:panelGrid columns="2" id="modalPainelAgendamento">
+
+					<!-- DATA DA COLETA -->
+					<h:outputLabel value="#{bundle['remessa.label.data.coleta']}"
+						styleClass="label-button">
+						<h:outputText styleClass="pesquisaDireta" />
+						<br />
+						<p:calendar id="idDataFim" size="8" style="margin-right: 8px;"
+							value="#{consultaRemessaController.tramiteRemessaVO.dataAgendamento}"
+							pattern="dd/MM/yyyy" locale="pt_BR"
+							converter="converter.DataConverter" maxlength="10"
+							onkeyup="maskIt(this,event,'##/##/#####',false,false)"
+							required="true"
+							requiredMessage="#{bundle['remessa.agenda.data.coleta.obrigatoria']}"
+							validator="validator.DataValidator"
+							validatorMessage="Campo #{bundle['remessa.label.data.coleta']} inválido.">
+						</p:calendar>
+
+					</h:outputLabel>
+
+					<!-- HORA DA COLETA -->
+					<h:outputLabel value="#{bundle['remessa.label.hora.coleta']}"
+						styleClass="label-button">
+						<br />
+						<p:inputMask mask="99:99" id="j_username" maxlength="5"
+							style="width: 50px; text-align:left;"
+							value="#{consultaRemessaController.horaAgendamento}"
+							placeHolder="">
+						</p:inputMask>
+					</h:outputLabel>
+
+				</h:panelGrid>
+
+				<!-- OBSERVAÇÃO	 -->
+				<h:outputLabel value="#{bundle['requisicao.label.observacao']}"
+					styleClass="label-button">
+					<br />
+					<h:inputTextarea
+						value="#{consultaRemessaController.tramiteRemessaVO.observacao}"
+						style="text-align: left; white-space: pre-wrap;"
+						onchange="limitarTextArea(this,162)"
+						onmouseout="limitarTextArea(this,162)"
+						onkeyup="limitarTextArea(this,162)" maxlength="162" cols="90"
+						rows="8" />
+				</h:outputLabel>
+				<p:commandLink id="btnConfirmar"
+					styleClass="btnAzul marginTop buttonSelected"
+					update="messagesAgendamento"
+					actionListener="#{consultaRemessaController.agendar()}">
+					<span><h:outputText style="width: 1; height: 1;"
+							title="#{bundle['MH011']}"
+							value="#{bundle['remessa.button.agendar']}" /></span>
+				</p:commandLink>
+
+				<p:commandLink id="btnNaoConfirmar"
+					styleClass="btnLaranja marginTop buttonSelected"
+					oncomplete="modalAgendamento.hide()">
+					<span><h:outputText style="width: 1; height: 1;"
+							title="#{bundle['MH013']}" value="#{bundle['MI010']}" /></span>
+				</p:commandLink>
+				<p:spacer height="30px" />
+			</h:form>
+		</p:dialog>
+
+		<!-- REAGENDAR/RECEBER/CONFERIR/DEVOLVER/INVALIDAR REMESSA  -->
+		<p:dialog
+			header="#{bundle['geral.label.remessa']} #{consultaRemessaController.remessa.id} - #{bundle['geral.label.situacaoAtual']} #{consultaRemessaController.remessa.tramiteRemessaAtual.situacao.nome}"
+			id="modalAcoesRemessaId" widgetVar="modalAcoesRemessa"
+			styleClass="ui-dialog-background" modal="true" dynamic="true"
+			width="600px" draggable="true" resizable="false" position="center"
+			onHide="giveFocusRemote();">
+			<h:form id="formAcaoRemessa">
+				<p:messages id="messagesAcao" />
+				<h:panelGrid columns="3" id="modalPainelAcao">
+
+					<!-- AÇÃO -->
+					<h:outputLabel value="#{bundle['geral.label.acao']}"
+						styleClass="label-button">
+						<h:outputText styleClass="pesquisaDireta" />
+						<br />
+						<h:selectOneRadio value="#{consultaRemessaController.acaoRemessa}" styleClass="radioButtonSpace">
+							<f:selectItems
+								value="#{consultaRemessaController.listaAcaoRemessa}" var="acao"
+								itemValue="#{acao}" itemLabel="#{acao}"/>
+							<f:ajax event="change" render="pnlListaAlcada" execute="@this"
+								listener="#{consultaRemessaController.ajaxReagendar()}" />
+						</h:selectOneRadio>
+
+					</h:outputLabel>
+					
+				</h:panelGrid>
+				
+				<p:outputPanel id="pnlListaAlcada">
+						<!-- DATA DA COLETA -->
+						<h:outputLabel value="#{bundle['remessa.label.data.coleta']}"
+							styleClass="label-button" id="dtColeta"
+							rendered="#{consultaRemessaController.reagendar}">
+							<h:outputText styleClass="pesquisaDireta" />
+							<br />
+							<p:calendar id="idDataFimAcao" size="8"
+								style="margin-right: 8px;"
+								value="#{consultaRemessaController.tramiteRemessaVO.dataAgendamento}"
+								pattern="dd/MM/yyyy" locale="pt_BR"
+								converter="converter.DataConverter" maxlength="10"
+								onkeyup="maskIt(this,event,'##/##/#####',false,false)"
+								required="true"
+								requiredMessage="#{bundle['remessa.agenda.data.coleta.obrigatoria']}"
+								validator="validator.DataValidator"
+								validatorMessage="Campo #{bundle['remessa.label.data.coleta']} inválido.">
+							</p:calendar>
+
+						</h:outputLabel>
+
+						<!-- HORA DA COLETA -->
+						<h:outputLabel value="#{bundle['remessa.label.hora.coleta']}"
+							styleClass="label-button" id="hrColeta"
+							rendered="#{consultaRemessaController.reagendar}">
+							<br />
+							<p:inputMask mask="99:99" id="horaFimAcao" maxlength="5"
+								style="width: 50px; text-align:left;"
+								value="#{consultaRemessaController.horaAgendamento}"
+								placeHolder="">
+							</p:inputMask>
+						</h:outputLabel>
+
+					</p:outputPanel>
+
+				<!-- OBSERVAÇÃO	 -->
+				<h:outputLabel value="#{bundle['requisicao.label.observacao']}"
+					styleClass="label-button">
+					<br />
+					<p:inputTextarea
+						value="#{consultaRemessaController.tramiteRemessaVO.observacao}"
+						style="text-align: left; white-space: pre-wrap;"
+						onchange="limitarTextArea(this,200)"
+						onmouseout="limitarTextArea(this,200)"
+						onkeyup="limitarTextArea(this,200)" maxlength="200" cols="90"
+						rows="8">
+					</p:inputTextarea>
+				</h:outputLabel>
+
+				<!-- QUEBRA DE LINHA ANTES DOS BOTÕES -->
+				
+				<div style="margin-top: 10px !important; float:left;">
+					<p:commandLink id="btnConfirmarAcao"
+						styleClass="btnAzul marginTop buttonSelected" update="messagesAcao"
+						actionListener="#{consultaRemessaController.definirSituacaoTramite()}">
+						<span><h:outputText style="width: 1; height: 1;"
+								title="#{bundle['MH011']}"
+								value="#{bundle['geral.button.salvar']}" /></span>
+					</p:commandLink>
+	
+					<p:commandLink id="btnNaoConfirmarAcao"
+						styleClass="btnLaranja marginTop buttonSelected"
+						oncomplete="modalAcoesRemessa.hide()">
+						<span><h:outputText style="width: 1; height: 1;"
+								title="#{bundle['MH013']}" value="#{bundle['MI010']}" /></span>
+					</p:commandLink>
+					
+				</div>
+				<p:spacer height="30px" />
+
+			</h:form>
+		</p:dialog>
+
+		<!-- MODAL FECHAMENTO DE REMESSA CONFERIDA -->
+		<p:dialog
+			header="#{bundle['geral.label.remessa']} #{consultaRemessaController.remessa.id} - #{bundle['geral.label.situacaoAtual']} #{consultaRemessaController.remessa.tramiteRemessaAtual.situacao.nome}"
+			closable="true" id="modalFechamentoRemessaId"
+			widgetVar="modalFechamentoRemessa" width="1024" minHeight="300"
+			styleClass="ui-dialog-background" modal="true"
+			style="width: 1200px !important; min-height: 200px !important;"
+			resizable="false" position="center" onHide="giveFocusRemote();">
+			<h:form id="formFechamentoRemessa">
+
+				<div style="max-height: 350px; overflow: auto;">
+
+					<fieldset class="filtro">
+						<h:outputLabel
+							style="max-width: 60px; font-weight: bold !important; font-size: 14px !important;"
+							value="#{bundle['remessa.consulta.modalFechamento.titulo']} #{consultaRemessaController.remessa.id}?">
+						</h:outputLabel>
+						<br></br>
+
+						<h:panelGrid id="pnlAccordion" style="width: 100%">
+							<f:facet name="header">
+								<table class="header-table-accordion-requisicao" width="100%"
+									style="border-right: 1px dotted #666; border-left: 1px dotted #666; border-top: 1px dotted #666;">
+									<tr>
+										<!-- NUMERO DA REMESSA -->
+										<td
+											style="border-right: 1px dotted #666; min-width: 8%; width: 8%;"><h:outputText
+												value="#{bundle['remessa.consulta.accordion.header.remessa']}" />
+										</td>
+										<!-- UNIDADE SOLICITANTE -->
+										<td
+											style="border-right: 1px dotted #666; width: 16%; min-width: 16%;"><h:outputText
+												value="#{bundle['geral.label.unidadeSolicitanteU']}" /></td>
+										<!-- USUÁRIO DA ABERTURA -->
+										<td
+											style="border-right: 1px dotted #666; width: 8%; min-width: 8%;"><h:outputText
+												value="#{bundle['geral.label.usuarioAbertura']}" /></td>
+										<!-- DOCUMENTO -->
+										<td
+											style="border-right: 1px dotted #666; min-width: 18% !important; max-width: 18% !important; width: 18% !important;"><h:outputText
+												value="#{bundle['geral.label.documentoU']}" /></td>
+										<!-- DATA DE ABERTURA -->
+										<td
+											style="border-right: 1px dotted #666; min-width: 10%; width: 10%;"><h:outputText
+												value="#{bundle['geral.label.dataAbertura']}" /></td>
+										<!-- DATA DE AGENDAMENTO DO TRAMITE -->
+										<td
+											style="border-right: 1px dotted #666; width: 10%; min-width: 10%;"><h:outputText
+												value="#{bundle['remessa.consulta.accordion.header.dataAgendamento']}" /></td>
+										<!-- AÇÕES -->
+										<td style="min-width: 30%; width: 30%"><h:outputText
+												value="#{bundle['geral.label.acoes']}" /></td>
+									</tr>
+								</table>
+							</f:facet>
+							<h:column>
+								<div class="accordion" id="accordionRemessa">
+									<p:row>
+										<div class="accordion-group">
+											<div class="accordion-heading"
+												style="top: 0px; border-right: 1px dotted #666; border-left: 1px dotted #666;">
+												<table width="100%">
+													<tr>
+														<!-- NUMERO DA REMESSA -->
+														<td align="left"
+															style="border-right: 1px dotted #666; width: 8%; min-width: 8%; word-wrap: break-word;"
+															onclick="clickAccordion(this)"><h:outputLabel
+																value="#{consultaRemessaController.remessa.id}"
+																styleClass="label-accordion"
+																style="margin-left:25px; font-weight: bold !important;">
+															</h:outputLabel></td>
+														<!-- UNIDADE SOLICITANTE -->
+														<td align="center"
+															style="border-right: 1px dotted #666; width: 16%; min-width: 16%; max-width: 16%; min-height: 34px; word-wrap: break-word;">
+															<div align="left">
+																<h:outputLabel
+																	value="#{consultaRemessaController.remessa.unidadeSolicitante.descricaoCompleta}"
+																	title="#{consultaRemessaController.remessa.unidadeSolicitante.descricaoCompleta}"
+																	styleClass="label-accordion" />
+															</div>
+														</td>
+														<!-- USUÁRIO DA ABERTURA -->
+														<td align="center"
+															style="border-right: 1px dotted #666; width: 8%; min-width: 8%; max-width: 8%; min-height: 34px; word-wrap: break-word;">
+															<h:outputLabel
+																value="#{consultaRemessaController.remessa.codigoUsuarioAbertura.toUpperCase()}"
+																styleClass="label-accordion" />
+														</td>
+														<!-- NOME DO DOCUMENTO -->
+														<td align="center"
+															style="border-right: 1px dotted #666; width: 18%; min-width: 18%; min-height: 34px; word-wrap: break-word;"><h:outputLabel
+																value="#{consultaRemessaController.remessa.documento.nome}"
+																styleClass="label-accordion" /></td>
+														<!-- DATA DE ABERTURA -->
+														<td align="center"
+															style="border-right: 1px dotted #666; width: 10%; min-width: 10%; word-wrap: break-word;"><h:outputLabel
+																style="margin-top:0px;"
+																value="#{consultaRemessaController.remessa.dataHoraAberturaFormatada}"
+																styleClass="label-accordion" /></td>
+														<!-- DATA DE AGENDAMENTO -->
+														<td align="center"
+															style="border-right: 1px dotted #666; width: 10%; min-width: 10%; min-height: 36px; word-wrap: break-word;"><h:outputLabel
+																value="#{consultaRemessaController.remessa.dataAgendamentoFormatada != null ? consultaRemessaController.remessa.dataAgendamentoFormatada : '--' }"
+																styleClass="label-accordion" title="#{bundle['MH086']}" /></td>
+														<!-- SITUAÇÃO DA REMESSA -->
+														<td align="center"
+															style="width: 30%; min-width: 28%; max-width: 30%; min-height: 34px; word-wrap: break-word; padding-left: 110px;"><h:commandLink
+																title="#{bundle['remessa.consulta.copiar.localizacao']}"
+																class="dataTables_inlinebutton">
+																<p:ajax event="click"
+																	process="@this dataTableRemessaDocumento dtMovDiarioConcluir"
+																	update="dataTableRemessaDocumento dtMovDiarioConcluir"
+																	listener="#{consultaRemessaController.replicarLocalizacaoItens()}" />
+																<div class="imgCopiar"></div>
+															</h:commandLink> <h:commandLink
+																title="#{bundle['remessa.consulta.limpar.localizacao']}"
+																class="dataTables_inlinebutton">
+																<p:ajax event="click"
+																	process="@this dataTableRemessaDocumento dtMovDiarioConcluir"
+																	update="dataTableRemessaDocumento dtMovDiarioConcluir"
+																	listener="#{consultaRemessaController.limparLocalizacaoItens()}" />
+																<div class="imgLimpar"></div>
+															</h:commandLink></td>
+													</tr>
+												</table>
+											</div>
+											<div id="collapseRemessa" class="accordion-body collapse">
+												<div class="accordion-inner"
+													style="border-right: 1px dotted #666 !important; border-left: 1px dotted #666 !important;">
+													<h:panelGrid
+														style=" margin-top: -2px; margin-bottom: -2px; margin-left: -2px; width:100%;">
+
+														<!-- REMESSA DE DOCUMENTOS A-B -->
+														<ui:fragment
+															rendered="#{!consultaRemessaController.remessa.tipoRemessaMoviMentoDiario}">
+															<p:dataTable id="dataTableRemessaDocumento" var="item"
+																style="margin-right: -4px !important;" sortBy="id"
+																widgetVar="remessaDocumento" rowIndexVar="rowIx"
+																value="#{consultaRemessaController.remessa.remessaDocumentosTratados()}"
+																styleClass="estilo-border-dotted" rowSelectMode="single"
+																emptyMessage="Nenhum registro correspondente encontrado"
+																rowStyleClass="#{empty rowIx or rowIx mod 2 ne 0 ? 'even-row' : 'odd-row'}">
+
+																<!-- NUMERO DO ITEM -->
+																<p:column
+																	style="text-align:center; border-left: 1px dotted #666 !important; width: 5% !important;"
+																	styleClass="totalColetas">
+																	<f:facet name="header">
+																		<h:outputLabel
+																			value="#{bundle['remessa.consulta.table.header.item']}"
+																			style="color: white;" />
+																	</f:facet>
+																	<p:commandLink id="idItem"
+																		update="@(.ui-dialog),:modalRemessaDocumentoID"
+																		actionListener="#{consultaRemessaController.visualizarRemessaDocumento(item, true)}">
+																		<div style="height: 100%; width: 100%;">
+																			<span><h:outputText
+																					title="#{bundle['remessa.consulta.table.hint.item']}"
+																					value="#{item.id}"
+																					style="font-weight: bold !important;" /></span>
+																		</div>
+																	</p:commandLink>
+
+																</p:column>
+
+																<!-- UNIDADE GERADORA -->
+																<p:column
+																	style="border-left: 1px dotted #666 !important; width: 130px !important;"
+																	styleClass="celulaConsulta">
+																	<f:facet name="header">
+																		<h:outputText style="color: white; text-align:left;"
+																			value="#{bundle['geral.label.unidadeGeradora.maiusculas']}" />
+																	</f:facet>
+																	<h:outputText
+																		value="#{item.unidadeGeradora.descricaoCompleta}"
+																		style="overflow:hidden; text-align:left; font-weight: bold;"/>
+																</p:column>
+
+																<!-- DATA DE GERAÇÃO / PERÍODO -->
+																<p:column
+																	style="text-align:center; border-left: 1px dotted #666 !important; width: 120px !important;"
+																	styleClass="celulaConsulta">
+																	<f:facet name="header">
+																		<h:outputText style="text-align:center; color: white;"
+																			value="#{bundle['geral.label.dataGeracaoPeriodo']}" />
+																	</f:facet>
+																	<div>
+																		<h:outputText
+																			value="#{item.dataGeracaoPeriodoFormatado}"
+																			style="overflow:hidden;" />
+																	</div>
+																</p:column>
+
+																<!-- LOCALIZAÇÃO -->
+																<p:column exportable="false"
+																	styleClass="totalColetas center"
+																	style="text-align:center; width: 31% !important; border-left: 1px dotted #666 !important;">
+																	<f:facet name="header">
+																		<h:outputText
+																			value="#{bundle['remessa.consulta.table.header.localizacao']}"
+																			style="color: #FFF;" />
+																	</f:facet>
+																	<h:inputText maxlength="200"
+																		value="#{item.descricaoLocalizacao}"
+																		id="localizacaoItem"
+																		style="width: 98%; border: 1px solid #ccc !important; color: #000 !important; background: #fff !important;">
+																	</h:inputText>
+
+																</p:column>
+
+																<p:columnGroup type="footer">
+																	<p:row>
+																		<p:column colspan="7" styleClass="footerAccordion"
+																			style="background: #808080 !important;" />
+																	</p:row>
+																</p:columnGroup>
+															</p:dataTable>
+														</ui:fragment>
+
+														<!-- REMESSA DE DOCUMENTOS C -->
+														<ui:fragment
+															rendered="#{consultaRemessaController.remessa.tipoRemessaMoviMentoDiario}">
+															<p:dataTable id="dtMovDiarioConcluir" var="itemConcluir"
+																style="margin-right: -4px !important;"
+																sortBy="dataMovimento" rowSelectMode="single"
+																widgetVar="remessaDocumentoDiarioConcluir"
+																rowIndexVar="rowIx"
+																value="#{consultaRemessaController.remessa.remessaMovimentoTratado()}"
+																styleClass="estilo-border-dotted"
+																emptyMessage="Nenhum registro correspondente encontrado"
+																rowStyleClass="#{empty rowIx or rowIx mod 2 ne 0 ? 'even-row' : 'odd-row'}">
+
+																<!-- UNIDADE GERADORA -->
+																<p:column
+																	style="border-left: 1px dotted #666 !important; width: 110px !important;"
+																	styleClass="celulaConsulta">
+																	<f:facet name="header">
+																		<h:outputText style="color: white; text-align:left;"
+																			value="#{bundle['geral.label.unidadeGeradora.maiusculas']}" />
+																	</f:facet>
+																	<h:outputText
+																		value="#{itemConcluir.unidadeGeradora.descricaoCompleta}"
+																		style="overflow:hidden; text-align:left;" />
+																</p:column>
+
+																<!-- DATA DE GERAÇÃO -->
+																<p:column
+																	style="text-align:center; border-left: 1px dotted #666 !important; width: 30px !important;"
+																	styleClass="totalColetas">
+																	<f:facet name="header">
+																		<h:outputText style="color: white; text-align:center;"
+																			value="#{bundle['relatorio.suporte.data']}" />
+																	</f:facet>
+																	<h:outputText
+																		value="#{itemConcluir.dataMovimentoFormatada}"
+																		style="overflow:hidden;" />
+																</p:column>
+
+																<!-- IC LOTERICO -->
+																<p:column
+																	style="text-align:center; border-left: 1px dotted #666 !important; width: 30px !important;"
+																	styleClass="totalColetas">
+																	<f:facet name="header">
+																		<h:outputLabel
+																			value="#{bundle['remessa.rascunho.tfLoterico']}"
+																			style="color: white;" />
+																	</f:facet>
+																	<h:outputText
+																		value="#{itemConcluir.icLoterico.descricaoCompleta}"
+																		style="font-weight: bold !important;" />
+																</p:column>
+
+																<!-- NUMERO TERMINAL -->
+																<p:column
+																	style="text-align:center; border-left: 1px dotted #666 !important; width: 30px !important;"
+																	styleClass="totalColetas">
+																	<f:facet name="header">
+																		<h:outputLabel
+																			value="#{bundle['remessa.rascunho.terminal']}"
+																			style="color: white;" />
+																	</f:facet>
+																	<h:outputText value="#{itemConcluir.nuTerminal}"
+																		style="font-weight: bold !important;" />
+																</p:column>
+
+																<!-- GRUPO 1 -->
+																<p:column
+																	style="text-align:center; border-left: 1px dotted #666 !important; width: 30px !important;"
+																	styleClass="totalColetas">
+																	<f:facet name="header">
+																		<h:outputLabel
+																			value="#{bundle['remessa.rascunho.grupo1']}"
+																			style="color: white;" />
+																	</f:facet>
+																	<h:outputText value="#{itemConcluir.grupo1}"
+																		style="font-weight: bold !important;" />
+																</p:column>
+
+																<!-- GRUPO 2 -->
+																<p:column
+																	style="text-align:center; border-left: 1px dotted #666 !important; width: 30px !important;"
+																	styleClass="totalColetas">
+																	<f:facet name="header">
+																		<h:outputLabel
+																			value="#{bundle['remessa.rascunho.grupo2']}"
+																			style="color: white;" />
+																	</f:facet>
+																	<h:outputText value="#{itemConcluir.grupo2}"
+																		style="font-weight: bold !important;" />
+																</p:column>
+
+																<!-- GRUPO 3-->
+																<p:column
+																	style="text-align:center; border-left: 1px dotted #666 !important; width: 30px !important;"
+																	styleClass="totalColetas">
+																	<f:facet name="header">
+																		<h:outputLabel
+																			value="#{bundle['remessa.rascunho.grupo3']}"
+																			style="color: white;" />
+																	</f:facet>
+																	<h:outputText value="#{itemConcluir.grupo3}"
+																		style="font-weight: bold !important;" />
+																</p:column>
+
+																<!-- LOCALIZAÇÃO -->
+																<p:column
+																	style="text-align:center; border-left: 1px dotted #666 !important; width: 35px !important;"
+																	styleClass="totalColetas">
+																	<f:facet name="header">
+																		<h:outputLabel
+																			value="#{bundle['remessa.rascunho.localizacao']}"
+																			style="color: white;" />
+																	</f:facet>
+																	<h:inputText maxlength="200"
+																		value="#{itemConcluir.localizacao}"
+																		id="localizacaoItemC"
+																		style="width: 98%; border: 1px solid #ccc !important; color: #000 !important; background: #fff !important;">
+																	</h:inputText>
+																</p:column>
+
+																<p:columnGroup type="footer">
+																	<p:row>
+																		<p:column colspan="8" styleClass="footerAccordion"
+																			style="background: #808080 !important;" />
+																	</p:row>
+																</p:columnGroup>
+															</p:dataTable>
+														</ui:fragment>
+													</h:panelGrid>
+												</div>
+											</div>
+										</div>
+									</p:row>
+								</div>
+							</h:column>
+						</h:panelGrid>
+
+						<f:facet name="footer">
+							<h:panelGrid
+								style="width:100%; border-right: 1px dotted #666; border-left: 1px dotted #666; border-bottom: 1px dotted #666;"
+								styleClass="header-table-accordion-requisicao">
+								<p:row>
+									<p:column style="height: 20px; " />
+								</p:row>
+							</h:panelGrid>
+						</f:facet>
+
+						<!-- OBSERVAÇÃO	 -->
+						<h:outputLabel
+							value="#{bundle['remessa.consulta.item.observacao.label']}"
+							styleClass="label-button">
+							<br />
+							<p:inputTextarea
+								value="#{consultaRemessaController.tramiteRemessaVO.observacao}"
+								style="text-align: left; white-space: pre-wrap;"
+								onchange="limitarTextArea(this,200)"
+								onmouseout="limitarTextArea(this,200)"
+								onkeyup="limitarTextArea(this,200)" maxlength="200" cols="160"
+								rows="4">
+							</p:inputTextarea>
+						</h:outputLabel>
+
+						<!-- QUEBRA DE LINHA ANTES DOS BOTÕES -->
+						<p:spacer style="width: 700px !important; height: 5px !important;"></p:spacer>
+
+						<p:commandLink id="btnConfirmarAcao"
+							styleClass="btnAzul marginTop buttonSelected"
+							action="#{consultaRemessaController.fecharRemessa()}">
+							<span><h:outputText style="width: 1; height: 1;"
+									title="#{bundle['MH011']}"
+									value="#{bundle['geral.button.salvar']}" /></span>
+						</p:commandLink>
+
+						<p:commandLink id="btnNaoConfirmarAcao"
+							styleClass="btnLaranja marginTop buttonSelected"
+							oncomplete="modalFechamentoRemessa.hide()"
+							actionListener="#{consultaRemessaController.limparLocalizacao()}">
+							<span><h:outputText style="width: 1; height: 1;"
+									title="#{bundle['MH013']}" value="#{bundle['MI010']}" /></span>
+						</p:commandLink>
+						<p:spacer height="30px" />
+
+					</fieldset>
+
+				</div>
+
+			</h:form>
+		</p:dialog>
+
+		<!-- MODAL HISTORICO -->
+		<p:dialog
+			header="#{bundle['remessa.consulta.header.modalHistorico']} #{consultaRemessaController.remessa.id}"
+			closable="true" id="modalHistoricoId" widgetVar="modalHistorico"
+			width="600" minHeight="190" styleClass="ui-dialog-background"
+			modal="true" resizable="false" position="center"
+			onHide="giveFocusRemote();">
+			<h:form id="formHistorico">
+				<h:panelGrid id="gridDataTable" columns="1" width="100%">
+					<p:dataTable id="dataTable" var="tramite"
+						widgetVar="historicoRemessa"
+						value="#{consultaRemessaController.listaTramitesRemessa}"
+						paginatorPosition="bottom" styleClass="estilo-border-dotted zebr"
+						rowSelectMode="single" rowIndexVar="rowIx"
+						emptyMessage="Nenhum registro correspondente encontrado"
+						filteredValue="#{consultaRemessaController.filtredListaTramitesRemessa}"
+						paginator="true" rows="10" paginatorAlwaysVisible="true"
+						paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+						currentPageReportTemplate="Exibindo {startRecord} até {endRecord} de {totalRecords} registros "
+						rowStyleClass="#{empty rowIx or rowIx mod 2 ne 0 ? 'even-row' : 'odd-row'}">
+
+						<p:column sortBy="#{tramite.situacao.nome}"
+							filterBy="#{tramite.situacao.nome}"
+							filterStyle="display:none; visibility:hidden;"
+							style="text-align:left; width: 0px;"
+							styleClass="noBackGroundImage" width="20%">
+							<f:facet name="header">
+								<h:outputText value="#{bundle['geral.label.situacaoU']}" />
+							</f:facet>
+							<h:outputText value="#{tramite.situacao.nome.toUpperCase()}">
+							</h:outputText>
+						</p:column>
+						<p:column sortBy="#{tramite.dataTramiteRemessaFormatada}"
+							filterBy="#{tramite.dataTramiteRemessaFormatada}"
+							filterStyle="display:none; visibility:hidden;"
+							style="text-align:center; width: 0px;"
+							styleClass="noBackGroundImage" width="22%">
+							<f:facet name="header">
+								<h:outputText value="#{bundle['geral.label.dataHora']}" />
+							</f:facet>
+							<h:outputText value="#{tramite.dataTramiteRemessaFormatada}">
+							</h:outputText>
+						</p:column>
+						<!-- USUÁRIO -->
+						<p:column sortBy="#{tramite.codigoUsuario}"
+							filterBy="#{tramite.codigoUsuario}"
+							filterStyle="display:none; visibility:hidden;"
+							style="text-align:left; width: 0px;"
+							styleClass="noBackGroundImage" width="18%">
+							<f:facet name="header">
+								<h:outputText value="#{bundle['geral.label.usuarioU']}" />
+							</f:facet>
+							<h:outputText value="#{tramite.codigoUsuario}">
+							</h:outputText>
+						</p:column>
+						<!-- OBSERVAÇÃO -->
+						<p:column sortBy="#{tramite.observacao}"
+							filterBy="#{tramite.observacao}"
+							filterStyle="display:none; visibility:hidden;"
+							style="text-align:left; width: 0px;"
+							styleClass="noBackGroundImage" width="40%">
+							<f:facet name="header">
+								<h:outputText
+									value="#{bundle['remessa.consulta.modalHistorico.observacao']}" />
+							</f:facet>
+							<h:outputLabel value="--"
+								rendered="#{tramite.observacao == null}" />
+							<h:outputText rendered="#{tramite.observacao != null}"
+								value="#{tramite.observacao}" />
+
+						</p:column>
+					</p:dataTable>
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+
+		<!-- VISUALIZAR REMESSA DOCUMENTO -->
+		<!-- 			header="#{bundle['remessa.mantemremessa.remessaDocumento.header.parte1']} #{consultaRemessaController.remessaDocumento.nuItem} #{bundle['remessa.mantemremessa.remessaDocumento.header.parte2']} #{consultaRemessaController.remessa.id}" -->
+		<p:dialog
+			header="#{bundle['remessa.mantemremessa.remessaDocumento.header.parte1']} #{bundle['remessa.mantemremessa.remessaDocumento.header.parte2']} #{consultaRemessaController.remessa.id}"
+			id="modalRemessaDocumentoID" widgetVar="modalRemessaDocumento"
+			styleClass="ui-dialog-background" modal="true" dynamic="true"
+			width="600px" draggable="true" position="center"
+			onHide="giveFocusRemote();">
+			<!-- style="max-height: 550px;" resizable="false"  -->
+
+			<h:form id="formRemessaDocumento">
+
+				<!-- UNIDADE GERADORA -->
+				<h:outputLabel value="#{bundle['geral.label.unidadeGeradora']}"
+					styleClass="label-button" title="#{bundle['MH003']}">
+					<h:outputText value="" styleClass="pesquisaDireta" />
+					<br />
+					<h:inputText maxlength="4"
+						value="#{consultaRemessaController.remessaDocumento.unidadeGeradora.id}"
+						id="codigoUnidadeFiltro" style="width: 35px; margin-right: 3px;"
+						disabled="true" styleClass="input-disabled">
+					</h:inputText>
+					<h:inputText maxlength="4" id="nomeUnidadeGeradora"
+						value="#{consultaRemessaController.remessaDocumento.unidadeGeradora.nome}"
+						style="width: 450px; margin-right: 8px;" disabled="true"
+						styleClass="input-disabled">
+					</h:inputText>
+				</h:outputLabel>
+
+				<ui:repeat var="grupoCampos"
+					value="#{consultaRemessaController.getListGrupoCampo()}">
+					<h:outputLabel
+						value="#{grupoCampos.legenda != null ? grupoCampos.legenda :grupoCampos.campo.descricao}"
+						styleClass="label-button" title="#{grupoCampos.mensagem}">
+
+						<h:outputText value=""
+							styleClass="#{grupoCampos.campoObrigatorio.id == 1 ?'pesquisaDireta':'' }" />
+						<br />
+
+						<p:inputMask id="input_M#{grupoCampos.campo.id}"
+							mask="#{grupoCampos.campo.mascara}" disabled="true"
+							title="#{grupoCampos.mensagem}"
+							rendered="#{grupoCampos.campo.tipo.id != 2 and consultaRemessaController.contemMascara(grupoCampos.campo.mascara)}"
+							maxlength="#{grupoCampos.campo.tamanho}"
+							style="#{consultaRemessaController.calculaTamanhoCampo(grupoCampos.legenda,  grupoCampos.campo.descricao, grupoCampos.campo.tamanho, grupoCampos.campoObrigatorio)}"
+							value="#{grupoCampos.valor}"
+							styleClass="#{grupoCampos.campo.tipo.id == 1 ? 'gri-numericos': ''} input-disabled">
+						</p:inputMask>
+
+						<h:inputText id="input_I#{grupoCampos.campo.id}"
+							title="#{grupoCampos.mensagem}" disabled="true"
+							rendered="#{grupoCampos.campo.tipo.id != 2 and consultaRemessaController.mascaraNumerica(grupoCampos.campo.mascara)  and !grupoCampos.campo.nome.equals('NU_OPERACAO_A11')}"
+							maxlength="#{grupoCampos.campo.tamanho}"
+							style="#{consultaRemessaController.calculaTamanhoCampo(grupoCampos.legenda,  grupoCampos.campo.descricao, grupoCampos.campo.tamanho, grupoCampos.campoObrigatorio)}"
+							value="#{grupoCampos.valor}"
+							styleClass="#{grupoCampos.campo.tipo.id == 1? 'gri-numericos': ''} input_din_#{formulariosRequisicaoCampos.campo.id} input-disabled">
+						</h:inputText>
+
+						<h:inputText id="input_D#{grupoCampos.campo.id}"
+							title="#{grupoCampos.mensagem}" disabled="true"
+							rendered="#{grupoCampos.campo.tipo.id != 2 and consultaRemessaController.mascaraMoeda(grupoCampos.campo.mascara) }"
+							maxlength="#{grupoCampos.campo.tamanho}"
+							style="#{consultaRemessaController.calculaTamanhoCampo(grupoCampos.legenda,  grupoCampos.campo.descricao, grupoCampos.campo.tamanho, grupoCampos.campoObrigatorio)}"
+							value="#{grupoCampos.valor}"
+							styleClass="#{grupoCampos.campo.tipo.id == 1 ? 'gri-numericos': ''} input_din_M#{grupoCampos.campo.id} input-disabled">
+						</h:inputText>
+
+						<h:inputText id="input_N#{grupoCampos.campo.id}"
+							title="#{grupoCampos.mensagem}" disabled="true"
+							rendered="#{grupoCampos.campo.tipo.id != 2 and grupoCampos.campo.mascara == null}"
+							maxlength="#{grupoCampos.campo.tamanho}"
+							style="#{consultaRemessaController.calculaTamanhoCampo(grupoCampos.legenda,  grupoCampos.campo.descricao, grupoCampos.campo.tamanho, grupoCampos.campoObrigatorio)}"
+							value="#{grupoCampos.valor}"
+							styleClass="#{grupoCampos.campo.tipo.id == 1 ? 'gri-numericos': ''} input-disabled">
+						</h:inputText>
+
+						<p:calendar id="campoData" disabled="true" styleClass="dataForm"
+							rendered="#{grupoCampos.campo.tipo.id == 2}"
+							value="#{grupoCampos.valorData}" title="#{grupoCampos.mensagem}"
+							pattern="dd/MM/yyyy" locale="pt_BR"
+							converter="converter.DataConverter" maxlength="10"
+							validator="validator.DataValidator">
+						</p:calendar>
+
+						<h:selectOneMenu id="idOperacao" style="width: 150px;"
+							rendered="#{grupoCampos.campo.nome.equals('NU_OPERACAO_A11')}"
+							converter="omnifaces.SelectItemsConverter"
+							styleClass="select-disabled" disabled="true"
+							value="#{grupoCampos.valor}">
+							<f:selectItem itemLabel="Selecione" noSelectionOption="true" />
+							<f:selectItems value="#{remessaController.operacoes}"
+								var="operacao" itemValue="#{operacao}"
+								itemLabel="#{operacao.descricaoCompleta}" />
+						</h:selectOneMenu>
+
+					</h:outputLabel>
+
+				</ui:repeat>
+
+				<p:spacer width="200px" height="45px"></p:spacer>
+				<p:outputPanel>
+					<p:commandLink id="btnFecharModalRemessaDocumento"
+						oncomplete="modalRemessaDocumento.hide(); "
+						styleClass="btnLaranja marginTop buttonSelected">
+						<span><h:outputText style="width: 1; height: 1;"
+								title="#{bundle['MH070']}"
+								value="#{bundle['geral.button.fechar']}" /></span>
+					</p:commandLink>
+				</p:outputPanel>
+
+				<!-- Forçando a criação da máscara nos imput -->
+				<script type="text/javascript">
+					<ui:repeat var="grupoCampos"
+						value="#{consultaRemessaController.getListGrupoCampo()}">
+							jQuery(".input_din_#{grupoCampos.campo.id}, .input_din_#{grupoCampos.campo.id} input").inputmask('#{grupoCampos.campo.mascara}');				
+							jQuery(".input_din_M#{grupoCampos.campo.id}").priceFormat({
+							    centsSeparator: ',',
+							    thousandsSeparator: '.'
+							});
+					</ui:repeat>
+					jQuery('#modalRemessaDocumentoID .ui-state-disabled').css('background-color','#EEEEEE !important;').css('font-weight','normal');
+					jQuery('#modalRemessaDocumentoID .ui-state-disabled, #modalRemessaDocumentoID .ui-inputfield').removeClass('ui-state-disabled').removeClass('ui-inputfield');
+				</script>
+			</h:form>
+
+		</p:dialog>
+
+		<!-- VISUALIZAR REMESSA DOCUMENTO TIPO C -->
+		<p:dialog
+			header="#{bundle['remessa.mantemremessa.correcao.header.parte3']} #{consultaRemessaController.itemDetalheTipoC.codigoRemessaTipoC}"
+			id="modalDetalharRemessaDocumentoID"
+			widgetVar="modalDetalharRemessaDocumento"
+			styleClass="ui-dialog-background" modal="true" dynamic="true"
+			width="600px" draggable="true" position="center"
+			onHide="giveFocusRemote();">
+
+			<h:form id="formModalDetalhar">
+				<div style="overflow: -y;">
+				
+				<h:panelGroup layout="block" rendered="#{consultaRemessaController.exibirMensagemInclusaoTipoC()}">
+					<div class="alert alert-success">
+						<p>A(s) inclusão(ões) feita(s) pela empresa terceirizada
+							estão destacadas em verde.</p>
+					</div>
+				</h:panelGroup>
+				
+					<table id="grid_remessa" class="table table-striped table-hover"
+						width="100%" style="border: 1px dotted #666" cellpadding="0">
+						<thead>
+							<tr>
+								<th style="text-align: center;">TF/Lotérico</th>
+								<th style="text-align: center;">Número TF/LOT</th>
+								<th style="text-align: center;">Qtd Envelopes Grupo 1</th>
+								<th style="text-align: center;">Qtd Envelopes Grupo 2</th>
+								<th style="text-align: center;">Qtd Envelopes Grupo 3</th>
+							</tr>
+						</thead>
+						<tbody>
+							<ui:repeat var="detalheDiario"
+								value="#{consultaRemessaController.carregarListaMovDiarioTratado()}"
+								varStatus="row">
+								<tr class="rowGrid">
+									<td style="text-align: left;"><h:outputText
+											value="#{detalheDiario.icLoterico.descricaoCompleta}"
+											style="font-weight: bold !important;"
+											styleClass="#{detalheDiario.icAlteracaoValida.getValue() == 5 ? 'pintaFonteVerde' : ''}" /></td>
+									<td style="text-align: right;"><h:outputText
+											value="#{detalheDiario.nuTerminal}"
+											style="font-weight: bold !important;"
+											styleClass="#{detalheDiario.icAlteracaoValida.getValue() == 5 ? 'pintaFonteVerde' : ''}" /></td>
+									<td style="text-align: right;"><h:outputText
+											value="#{detalheDiario.grupo1}"
+											style="font-weight: bold !important;"
+											styleClass="#{detalheDiario.icAlteracaoValida.getValue() == 5 ? 'pintaFonteVerde' : ''}" /></td>
+									<td style="text-align: right;"><h:outputText
+											value="#{detalheDiario.grupo2}"
+											style="font-weight: bold !important;"
+											styleClass="#{detalheDiario.icAlteracaoValida.getValue() == 5 ? 'pintaFonteVerde' : ''}" /></td>
+									<td style="text-align: right;"><h:outputText
+											value="#{detalheDiario.grupo3}"
+											style="font-weight: bold !important;"
+											styleClass="#{detalheDiario.icAlteracaoValida.getValue() == 5 ? 'pintaFonteVerde' : ''}" /></td>
+								</tr>
+							</ui:repeat>
+						</tbody>
+					</table>
+				</div>
+				<p:commandLink id="btnFechar" styleClass="btnAzul btn_fechar_modal"
+					oncomplete="modalDetalharRemessaDocumento.hide()"
+					actionListener="#{consultaRemessaController.limparDetalheMovimentotipoC()}">
+					<span><h:outputText style="width: 1; height: 1;"
+							value="Fechar" /></span>
+				</p:commandLink>
+			</h:form>
+
+		</p:dialog>
+
+		<!-- VISUALIZAR REMESSA DOCUMENTO EM ALTERACAO -->
+		<!-- 			header="#{bundle['remessa.mantemremessa.remessaDocumento.header.parte1']} #{consultaRemessaController.remessaDocumento.nuItem} #{bundle['remessa.mantemremessa.remessaDocumento.header.parte2']} #{consultaRemessaController.remessa.id}" -->
+		<p:dialog
+			header="#{bundle['remessa.mantemremessa.remessaDocumento.header.parte1']} #{bundle['remessa.mantemremessa.remessaDocumento.header.parte2']} #{consultaRemessaController.remessa.id}"
+			id="modalRemessaDocumentoAlteracaoID"
+			widgetVar="modalRemessaDocumentoAlteracao"
+			styleClass="ui-dialog-background" modal="true" dynamic="true"
+			width="800px" draggable="true" position="center"
+			onHide="giveFocusRemote();">
+			<!-- style="max-height: 550px;" resizable="false"  -->
+
+			<h:form id="formRemessaDocumentoAlteracao">
+
+				<fieldset style="border: grey solid 1px; padding: 10px !important;">
+					<legend>Original</legend>
+					<!-- UNIDADE GERADORA -->
+					<h:outputLabel value="#{bundle['geral.label.unidadeGeradora']}"
+						styleClass="label-button" title="#{bundle['MH003']}">
+						<h:outputText value="" styleClass="pesquisaDireta" />
+						<br />
+						<h:inputText maxlength="4"
+							value="#{consultaRemessaController.remessaDocumento.unidadeGeradora.id}"
+							id="codigoUnidadeFiltro" style="width: 35px; margin-right: 3px;"
+							disabled="true" styleClass="input-disabled">
+						</h:inputText>
+						<h:inputText maxlength="4" id="nomeUnidadeGeradora"
+							value="#{consultaRemessaController.remessaDocumento.unidadeGeradora.nome}"
+							style="width: 450px; margin-right: 8px;" disabled="true"
+							styleClass="input-disabled">
+						</h:inputText>
+					</h:outputLabel>
+
+					<!-- VALORES ORIGINAIS -->
+					<ui:repeat var="grupoCamposOriginais"
+						value="#{consultaRemessaController.getListGrupoCampoOriginal()}">
+						<h:outputLabel
+							value="#{grupoCamposOriginais.legenda != null ? grupoCamposOriginais.legenda :grupoCamposOriginais.campo.descricao}"
+							styleClass="label-button"
+							title="#{grupoCamposOriginais.mensagem}">
+
+							<h:outputText value=""
+								styleClass="#{grupoCamposOriginais.campoObrigatorio.id == 1 ?'pesquisaDireta':'' }" />
+							<br />
+
+							<p:inputMask id="input_M#{grupoCamposOriginais.campo.id}Original"
+								mask="#{grupoCamposOriginais.campo.mascara}" disabled="true"
+								title="#{grupoCamposOriginais.mensagem}"
+								rendered="#{grupoCamposOriginais.campo.tipo.id != 2 and consultaRemessaController.contemMascara(grupoCamposOriginais.campo.mascara)}"
+								maxlength="#{grupoCamposOriginais.campo.tamanho}"
+								style="#{consultaRemessaController.calculaTamanhoCampo(grupoCamposOriginais.legenda,  grupoCamposOriginais.campo.descricao, grupoCamposOriginais.campo.tamanho, grupoCamposOriginais.campoObrigatorio)}"
+								value="#{grupoCamposOriginais.valor}"
+								styleClass="#{grupoCamposOriginais.campo.tipo.id == 1 ? 'gri-numericos': ''} input-disabled">
+							</p:inputMask>
+
+							<h:inputText id="input_I#{grupoCamposOriginais.id}Original"
+								title="#{grupoCamposOriginais.mensagem}" disabled="true"
+								rendered="#{grupoCamposOriginais.campo.tipo.id != 2 and consultaRemessaController.mascaraNumerica(grupoCamposOriginais.campo.mascara)  and !grupoCamposOriginais.campo.nome.equals('NU_OPERACAO_A11')}"
+								maxlength="#{grupoCamposOriginais.campo.tamanho}"
+								style="#{consultaRemessaController.calculaTamanhoCampo(grupoCamposOriginais.legenda,  grupoCamposOriginais.campo.descricao, grupoCamposOriginais.campo.tamanho, grupoCamposOriginais.campoObrigatorio)}"
+								value="#{grupoCamposOriginais.valor}"
+								styleClass="#{grupoCamposOriginais.campo.tipo.id == 1? 'gri-numericos': ''} input_din_#{formulariosRequisicaoCampos.campo.id} input-disabled">
+							</h:inputText>
+
+							<h:inputText id="input_D#{grupoCamposOriginais.campo.id}Original"
+								title="#{grupoCamposOriginais.mensagem}" disabled="true"
+								rendered="#{grupoCamposOriginais.campo.tipo.id != 2 and consultaRemessaController.mascaraMoeda(grupoCamposOriginais.campo.mascara) }"
+								maxlength="#{grupoCamposOriginais.campo.tamanho}"
+								style="#{consultaRemessaController.calculaTamanhoCampo(grupoCamposOriginais.legenda,  grupoCamposOriginais.campo.descricao, grupoCampo.campo.tamanho, grupoCamposOriginais.campoObrigatorio)}"
+								value="#{grupoCamposOriginais.valor}"
+								styleClass="#{grupoCamposOriginais.campo.tipo.id == 1 ? 'gri-numericos': ''} input_din_M#{grupoCamposOriginais.campo.id} input-disabled">
+							</h:inputText>
+
+							<h:inputText id="input_N#{grupoCamposOriginais.campo.id}Original"
+								title="#{grupoCamposOriginais.mensagem}" disabled="true"
+								rendered="#{grupoCamposOriginais.campo.tipo.id != 2 and grupoCamposOriginais.campo.mascara == null}"
+								maxlength="#{grupoCamposOriginais.campo.tamanho}"
+								style="#{consultaRemessaController.calculaTamanhoCampo(grupoCamposOriginais.legenda,  grupoCamposOriginais.campo.descricao, grupoCamposOriginais.campo.tamanho, grupoCamposOriginais.campoObrigatorio)}"
+								value="#{grupoCamposOriginais.valor}"
+								styleClass="#{grupoCamposOriginais.campo.tipo.id == 1 ? 'gri-numericos': ''} input-disabled">
+							</h:inputText>
+
+							<p:calendar id="campoDataOriginal" disabled="true"
+								styleClass="dataForm"
+								rendered="#{grupoCamposOriginais.campo.tipo.id == 2}"
+								value="#{grupoCamposOriginais.valorData}"
+								title="#{grupoCamposOriginais.mensagem}" pattern="dd/MM/yyyy"
+								locale="pt_BR" converter="converter.DataConverter"
+								maxlength="10" validator="validator.DataValidator">
+							</p:calendar>
+
+							<h:selectOneMenu id="idOperacaoOriginal" style="width: 150px;"
+								rendered="#{grupoCamposOriginais.campo.nome.equals('NU_OPERACAO_A11')}"
+								converter="omnifaces.SelectItemsConverter"
+								styleClass="select-disabled" disabled="true"
+								value="#{grupoCamposOriginais.valor}">
+								<f:selectItem itemLabel="Selecione" noSelectionOption="true" />
+								<f:selectItems value="#{remessaController.operacoes}"
+									var="operacao" itemValue="#{operacao}"
+									itemLabel="#{operacao.descricaoCompleta}" />
+							</h:selectOneMenu>
+
+						</h:outputLabel>
+
+					</ui:repeat>
+				</fieldset>
+
+				<div class="clear"
+					style="min-height: 10px !important; height: 10px !important"></div>
+				<div class="alert alert-danger">
+					<p>A(s) alteração(ões) feita(s) pela empresa terceirizada estão
+						destacadas em vermelho.</p>
+				</div>
+
+				<fieldset style="border: grey solid 1px; padding: 10px !important;">
+					<legend>Alterado pela terceirizada</legend>
+					<!-- UNIDADE GERADORA -->
+					<h:outputLabel value="#{bundle['geral.label.unidadeGeradora']}"
+						styleClass="label-button" title="#{bundle['MH003']}">
+						<h:outputText value="" styleClass="pesquisaDireta" />
+						<br />
+						<h:inputText maxlength="4"
+							value="#{consultaRemessaController.remessaDocumento.numeroRemessaTipoAB.unidadeGeradora.id}"
+							id="codigoUnidadeFiltroClone"
+							style="width: 35px; margin-right: 3px;" disabled="true"
+							styleClass="input-disabled">
+						</h:inputText>
+						<h:inputText maxlength="4" id="nomeUnidadeGeradoraClone"
+							value="#{consultaRemessaController.remessaDocumento.numeroRemessaTipoAB.unidadeGeradora.nome}"
+							style="width: 450px; margin-right: 8px;" disabled="true"
+							styleClass="input-disabled">
+						</h:inputText>
+					</h:outputLabel>
+
+					<!-- VALORES ALTERADOS PELA TERCEIRIZADA -->
+					<ui:repeat var="grupoCampos"
+						value="#{consultaRemessaController.getListGrupoCampo()}">
+						<h:outputLabel
+							value="#{grupoCampos.legenda != null ? grupoCampos.legenda :grupoCampos.campo.descricao}"
+							styleClass="label-button" title="#{grupoCampos.mensagem}">
+
+							<h:outputText value=""
+								styleClass="#{grupoCampos.campoObrigatorio.id == 1 ?'pesquisaDireta':'' }" />
+							<br />
+
+							<p:inputMask id="input_M#{grupoCampos.campo.id}"
+								mask="#{grupoCampos.campo.mascara}" disabled="true"
+								title="#{grupoCampos.mensagem}"
+								rendered="#{grupoCampos.campo.tipo.id != 2 and consultaRemessaController.contemMascara(grupoCampos.campo.mascara)}"
+								maxlength="#{grupoCampos.campo.tamanho}"
+								style="#{consultaRemessaController.calculaTamanhoCampo(grupoCampos.legenda,  grupoCampos.campo.descricao, grupoCampos.campo.tamanho, grupoCampos.campoObrigatorio)}"
+								value="#{grupoCampos.valor}"
+								styleClass="#{grupoCampos.campo.tipo.id == 1 ? 'gri-numericos': ''} input-disabled
+							#{grupoCampos.valoresDiferentes? 'pintaValorVermelho' : ''}">
+							</p:inputMask>
+
+							<h:inputText id="input_I#{grupoCampos.id}"
+								title="#{grupoCampos.mensagem}" disabled="true"
+								rendered="#{grupoCampos.campo.tipo.id != 2 and consultaRemessaController.mascaraNumerica(grupoCampos.campo.mascara)  and !grupoCampos.campo.nome.equals('NU_OPERACAO_A11')}"
+								maxlength="#{grupoCampos.campo.tamanho}"
+								style="#{consultaRemessaController.calculaTamanhoCampo(grupoCampos.legenda,  grupoCampos.campo.descricao, grupoCampos.campo.tamanho, grupoCampos.campoObrigatorio)}"
+								value="#{grupoCampos.valor}"
+								styleClass="#{grupoCampos.campo.tipo.id == 1? 'gri-numericos': ''} input_din_#{formulariosRequisicaoCampos.campo.id} input-disabled 
+							#{grupoCampos.valoresDiferentes? 'pintaValorVermelho' : ''}">
+							</h:inputText>
+
+							<h:inputText id="input_D#{grupoCampos.campo.id}"
+								title="#{grupoCampos.mensagem}" disabled="true"
+								rendered="#{grupoCampos.campo.tipo.id != 2 and consultaRemessaController.mascaraMoeda(grupoCampos.campo.mascara) }"
+								maxlength="#{grupoCampos.campo.tamanho}"
+								style="#{consultaRemessaController.calculaTamanhoCampo(grupoCampos.legenda,  grupoCampos.campo.descricao, grupoCampo.campo.tamanho, grupoCampos.campoObrigatorio)}"
+								value="#{grupoCampos.valor}"
+								styleClass="#{grupoCampos.campo.tipo.id == 1 ? 'gri-numericos': ''} input_din_M#{grupoCampos.campo.id} input-disabled
+							#{grupoCampos.valoresDiferentes? 'pintaValorVermelho' : ''}">
+							</h:inputText>
+
+							<h:inputText id="input_N#{grupoCampos.campo.id}"
+								title="#{grupoCampos.mensagem}" disabled="true"
+								rendered="#{grupoCampos.campo.tipo.id != 2 and grupoCampos.campo.mascara == null}"
+								maxlength="#{grupoCampos.campo.tamanho}"
+								style="#{consultaRemessaController.calculaTamanhoCampo(grupoCampos.legenda,  grupoCampos.campo.descricao, grupoCampos.campo.tamanho, grupoCampos.campoObrigatorio)}"
+								value="#{grupoCampos.valor}"
+								styleClass="#{grupoCampos.campo.tipo.id == 1 ? 'gri-numericos': ''} input-disabled
+							#{grupoCampos.valoresDiferentes? 'pintaValorVermelho' : ''}">
+							</h:inputText>
+
+							<p:calendar id="campoData" disabled="true"
+								styleClass="dataForm #{grupoCampos.valoresDiferentes? 'pintaValorVermelho' : ''} "
+								rendered="#{grupoCampos.campo.tipo.id == 2}"
+								value="#{grupoCampos.valorData}" title="#{grupoCampos.mensagem}"
+								pattern="dd/MM/yyyy" locale="pt_BR"
+								converter="converter.DataConverter" maxlength="10"
+								validator="validator.DataValidator">
+							</p:calendar>
+
+							<h:selectOneMenu id="idOperacao" style="width: 150px;"
+								rendered="#{grupoCampos.campo.nome.equals('NU_OPERACAO_A11')}"
+								converter="omnifaces.SelectItemsConverter"
+								styleClass="select-disabled #{grupoCampos.valoresDiferentes? 'pintaValorVermelho' : ''}"
+								disabled="true" value="#{grupoCampos.valor}">
+								<f:selectItem itemLabel="Selecione" noSelectionOption="true" />
+								<f:selectItems value="#{remessaController.operacoes}"
+									var="operacao" itemValue="#{operacao}"
+									itemLabel="#{operacao.descricaoCompleta}" />
+							</h:selectOneMenu>
+
+						</h:outputLabel>
+
+					</ui:repeat>
+				</fieldset>
+
+				<p:spacer width="200px" height="5px"></p:spacer>
+				<p:outputPanel>
+					<p:commandLink id="btnFecharModalRemessaDocumento"
+						oncomplete="modalRemessaDocumentoAlteracao.hide(); "
+						styleClass="btnAzul marginTop buttonSelected">
+						<span><h:outputText style="width: 1; height: 1;"
+								title="#{bundle['MH070']}"
+								value="#{bundle['geral.button.fechar']}" /></span>
+					</p:commandLink>
+				</p:outputPanel>
+
+				<!-- Forçando a criação da máscara nos imput -->
+				<script type="text/javascript">
+					<ui:repeat var="grupoCamposOriginais"
+						value="#{consultaRemessaController.getListGrupoCampo()}">
+							jQuery(".input_din_#{grupoCamposOriginais.campo.id}, .input_din_#{grupoCamposOriginais.campo.id} input").inputmask('#{grupoCamposOriginais.campo.mascara}');				
+							jQuery(".input_din_M#{grupoCamposOriginais.campo.id}").priceFormat({
+							    centsSeparator: ',',
+							    thousandsSeparator: '.'
+							});
+					</ui:repeat>
+					jQuery('#modalRemessaDocumentoAlteracaoID .ui-state-disabled').css('background-color','#EEEEEE !important;').css('font-weight','normal');
+					jQuery('#modalRemessaDocumentoAlteracaoID .ui-state-disabled, #modalRemessaDocumentoAlteracaoID .ui-inputfield').removeClass('ui-state-disabled').removeClass('ui-inputfield');
+				</script>
+			</h:form>
+
+		</p:dialog>
+
+		<!-- VISUALIZAR REMESSA DOCUMENTO TIPO C ALTERACAO-->
+		<p:dialog
+			header="#{bundle['remessa.mantemremessa.correcao.header.parte3']} #{consultaRemessaController.itemDetalheTipoC.codigoRemessaTipoC}"
+			id="modalDetalharRemessaDocumentoAlteracaoID"
+			widgetVar="modalDetalharRemessaDocumentoAlteracao"
+			styleClass="ui-dialog-background" modal="true" dynamic="true"
+			width="700px" draggable="true" position="center"
+			onHide="giveFocusRemote();">
+			
+			<h:panelGroup layout="block" rendered="#{consultaRemessaController.exibirMensagemInclusaoTipoC()}">
+					<div class="alert alert-success">
+						<p>A(s) inclusão(ões) feita(s) pela empresa terceirizada
+							estão destacadas em verde.</p>
+					</div>
+				</h:panelGroup>
+
+			<h:form id="formModalDetalharAlteradas">
+				<div style="overflow: -y;">
+					<table id="grid_remessa" class="table table-striped table-hover"
+						width="100%" style="border: 1px dotted #666" cellpadding="0">
+						<thead>
+							<tr>
+								<th style="text-align: center;">Nº Item</th>
+								<th style="text-align: center;">TF/Lotérico</th>
+								<th style="text-align: center;">Número TF/LOT</th>
+								<th style="text-align: center;">Qtd Envelopes Grupo 1</th>
+								<th style="text-align: center;">Qtd Envelopes Grupo 2</th>
+								<th style="text-align: center;">Qtd Envelopes Grupo 3</th>
+							</tr>
+						</thead>
+						<tbody>
+							<ui:repeat var="detalheDiario"
+								value="#{consultaRemessaController.carregarListasAlteracaoSubstituido()}"
+								varStatus="row">
+								<tr class="rowGrid">
+									<td style="text-align: right;"><h:outputText
+											value="#{detalheDiario.nuItem}"
+											style="font-weight: bold !important;"
+											styleClass="#{detalheDiario.icAlteracaoValida.getValue() == 5 ? 'pintaFonteVerde' : ''}" /></td>
+									<td style="text-align: left;"><h:outputText
+											value="#{detalheDiario.icLoterico.descricaoCompleta}"
+											style="font-weight: bold !important;"
+											styleClass="#{detalheDiario.icAlteracaoValida.getValue() == 5 ? 'pintaFonteVerde' : ''}" /></td>
+									<td style="text-align: right;"><h:outputText
+											value="#{detalheDiario.nuTerminal}"
+											style="font-weight: bold !important;"
+											styleClass="#{detalheDiario.icAlteracaoValida.getValue() == 5 ? 'pintaFonteVerde' : ''}" /></td>
+									<td style="text-align: right;"><h:outputText
+											value="#{detalheDiario.grupo1}"
+											style="font-weight: bold !important;"
+											styleClass="#{detalheDiario.icAlteracaoValida.getValue() == 5 ? 'pintaFonteVerde' : ''}" /></td>
+									<td style="text-align: right;"><h:outputText
+											value="#{detalheDiario.grupo2}"
+											style="font-weight: bold !important;"
+											styleClass="#{detalheDiario.icAlteracaoValida.getValue() == 5 ? 'pintaFonteVerde' : ''}" /></td>
+									<td style="text-align: right;"><h:outputText
+											value="#{detalheDiario.grupo3}"
+											style="font-weight: bold !important;"
+											styleClass="#{detalheDiario.icAlteracaoValida.getValue() == 5 ? 'pintaFonteVerde' : ''}" /></td>
+								</tr>
+							</ui:repeat>
+						</tbody>
+					</table>
+
+					<div class="clear"
+						style="min-height: 10px !important; height: 10px !important"></div>
+					<div class="alert alert-danger">
+						<p>A(s) alteração(ões) feita(s) pela empresa terceirizada
+							estão destacadas em vermelho.</p>
+					</div>
+
+					<table id="grid_remessa" class="table table-striped table-hover"
+						width="100%" style="border: 1px dotted #666" cellpadding="0">
+						<thead>
+							<tr>
+								<th style="text-align: center;">Nº Item Alt.</th>
+								<th style="text-align: center;">TF/Lotérico</th>
+								<th style="text-align: center;">Número TF/LOT</th>
+								<th style="text-align: center;">Qtd Envelopes Grupo 1</th>
+								<th style="text-align: center;">Qtd Envelopes Grupo 2</th>
+								<th style="text-align: center;">Qtd Envelopes Grupo 3</th>
+							</tr>
+						</thead>
+						<tbody>
+							<ui:repeat var="detalheDiarioAlterado"
+								value="#{consultaRemessaController.carregarListasAlteracaoAlterado()}"
+								varStatus="row">
+								<tr class="rowGrid">
+									<td style="text-align: right;"><h:outputText
+											value="#{detalheDiarioAlterado.numeroRemessaTipoC.nuItem}"
+											style="font-weight: bold !important;" /></td>
+									<td style="text-align: left;"><h:outputText
+											value="#{detalheDiarioAlterado.icLoterico.descricaoCompleta}"
+											style="font-weight: bold !important;"
+											styleClass="#{detalheDiarioAlterado.flagValorDiferenteIcLoterico ? 'pintaFonteVermelha' : ''}" />
+									</td>
+									<td style="text-align: right;"><h:outputText
+											value="#{detalheDiarioAlterado.nuTerminal}"
+											style="font-weight: bold !important;"
+											styleClass="#{detalheDiarioAlterado.flagValorDiferenteNuTerminal ? 'pintaFonteVermelha' : ''}" />
+									</td>
+									<td style="text-align: right;"><h:outputText
+											value="#{detalheDiarioAlterado.grupo1}"
+											style="font-weight: bold !important;"
+											styleClass="#{detalheDiarioAlterado.flagValorDiferenteIcGrupo1 ? 'pintaFonteVermelha' : ''}" />
+									</td>
+									<td style="text-align: right;"><h:outputText
+											value="#{detalheDiarioAlterado.grupo2}"
+											style="font-weight: bold !important;"
+											styleClass="#{detalheDiarioAlterado.flagValorDiferenteIcGrupo2 ? 'pintaFonteVermelha' : ''}" />
+									</td>
+									<td style="text-align: right;"><h:outputText
+											value="#{detalheDiarioAlterado.grupo3}"
+											style="font-weight: bold !important;"
+											styleClass="#{detalheDiarioAlterado.flagValorDiferenteIcGrupo3 ? 'pintaFonteVermelha' : ''}" />
+									</td>
+								</tr>
+							</ui:repeat>
+						</tbody>
+					</table>
+				</div>
+				
+				<ui:fragment rendered="#{consultaRemessaController.hasQuantitativoZerado()}">
+					<div class="pintaFonteVermelha">#{bundle['MH152']}</div>
+				</ui:fragment>
+				
+				<p:commandLink id="btnFechar" styleClass="btnAzul btn_fechar_modal"
+					oncomplete="modalDetalharRemessaDocumentoAlteracao.hide()"
+					actionListener="#{consultaRemessaController.limparDetalheMovimentotipoC()}">
+					<span><h:outputText style="width: 1; height: 1;"
+							value="Fechar" /></span>
+				</p:commandLink>
+			</h:form>
+
+		</p:dialog>
+
+	</ui:define>
+</ui:composition>

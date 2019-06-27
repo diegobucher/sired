@@ -1,0 +1,55 @@
+.hide-column-names table thead tr {
+    display: none;
+}
+ 
+.ui-datatable table.table {
+ 	border-collapse: separate;
+ 	border-spacing: 0;
+ 	background-color: transparent;
+ 	border-spacing: 0;
+ 	margin-bottom: 0;
+}
+
+.ui-datatable table.table-bordered {
+ 	 -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    border-collapse: separate;   
+  
+}
+
+.table th.ui-state-default {
+	border-collapse: separate;
+	background: none;
+	border-radius: none;	
+}
+
+.ui-datatable .table.table-bordered thead th, 
+.ui-datatable .table.table-bordered tbody td, 
+.ui-datatable .table.table-bordered tfoot td {
+	border-left: 1px solid #DDDDDD;  	
+   	
+}
+.ui-datatable .table thead th, .ui-datatable .table tbody td, .ui-datatable .table tfoot td {
+   	border-top: 1px solid #DDDDDD;
+   	border-left: none;
+   	border-right: none;
+   	border-bottom: none;
+   	    
+    line-height: 20px;
+    padding: 6px;
+    vertical-align: top;
+    border-radius: 0px;
+    
+}
+
+
+.ui-datatable .table .show-filter {
+	display: block;
+}
+
+
+.ui-datatable .table .hide-filter {
+	display: none;
+}

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui">
+
+<!-- Forçando a criação da máscara nos input -->
+<h:outputScript library="js" name="requisicao.js" />
+
+	<p:dialog widgetVar="mdlInfo" id="modalInfoId"
+		header="#{modal.requisicaoSelecionada.documento.nome} - Cód. Requisição #{modal.requisicaoSelecionada.codigoRequisicao}"
+		onShow="ajustarTamanhoCamposDinamicos();" modal="true" width="800"
+		resizable="false">
+		
+		<div class="modalInsereDocumento">
+			<h:form>
+				<fieldset class="filtro">
+	
+					<p:panel id="campos">
+	
+						<h:panelGrid columns="1">
+	
+							<!-- begin-of: unidade geradora -->
+							<h:outputLabel styleClass="label-button" value="Unidade Geradora"
+								title="Unidade Geradora">
+								<h:outputText styleClass="obrigatorio" />
+								<br />
+	
+								<h:inputText styleClass="input-disabled" disabled="true"
+									value="#{modal.requisicaoSelecionada.requisicaoDocumento.unidadeGeradora.id}"
+									maxlength="4" style="width:30px; margin-right: 3px;">
+								</h:inputText>
+	
+								<h:inputText styleClass="input-disabled" disabled="true"
+									value="#{modal.requisicaoSelecionada.requisicaoDocumento.unidadeGeradora.nome}"
+									maxlength="100" style="width:245px;">
+								</h:inputText>
+							</h:outputLabel>
+							<!-- end-of: unidade geradora -->
+	
+						</h:panelGrid>
+						
+						<!-- begin-of: campos dinamicos -->
+						<p:dataList var="grupoCampo"
+							value="#{modal.listGrupoCampos.toArray()}"
+							styleClass="list-style-none" emptyMessage="">
+	
+							<!-- begin-of: label campo -->
+							<h:outputLabel styleClass="label-button grupo-campo"
+								title="#{grupoCampo.mensagem}"
+								value="#{!empty grupoCampo.legenda ? grupoCampo.legenda : grupoCampo.campo.descricao}">
+								<h:outputText
+									styleClass="#{grupoCampo.campoObrigatorio.id == '1' ? 'obrigatorio' : ''}" />
+								<br />
+	
+								<!-- begin-of: InputText -->
+								<h:inputText styleClass="mask-custom input-disabled"
+									disabled="true" title="#{grupoCampo.mensagem}"
+									rendered="#{!grupoCampo.campo.tipo.descricao.equalsIgnoreCase('DATA') and !grupoCampo.campo.nome.equalsIgnoreCase('NU_OPERACAO_A11')}"
+									maxlength="#{grupoCampo.campo.tamanho}"
+									value="#{grupoCampo.valor}">
+								</h:inputText>
+								
+								<h:inputHidden
+									rendered="#{modal.isCampoInputMask(grupoCampo.campo)}"
+									value="#{grupoCampo.campo.mascara}">
+								</h:inputHidden>
+								<!-- end-of: InputText -->
+	
+								<!-- bagin-of: Calendar -->
+								<h:inputText styleClass="mask-custom input-disabled"
+									disabled="true" title="#{grupoCampo.mensagem}"
+									rendered="#{grupoCampo.campo.tipo.descricao.equalsIgnoreCase('Data')}"
+									maxlength="#{grupoCampo.campo.tamanho}"
+									value="#{grupoCampo.valorData}">
+									<f:convertDateTime pattern="dd/MM/yyyy" locale="pt_BR" />
+								</h:inputText>
+								<!-- end-of: Calendar -->
+	
+								<!-- begin-of: operação -->
+								<h:inputText styleClass="mask-alpha input-disabled"
+									disabled="true" title="#{grupoCampo.mensagem}"
+									rendered="#{grupoCampo.campo.nome.equalsIgnoreCase('NU_OPERACAO_A11')}"
+									maxlength="#{grupoCampo.campo.tamanho}"
+									value="#{!empty modal.requisicaoSelecionada.requisicaoDocumento.operacao.deOperacao ? modal.requisicaoSelecionada.requisicaoDocumento.operacao.descricaoCompleta : ''}">
+								</h:inputText>
+								<!-- end-of: operação -->
+	
+							</h:outputLabel>
+							<!-- end-of: label campo -->
+	
+						</p:dataList>
+						<!-- end-of: campos dinamicos -->
+	
+						<!-- begin-of: formato -->
+						<h:outputLabel styleClass="label-button" value="Formato"
+							title="Formato do documento">
+							<h:outputText styleClass="obrigatorio" />
+							<br />
+	
+							<h:inputText styleClass="input-disabled" disabled="true"
+								value="#{modal.requisicaoSelecionada.formato.descricao}">
+							</h:inputText>
+						</h:outputLabel>
+						<!-- end-of: formato -->
+	
+						<!-- begin-of: demanda -->
+						<h:outputLabel styleClass="label-button" value="Demanda"
+							title="Demanda">
+							<h:outputText styleClass="obrigatorio" />
+							<br />
+	
+							<h:inputText styleClass="input-disabled" disabled="true"
+								value="#{modal.requisicaoSelecionada.requisicaoDocumento.tipoDemanda.nome}">
+							</h:inputText>
+						</h:outputLabel>
+						<!-- end-of: demanda -->
+	
+						<!-- begin-of: número do processo -->
+						<h:outputText value="#{TipoDemandaEnum.NORMAL}" />
+						<h:outputLabel styleClass="label-button" value="Número do Processo"
+							title="Número do Processo"
+							rendered="#{!modal.requisicaoSelecionada.requisicaoDocumento.tipoDemanda.nome.equalsIgnoreCase('NORMAL')}">
+							<h:outputText styleClass="obrigatorio" />
+							<br />
+	
+							<h:inputText styleClass="input-disabled" disabled="true"
+								value="#{modal.requisicaoSelecionada.requisicaoDocumento.nuDocumentoExigido}" />
+						</h:outputLabel>
+						<!-- end-of: número do processo -->
+	
+						<!-- begin-of: número da ocorrência -->
+						<h:outputLabel styleClass="label-button"
+							value="Número da Ocorrência" title="Número da Ocorrência"
+							rendered="false">
+							<h:outputText styleClass="obrigatorio" />
+							<br />
+	
+							<h:inputText styleClass="input-disabled" disabled="true" />
+						</h:outputLabel>
+						<!-- end-of: número da ocorrência -->
+	
+						<h:panelGrid columns="1">
+							<!-- begin-of: observação -->
+							<h:outputLabel styleClass="label-button" value="Observação">
+								<br />
+								<h:inputTextarea cols="120" rows="5"
+									styleClass="obsDocSolicitado2 input-disabled" disabled="true"
+									style="text-align: left; white-space: pre-wrap;"
+									value="#{modal.requisicaoSelecionada.requisicaoDocumento.observacao}" />
+							</h:outputLabel>
+							<!-- end-of: observação -->
+						</h:panelGrid>
+					</p:panel>
+	
+					<div class="clear"></div>
+				</fieldset>
+			</h:form>
+	
+			<!-- begin-of: atendimentos -->
+			<p:outputPanel
+				rendered="#{!empty modal.listAtendimentos}">
+				<fieldset class="secaoBorda">
+					<legend>Atendimento da Requisição</legend>
+	
+					<table class="zebra gridSub2" style="border: 1px dotted #666"
+						width="100%" border="0" cellpadding="1">
+						<thead>
+							<tr>
+								<th class="marginLeft center">DT. ATENDIMENTO</th>
+								<th class="borderLeft marginLeft center">QTD. SOLIC.</th>
+								<th class="borderLeft marginLeft center">QTD. DISP.</th>
+								<th class="borderLeft marginLeft center">OBSERVAÇÃO</th>
+							</tr>
+						</thead>
+						<tbody>
+							<ui:repeat var="tramite"
+								value="#{modal.listAtendimentos}">
+								<tr>
+									<td width="20%" class="marginLeft center"
+										style="background-color: #F4FCFE"><b> <h:outputFormat
+												value="#{tramite.dataHoraAtendimento}">
+												<f:convertDateTime pattern="dd/MM/yyyy HH:mm" locale="pt_BR" />
+											</h:outputFormat>
+									</b></td>
+									<td width="10%" class="borderLeft marginLeft center"
+										style="background-color: #F4FCFE">#{modal.requisicaoSelecionada.qtSolicitadaDocumento}</td>
+									<td width="10%" class="borderLeft marginLeft center"
+										style="background-color: #F4FCFE">#{tramite.qtdDisponibilizadaDocumento}</td>
+									<td width="60%" class="borderLeft marginLeft center"
+										style="background-color: #F4FCFE; word-break: break-all;"><span>#{tramite.observacao}</span></td>
+									<!-- end-of: observação -->
+								</tr>
+							</ui:repeat>
+						</tbody>
+					</table>
+				</fieldset>
+			</p:outputPanel>
+			<!-- end-of: atendimentos -->
+		</div>
+	</p:dialog>
+</html>

@@ -1,0 +1,171 @@
+<ui:composition template="/WEB-INF/templates/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+	<ui:define name="html-head">
+		<h:outputScript library="js" name="jquery.price_format.1.3.js" />
+	</ui:define>
+
+	<ui:param name="breadcrumbs"
+		value="#{bundle['geral.breadcrumb.remessa']},#{bundle['tituloPagina.abertura']}" />
+
+	<ui:define name="content-main-page">
+		<h:form id="formRemessaAB">
+
+			<p:messages id="messages" showDetail="false" /> 
+			<ui:fragment rendered="#{remessaDocumentosABController.modoEdicaoRemessaDocumento}">
+				<h3 class="titlePage">Edição do documento da remessa: #{remessaDocumentosABController.remessa.id}</h3>
+			</ui:fragment>
+			<ui:fragment rendered="#{remessaDocumentosABController.modoNovaRemessaDocumento }">
+				<h3 class="titlePage">Novo Documento da remessa: #{remessaDocumentosABController.remessa.id}</h3>
+			</ui:fragment>
+			<ui:fragment rendered="#{ (not remessaDocumentosABController.modoNovaRemessaDocumento) and (not remessaDocumentosABController.modoEdicaoRemessaDocumento) }">
+				<h3 class="titlePage">#{bundle['remessa.tituloPagina.abertura.descricao']}</h3>
+			</ui:fragment>
+
+			<h2>
+				<h:outputLabel value="Documento: " />
+				<h:outputLabel style="text-decoration: underline"
+					value="#{remessaDocumentosABController.documento.nome}" />
+			</h2>
+
+			<p:focus id="focusCadastro" for="formRemessaAB" />
+
+			<fieldset class="filtro">
+
+				<p:panel id="campos">
+					<h:outputLabel value="#{bundle['geral.label.unidadeGeradora']}"	styleClass="label-button" title="#{bundle['MH003']}">
+						<h:outputText value="" styleClass="pesquisaDireta" />
+						<br />
+						<h:inputText maxlength="4"	value="#{remessaDocumentosABController.codigoUnidadeFiltro}"
+							id="codigoUnidadeFiltro" style="width: 35px; margin-right: 3px; " onkeypress="return somenteNumero(event)">
+							<p:ajax event="change" listener="#{remessaDocumentosABController.pesquisarUnidadeGeradora()}"
+								update="nomeUnidadeGeradora messages" process="codigoUnidadeFiltro" />
+						</h:inputText>
+						<h:inputText maxlength="4" id="nomeUnidadeGeradora"	value="#{remessaDocumentosABController.nomeUnidadeFiltro}"
+							style="width: 400px; margin-right: 8px;" disabled="true" styleClass="input-disabled">
+						</h:inputText>
+					</h:outputLabel>
+
+					<p:dataList var="grupoCampos" value="#{remessaDocumentosABController.getListGrupoCampo()}"
+						styleClass="list-style-none" rendered="#{remessaDocumentosABController.grupo.grupoCampos.size() > 0}">
+
+						<h:outputLabel
+							value="#{grupoCampos.legenda != null ? grupoCampos.legenda :grupoCampos.campo.descricao}"
+							styleClass="label-button" title="#{grupoCampos.mensagem}">
+
+							<h:outputText value="" styleClass="#{grupoCampos.campoObrigatorio.id == 1 ?'pesquisaDireta':'' }" />
+							<br />
+
+							<p:inputMask id="input_M#{grupoCampos.campo.id}"
+								mask="#{grupoCampos.campo.mascara}"
+								title="#{grupoCampos.mensagem}"
+								rendered="#{grupoCampos.campo.tipo.id != 2 and remessaDocumentosABController.contemMascara(grupoCampos.campo.mascara)}"
+								maxlength="#{grupoCampos.campo.tamanho}"
+								style="#{remessaDocumentosABController.calculaTamanhoCampo(grupoCampos.legenda,  grupoCampos.campo.descricao, grupoCampos.campo.tamanho, grupoCampos.campoObrigatorio)}"
+								value="#{grupoCampos.valor}"
+								styleClass="#{grupoCampos.campo.tipo.id == 1? 'gri-numericos': ''}">
+							</p:inputMask>
+
+							<h:inputText id="input_I#{grupoCampos.campo.id}"
+								title="#{grupoCampos.mensagem}"
+								rendered="#{grupoCampos.campo.tipo.id != 2 and remessaDocumentosABController.mascaraNumerica(grupoCampos.campo.mascara)  and !grupoCampos.campo.nome.equals('NU_OPERACAO')}"
+								maxlength="#{grupoCampos.campo.tamanho}"
+								style="#{remessaDocumentosABController.calculaTamanhoCampo(grupoCampos.legenda,  grupoCampos.campo.descricao, grupoCampos.campo.tamanho, grupoCampos.campoObrigatorio)}"
+								value="#{grupoCampos.valor}"
+								styleClass="#{grupoCampos.campo.tipo.id == 1? 'gri-numericos': ''} input_din_#{grupoCampos.campo.id}">
+							</h:inputText>
+
+							<h:inputText id="input_D#{grupoCampos.campo.id}"
+								title="#{grupoCampos.mensagem}"
+								rendered="#{grupoCampos.campo.tipo.id != 2 and remessaDocumentosABController.mascaraMoeda(grupoCampos.campo.mascara) }"
+								maxlength="#{grupoCampos.campo.tamanho}"
+								style="#{remessaDocumentosABController.calculaTamanhoCampo(grupoCampos.legenda,  grupoCampos.campo.descricao, grupoCampos.campo.tamanho, grupoCampos.campoObrigatorio)}"
+								value="#{grupoCampos.valor}"
+								styleClass="#{grupoCampos.campo.tipo.id == 1 ? 'gri-numericos': ''} input_din_M#{grupoCampos.campo.id}">
+							</h:inputText>
+
+							<h:inputText id="input_N#{grupoCampos.campo.id}"
+								title="#{grupoCampos.mensagem}"
+								onkeypress="return previneCharDeExportacao(event)"
+								onchange="overPrevineCharDeExportacao(this);"
+								rendered="#{grupoCampos.campo.tipo.id != 2 and grupoCampos.campo.mascara == null}"
+								maxlength="#{grupoCampos.campo.tamanho}"
+								style="#{remessaDocumentosABController.calculaTamanhoCampo(grupoCampos.legenda,  grupoCampos.campo.descricao, grupoCampos.campo.tamanho, grupoCampos.campoObrigatorio)}"
+								value="#{grupoCampos.valor}"
+								styleClass="#{grupoCampos.campo.tipo.id == 1? 'gri-numericos': ''} inpLimparDyForm">
+							</h:inputText>
+
+							<p:calendar id="documentDate" 
+								rendered="#{grupoCampos.campo.tipo.id == 2}"
+								styleClass="dataForm" value="#{grupoCampos.valorData}"
+								title="#{grupoCampos.mensagem}" pattern="dd/MM/yyyy" mask="true"
+								locale="pt_BR" converter="converter.DataConverter"
+								maxlength="10" validator="dateValidator"
+								validatorMessage=" Campo #{grupoCampos.legenda != null ? grupoCampos.legenda : grupoCampos.campo.descricao} inválido.">
+								<f:attribute name="field" value="Data" />
+								<f:converter converterId="br.gov.caixa.gitecsa.DateConverter" />
+							</p:calendar>
+						</h:outputLabel>
+					</p:dataList>
+				</p:panel>
+
+				<!-- QUEBRA DE LINHA PARA OS BOTÕES -->
+
+				<div class="clear-space"></div>
+				<br />
+
+				<!-- BOTÕES -->
+				<p:outputPanel>
+
+					<!-- GRAVAR -->
+					<p:commandLink id="idGravar"
+						action="#{remessaDocumentosABController.gravar()}"
+						styleClass="btnAzul marginTopField" process="@form" update="messages"
+						onfocus="$(this).addClass('btnSelected');"
+						onblur="$(this).removeClass('btnSelected');"
+						style="margin-left:13px; margin-top:8px !important;">
+						<span> <h:outputText title="#{bundle['MH011']}"	value="#{bundle['geral.button.gravar']}" />
+						</span>
+					</p:commandLink>
+
+					<!-- CANCELAR -->
+					<p:commandLink id="idCancelar" immediate="true"
+						update="campos, scripts" style="margin-top:8px !important;"
+						styleClass="btnLaranja marginTopField" process="@this"
+						action="#{remessaDocumentosABController.cancelar()}"
+						onfocus="$(this).addClass('btnSelected');"
+						onblur="$(this).removeClass('btnSelected');"
+						onclick="$('.inpLimparDyForm, .inpLimparDyForm input').val('');">
+						<span><h:outputText title="#{bundle['MH013']}" value="#{bundle['MI010']}" /></span>
+					</p:commandLink>
+
+				</p:outputPanel>
+
+			</fieldset>
+
+			<p:panel id="scripts">
+				<!-- Forçando a criação da máscara nos imput -->
+				<script type="text/javascript">						
+					<ui:repeat var="grupoCampos"
+						value="#{remessaController.getListGrupoCampo()}">
+							jQuery(".input_din_#{grupoCampos.campo.id}, .input_din_#{grupoCampos.campo.id} input").inputmask('#{grupoCampos.campo.mascara}');				
+							jQuery(".input_din_M#{grupoCampos.campo.id}").priceFormat({
+							    centsSeparator: ',',
+							    thousandsSeparator: '.'
+							});
+					</ui:repeat>
+
+			        var $ = jQuery;
+			        $(document).ready(function() {
+			            $("input[id*='Date']").mask('99/99/9999');
+			        });
+				</script>
+			</p:panel>
+		</h:form>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:o="http://omnifaces.org/ui">
+	
+	<fieldset class="filtro">
+		<h:panelGrid columns="1" id="modalPainelCad06">
+			<h:panelGrid columns="8" id="pnlGrid">
+				<h:outputLabel value="#{bundle['requisicao.consulta.label.numeroRequisicao']}" styleClass="label-button">
+					<br/>
+					<p:inputText maxlength="11" id="numeroRequisicoes"
+						value="#{terceirizadaRequisicaoController.filtroRequisicao.numeroRequisicoes}"
+						style="width: 90px; text-align:left;" onchange="overSomenteNumeros(this);"
+						onkeypress="return somenteNumero(event);" immediate="true">
+					</p:inputText>
+				</h:outputLabel>
+				
+				<h:outputLabel
+					value="#{bundle['geral.label.dataInicio']}" styleClass="label-button">
+					<h:outputText styleClass="pesquisaDireta" />
+					<br />
+					<p:calendar id="idDataInicio" size="8" style="margin-right: 0px;"
+						styleClass="filtro-opcional"
+						value="#{terceirizadaRequisicaoController.filtroRequisicao.dataInicio}"
+						requiredMessage="#{bundle['requisicao.consulta.data.obrigatorio']}"
+						pattern="dd/MM/yyyy" locale="pt_BR" maxlength="10"
+						onkeyup="maskIt(this,event,'##/##/#####',false,false)"
+						validator="dateValidator">
+						<f:attribute name="field"
+							value="#{bundle['geral.label.dataFim']}" />
+						<f:converter converterId="br.gov.caixa.gitecsa.DateConverter" />
+					</p:calendar>
+				</h:outputLabel>
+
+				<h:outputLabel value="#{bundle['geral.label.dataFim']}"
+					styleClass="label-button">
+					<br />
+					<p:calendar id="idDataFim" size="8" style="margin-right: 0px;"
+						styleClass="filtro-opcional"
+						value="#{terceirizadaRequisicaoController.filtroRequisicao.dataFim}"
+						pattern="dd/MM/yyyy" locale="pt_BR" maxlength="10"
+						onkeyup="maskIt(this,event,'##/##/#####',false,false)"
+						validator="dateValidator">
+						<f:attribute name="field"
+							value="#{bundle['geral.label.dataFim']}" />
+						<f:converter converterId="br.gov.caixa.gitecsa.DateConverter" />
+					</p:calendar>
+				</h:outputLabel>
+				
+				<!-- UNIDADE SOLICITANTE -->
+				<h:outputLabel value="#{bundle['geral.label.unidadeSolicitante']}" styleClass="label-button" >
+					<br/>
+					<h:inputText maxlength="4" value="#{terceirizadaRequisicaoController.filtroRequisicao.unidadeSolicitante.id}" style="width: 35px; margin-right: 3px;"
+						styleClass="filtro-opcional input-cgc-unidade"
+						id="codigoUnidadeFiltro" onkeypress="return somenteNumero(event)" onchange="overSomenteNumeros(this);">
+						<f:converter converterId="javax.faces.Long" />
+						<p:ajax event="blur" listener="#{terceirizadaRequisicaoController.pesquisarUnidadeSolicitante()}" 
+							update="nomeUnidadeGeradora messages" process="codigoUnidadeFiltro" />
+					</h:inputText>
+					
+					<h:inputText maxlength="100" id="nomeUnidadeGeradora" value="#{terceirizadaRequisicaoController.filtroRequisicao.unidadeSolicitante.nome}"  
+						style="width: 280px; margin-right: 0px;" disabled="true" styleClass="input-disabled" >
+					</h:inputText>
+				</h:outputLabel>
+				
+				<h:outputLabel value="#{bundle['geral.label.situacao']}"
+					styleClass="label-button">
+					<br />
+					<h:selectOneMenu id="selectSituacao"
+						style="margin-right:8px;" styleClass="filtro-opcional"
+						value="#{terceirizadaRequisicaoController.filtroRequisicao.situacao}"
+						converter="omnifaces.SelectItemsConverter">
+						<f:selectItem itemLabel="PENDENTES"/>
+						<f:selectItems value="#{terceirizadaRequisicaoController.listaSituacoesTerceirizada}"
+							var="situacao" itemValue="#{situacao}"
+							itemLabel="#{situacao.label}" />
+					</h:selectOneMenu>
+				</h:outputLabel>						
+			</h:panelGrid>
+			
+			<h:panelGrid columns="7" id="painelButtom">
+			
+				<p:commandLink title="#{bundle['MH065']}"
+					styleClass="btnAzul marginTop buttonSelected btn-dep-cgc-unidade" 
+					actionListener="#{terceirizadaRequisicaoController.localizar()}"
+					oncomplete="applyStylesResultsDataTable();"
+					update="formConsulta modalPainelCad06 messages" id="btnLocalizar">
+					<span>#{bundle['geral.button.consultar']}</span>
+				</p:commandLink>
+	
+				<h:commandLink 
+					title="#{bundle['MH012']}"
+					styleClass="btnLaranja marginTop buttonSelected"
+					action="/paginas/requisicao/consulta.xhtml?faces-redirect=true" >
+					<span>#{bundle['geral.button.limpar']}</span>
+				</h:commandLink>
+
+			<h:commandLink styleClass="btnLaranja marginTop buttonSelected" onclick="abrirJanelaUpload(); return false;"
+				title="#{bundle['geral.button.atendimento_lote_zip.hint']}">
+				<span>Atendimento em Lote (ZIP)</span>
+			</h:commandLink>
+
+			<p:commandLink update="pnlUploadCSV" styleClass="btnLaranja marginTop buttonSelected btnAtendimento" title="#{bundle['geral.button.atendimento_lote_csv.hint']}">
+				<span>Atendimento em Lote (CSV)</span>
+			</p:commandLink>
+
+			<p:commandLink styleClass="btnLaranja marginTop" title="Clique aqui para visualizar os relatórios"
+					actionListener="#{terceirizadaRequisicaoController.listarRelatoriosAtendimentoLote()}"
+					update="formConsulta messages">
+					<span>Relatórios em Lote</span>
+				</p:commandLink>
+				
+				<p:commandLink styleClass="btnLaranja marginTop buttonSelected btn-dep-cgc-unidade"
+					title="#{bundle['geral.button.exportar_excel.hint']}" global="false"
+					process="@form" ajax="false"
+					onclick="PrimeFaces.monitorDownload(showStatus, hideStatus);"
+					disabled="#{!(terceirizadaRequisicaoController.listRequisicaoModel.rowCount > 0)}"
+					id="btnExportarExcel">
+					<p:fileDownload value="#{terceirizadaRequisicaoController.exportarFormatoExcel()}" />
+					<span>#{bundle['geral.button.exportar_excel']}</span>
+				</p:commandLink>
+				
+				<p:commandLink styleClass="btnLaranja marginTop buttonSelected btn-dep-cgc-unidade"
+					title="#{bundle['geral.button.exportar_csv.hint']}" global="false"
+					process="@form" ajax="false"
+					onclick="PrimeFaces.monitorDownload(showStatus, hideStatus);"
+					disabled="#{!(terceirizadaRequisicaoController.listRequisicaoModel.rowCount > 0)}"
+					id="btnExportarCSV">
+					<p:fileDownload value="#{terceirizadaRequisicaoController.exportarFormatoCSV()}" />
+					<span>#{bundle['geral.button.exportar_csv']}</span>
+				</p:commandLink>
+				
+			</h:panelGrid>			
+		</h:panelGrid>
+	</fieldset>
+</html>

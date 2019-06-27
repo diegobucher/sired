@@ -1,0 +1,147 @@
+<ui:composition template="/WEB-INF/templates/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+	<ui:define name="html-head">
+	</ui:define>
+
+	<ui:param name="breadcrumbs" value="#{bundle['geral.breadcrumb.remessa']},#{bundle['tituloPagina.abertura']}" />
+
+	<ui:define name="content-main-page">
+	
+		<h:form id="formAbertura" >		
+			<p:focus id="focusConsulta" />
+			<p:messages id="messagesAbertura" showDetail="false" />
+			
+			<ui:fragment rendered="#{!aberturaRemessaController.modoEdicaoRemessaAB}">
+				<h3 class="title-page">#{bundle['remessa.tituloPagina.abertura.descricao']}</h3>
+			</ui:fragment>
+			
+			<ui:fragment rendered="#{aberturaRemessaController.modoEdicaoRemessaAB}">
+				<h3 class="title-page">#{bundle['remessa.tituloPagina.abertura.rascunhoNumero']} - #{aberturaRemessaController.remessa.id}</h3>
+			</ui:fragment>
+			
+			<fieldset class="filtro">
+				<h:panelGrid columns="1" id="painelAbertura">
+					<h:outputLabel	value="#{bundle['MA059']}" styleClass="label-button">
+						<h:outputText value="" styleClass="pesquisaDireta" />
+					</h:outputLabel>
+				</h:panelGrid>
+				
+				<h:panelGrid columns="3" id="painelAbertura02">
+					<p:inputText id="textNome" value="#{aberturaRemessaController.nomeFiltro}"
+						style="margin-right:8px; width:530px;" maxlength="60" immediate="true"														
+						onblur="$(this).val($(this).val().replace(/[^a-zA-Z 0-9]+/g,''));"
+						onfocus="$(this).val($(this).val().replace(/[^a-zA-Z 0-9]+/g,''));"
+						onkeypress="return executaEnterCampo(event, this, 'formAbertura:btnLocalizar');"
+						styleClass="letras-maiusculas semClear"/>
+					
+					<p:commandLink id="btnLocalizar" 
+						title="#{bundle['MH001']}"
+						styleClass="btnAzul marginTop buttonSelected"
+						style="margin-top:0px !important;"
+						action="#{aberturaRemessaController.localizar}"
+						update="pnlListaDocumentos messagesAbertura">
+						<span>#{bundle['geral.button.localizar']}</span>
+					</p:commandLink>
+					
+					<ui:fragment rendered="#{!aberturaRemessaController.modoEdicaoRemessaAB}">
+						<p:commandLink id="btnMovimentoDiario"	title="#{bundle['MH066']}"	styleClass="btnLaranja marginTop buttonSelected"
+							style="margin-top:0px !important;"	action="#{aberturaRemessaController.abrirMovimentoDiario()}">
+							<span>#{bundle['remessa.btn.abrir.movimento.diario']}</span>
+						</p:commandLink>					
+					</ui:fragment>
+					
+				</h:panelGrid>
+			</fieldset>
+
+			<p:outputPanel id="pnlListaDocumentos">
+
+				<p:dataTable value="#{aberturaRemessaController.lista}"
+					var="documento" widgetVar="documentos" id="dataTableCrud" rows="10"
+					emptyMessage="#{bundle['MA008']}"
+					rendered="#{aberturaRemessaController.pesquisaRealizada}"
+					paginator="true"
+					sortFunction="#{aberturaRemessaController.sortByString}"
+					styleClass="estilo-border-dotted zebr" paginatorPosition="bottom"
+					tableStyleClass="tablefixa"
+					rowStyleClass="#{empty rowIx or rowIx mod 2 ne 0 ? 'even-row' : 'odd-row'}"
+					rowIndexVar="rowIx" style="border-top: 1px dotted #666 !important;"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					currentPageReportTemplate="#{bundle['geral.crud.exibindo']} {startRecord} #{bundle['geral.crud.ate']} {endRecord}  #{bundle['geral.crud.de']} {totalRecords}  #{bundle['geral.crud.registros']} "
+					rowsPerPageTemplate="5,10,25,50">
+
+					<p:columnGroup type="header">
+						<p:row>
+							<!-- begin-of: documento -->
+							<p:column
+								headerText="#{bundle['geral.label.documento.maiusculas']}"
+								style="text-align:center !important; width:80%; border-left: 1px dotted #666 !important;"
+								styleClass="gri-alfanumericos noBackGroundImage">
+							</p:column>
+
+							<!-- begin-of: ações -->
+							<p:column headerText="#{bundle['geral.label.acoes.maiusculas']}"
+								style="text-align:center !important; width:20%; border-left: 1px dotted #666 !important; border-right: 1px dotted #666 !important;"
+								styleClass="gri-alfanumericos noBackGroundImage">
+							</p:column>
+						</p:row>
+					</p:columnGroup>
+
+					<p:column sortBy="#{documento.nome}"
+						style="text-align:center !important; width:100%; border-left: 1px dotted #666 !important; border-right: 1px dotted #666 !important;"
+						headerText="#{bundle['geral.label.documento.maiusculas']}"
+						sortFunction="#{aberturaRemessaController.sortByString}"
+						styleClass="gri-alfanumericos noBackGroundImage">
+						<div align="left">
+							<p:commandLink id="linkDocumento" immediate="true" update=":modalAvisoDocumentoID :formAbertura:messagesAbertura"
+								actionListener="#{aberturaRemessaController.abrirRemessa(documento)}"
+								title="#{bundle['MH002']}" value="#{documento.nome}" />
+						</div>
+					</p:column>
+					
+					<!-- begin-of: download -->
+						<p:column
+							style="text-align:center !important; width:10%; border-left: 1px dotted #666 !important; border-right: 1px dotted #666 !important;"
+							styleClass="noBackGroundImage">
+							<p:commandLink title="Clique aqui para Baixar o modelo do documento para Requisições em Lote" 
+								styleClass="image-link" onclick="PrimeFaces.monitorDownload(showStatus, hideStatus);" ajax="false">
+								<p:fileDownload value="#{aberturaRemessaController.downloadModeloExcel(documento)}" />
+								<img class="icon-download" src="#{request.contextPath}/resources/imagens/img_trans.gif" width="1" height="1" />
+							</p:commandLink>
+						</p:column>
+					
+					<p:columnGroup type="footer">
+						<p:row>
+							<p:column colspan="2" styleClass="footerAccordion"
+								style="height: 27px !important; background: #d7d7d7 !important; border-left: 1px dotted #666 !important; border-right: 1px dotted #666 !important; border-bottom: 1px dotted #666 !important;" />
+						</p:row>
+					</p:columnGroup>
+					
+				</p:dataTable>
+			</p:outputPanel>
+		</h:form>
+
+		<p:dialog header="#{bundle['requisicao.label.aviso']}"
+			id="modalAvisoDocumentoID" widgetVar="modalAvisoDocumento"
+			styleClass="ui-dialog-background" modal="true" dynamic="true"
+			draggable="true" width="650px" height="auto" resizable="false"
+			position="center" onHide="giveFocusRemote();">
+			<div>
+				<span id="atencaoId" class="atencao2" style="margin-top: -2px !important;" />
+			</div>
+			<div style="margin-left: 40px;">
+				<h:outputText escape="false"
+					style=" font-weight: bold !important; text-align: justify;"
+					value="#{aberturaRemessaController.msgPersonalidada}" />
+				<br />
+				
+			</div>
+		</p:dialog>
+	</ui:define>
+
+</ui:composition>

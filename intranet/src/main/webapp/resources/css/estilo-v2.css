@@ -1,0 +1,763 @@
+﻿@charset "utf-8";
+/*--------------------------------------------------------------------------------------------
+						|	layout básico	|
+--------------------------------------------------------------------------------------------- */
+
+*{ margin:0; padding:0;}
+html, body {height:100%;}
+* html #tudo {height: 100%;}
+body {	background:#fff; color:#333; font:75%/1.6  Arial, Helvetica, sans-serif;}
+#tudo{ width:100%; min-height:100%; position:relative;}
+
+#wrapTopo{ background:url(#{request.contextPath}/resources/imagens/topo.gif) repeat-x 0 0; height:136px; color:#FFF;}
+#wrapTopo #topo{width:944px; margin:0 auto;}
+#wrapTopo #topo h1{width:944px; height:55px; margin:0 auto; text-indent:-9000px; background:url(#{request.contextPath}/resources/imagens/logocaixa.gif) no-repeat 0px 16px; }
+#wrapTopo #topo h2{float:left; font-size:26px; font-weight:bold; margin-top:16px; line-height:25px; text-transform:uppercase;}
+#wrapTopo #topo h2 span{font-size:16px; display:block;}
+#wrapTopo #topo #wrapIdentificacao{ position:relative; float:right; height:61px; margin-top:10px; background:url(#{request.contextPath}/resources/imagens/informacao_02.png) no-repeat 100% 0%; display:block; padding-right:10px; color:#005689; font-size:11px; }
+#wrapTopo #topo #wrapIdentificacao div#identificacao{ float:left; height:61px; background:url(#{request.contextPath}/resources/imagens/informacao_01.png) no-repeat 0 0; display:block;  padding:10px 8px 10px 15px; min-width:300px; max-width:530px;}
+#wrapTopo #topo #wrapIdentificacao div#identificacao p{ display:block; border-right:1px solid #bcdaf6; padding-right:8px; float:left; margin-right:8px;}
+#wrapTopo #topo #wrapIdentificacao div#identificacao span{ font-size:13px; font-weight:bold;}
+#wrapTopo #topo #wrapIdentificacao div#identificacao p#ultAcesso{ border:none; font-weight:bold;}
+#wrapTopo #topo #wrapIdentificacao div#identificacao div#dropIdentif{background:url(#{request.contextPath}/resources/imagens/telaInfor.png) no-repeat scroll; width:256px; height:100px; z-index:1000; position:absolute; left:80px; top:50px; display:block; padding:10px 10px 10px 10px;}
+
+
+#wrapMenuHor{ background:#FFF url(#{request.contextPath}/resources/imagens/bkMenuH.gif) repeat-x 0 100%; min-height:57px; max-height:114px;}
+#wrapMenuHor #menuHorizontal{ margin:0 auto; width:944px; }
+#wrapMenuHor #menuHorizontal ul{ padding:0; list-style-type:none; overflow:hidden; background:url(#{request.contextPath}/resources/imagens/dividorDuplo.png) repeat-x 0 100%;}
+#wrapMenuHor #menuHorizontal ul li{ float:left; padding:16px 0}
+#wrapMenuHor #menuHorizontal ul li a{ color:#0039ba; font-size:14px; font-weight:bold; text-decoration:none; padding:0 16px 0 16px;  background:url(#{request.contextPath}/resources/imagens/dividoriaMenuH.gif) no-repeat 0 100%;}
+#wrapMenuHor #menuHorizontal ul li:first-child a{padding-left:0; background:none;}
+#wrapMenuHor #menuHorizontal ul li a:hover{ text-decoration:underline;}
+#wrapMenuHor #menuHorizontal ul li a:active{ color:#f60;}
+
+#wrapMenuHor #menuHorizontal ul li ul.dropdown{width: 165px; /* Set width of the dropdown */ background: #f2f2f2; display: none; position: absolute; z-index: 999; border:1px solid #ccc;}
+#wrapMenuHor #menuHorizontal ul li:hover ul.dropdown{display: block;/* Display the dropdown */}
+#wrapMenuHor #menuHorizontal ul li ul.dropdown li{width: 165px; display: block; padding:0 !important;}
+#wrapMenuHor #menuHorizontal ul li ul.dropdown a:hover{color: #fff;/* text-decoration:underline;*/ background: #0039ba;}
+#wrapMenuHor #menuHorizontal ul li ul.dropdown a{display: block; padding: 8px 10px !important; color: #333; text-decoration: none;}
+
+#wrapAuxiliar ul.breadCrumb{ padding:20px 0 ; list-style-type: none; width:100%; overflow:hidden; }
+#wrapAuxiliar ul.breadCrumb li{ float:left; padding:0 7px 0 7px;}
+#wrapAuxiliar ul.breadCrumb li a, ul.breadCrumb li a:active { color:#0039ba; font-size:12px; padding:0 15px 0 0; background:url(#{request.contextPath}/resources/imagens/seta.jpg) no-repeat 100% 7px;}
+#wrapAuxiliar ul.breadCrumb li:first-child{ padding-left:0; color:333; font-size:12px; font-weight:bold; }
+#wrapAuxiliar ul.breadCrumb li:last-child{ color:#333;}
+
+#wrapConteudo{padding-bottom:78px; min-height:670px}
+#wrapConteudo .conteudo{ margin:0 auto; width:944px;}
+#wrapConteudo .conteudo #wrapAuxiliar{display:block;}
+#wrapConteudo .conteudo #wrapMenuVertical{ float:left; width:160px; margin-right:10px; display:block;}
+#wrapConteudo .conteudo #util{ float:right; width:752PX;}
+
+
+
+/*-----------------|	Menu Vertical	|-----------------------------*/
+
+#wrapMenuVertical ul#menuVertical{ list-style-type:none; overflow:hidden;}
+#wrapMenuVertical ul#menuVertical li{ border-bottom:1px solid #CCC; padding:6px 10px; background:url(#{request.contextPath}/resources/imagens/seta.jpg) no-repeat 0 18px;}
+#wrapMenuVertical ul#menuVertical li a{ text-decoration:none; color:#333; font-size:13px; font-weight:bold; display:block; padding:6px 10px}
+#wrapMenuVertical ul#menuVertical li a:hover{ background:#002aa8; color:#FFF; display:block;}	
+
+ul#menuVertical li ul{ list-style-type:none !important; }
+ul#menuVertical li ul li{ border-bottom:none!important; padding:0!important; background:url(#{request.contextPath}/resources/imagens/ponto.png) no-repeat 02px 14px!important; }
+ul#menuVertical li ul li a{text-docoration:none!important; font-size:12px !important; font-weight:normal !important;/* text-indent:15px !important;*/}
+ul#menuVertical li ul li a:hover{ text-decoration:underline !important; background:none !important; color:#333!important;/* font-weight:bold !important;*/ }
+.sub{ cursor:default; background:none !important; color:#333 !important;}
+/*ul#menuVertical li ul li a*/.atual{ text-decoration:underline !important; /*background:none !important; color:#333!important; font-weight:bold !important;*/ cursor:default!important; }
+
+
+
+
+/*--------------------------------------------------------------------------------------------
+						|	layout conteudo expandido	|   
+--------------------------------------------------------------------------------------------- */
+.conteudoExpandido { margin:0 auto;  width:100%;  min-width: 944px; overflow: hidden;}
+.conteudoExpandido #util{ float:left; min-width:752px;  width:88%; padding-left:10px;}
+.conteudoExpandido #wrapMenuVertical{ float:left;  width:10%; overflow: hidden; display:block;}
+/*--------------------------------------------------------------------------------------------*/
+
+
+.carregando{ height:100px; width:100px; border:1px solid #9BABCF;/* margin:30px auto;*/ background:url(#{request.contextPath}/resources/imagens/carregando.gif) no-repeat -25px -30px; position:absolute; top:250px; left:46%; z-index:1002; display:none;}
+.carregando span{ position:absolute; top:70px; left:17px; font-weight:bold;}
+
+.obrigatorio:before{content:" * "; color:red; font-weight:bold;}
+.pesquisaDireta:before{content:" ** "; color:red; font-weight:bold;}
+/*form ul{list-style:none;}
+form ul li{  font-size:11px; font-style:italic; color:333;}
+*/
+ul.campoObrigatorio{list-style:none;}
+ul.campoObrigatorio li{ font-size:11px; font-style:italic; color:333;}
+
+.xxyy:after{content:url(#{request.contextPath}/resources/imagens/seta.jpg)}
+
+.btnLink{ color:#333; font-weight:bold;}
+.btnLink:hover{font-weight:bold; color:#F60;}
+/*.btnLink:visited{color:#333; font-weight:bold;}
+.btnLink:active{color:#333; font-weight:bold;}*/
+#senha, #matricula{width:145px;}
+#dominio{width:126px;}
+.check{ border:none !important; background:none !important; }
+
+h1{ text-transform:uppercase; color:#0039ba; font-size:20px;}/*Nome da Área*/
+h3{clear:both; font-size:18px; font-weight:bold; color:#002aa8; background:url(#{request.contextPath}/resources/imagens/borderbottom.gif) repeat-x 0 100%; margin-bottom:10px;}/*Nome do formulário*/
+.marginLeft{ margin-left:10px;}
+.marginRight{ margin-right:8px;}
+.marginBottom{ margin-bottom:10px;}
+.marginTop{ margin-top:10px;}
+.marginTop20{ margin-top:24px;}
+.textCenter{ text-align:center;}
+.textLeft{ text-align:left;}
+.textRight{text-align:right;}
+.floatLeft{ float:left;}
+.floatRight{ float:right;}
+.clear{ clear:both;}
+.data{ width:62px; float:left;}
+.calendarDelete{ height:16px; width:16px; border:none; background:none;}
+#btnRemove2{ background: url(#{request.contextPath}/resources/imagens/remover.png) no-repeat; border:none; cursor:pointer; height:23px; width:37px;}
+#btnRemove3{ background: url(#{request.contextPath}/resources/imagens/remover.png) no-repeat; border:none; cursor:pointer; height:28px; width:37px;}
+#btnRemove{ background: url(#{request.contextPath}/resources/imagens/remover.png) no-repeat; border:none; cursor:pointer; height:23px; width:37px; margin-bottom:10px; margin-top:60px;}
+#btnRemoveAll{ background: url(#{request.contextPath}/resources/imagens/remove_all.png) no-repeat; border:none; cursor:pointer; height:25px; width:37px;}
+#btnAdd{background: url(#{request.contextPath}/resources/imagens/add.png) no-repeat;  border:none; cursor:pointer; height:23px; width:37px;}
+#btnAddAll{background: url(#{request.contextPath}/resources/imagens/add_all.png) no-repeat;  border:none; cursor:pointer; height:25px; width:37px;}
+#btnAdd1{background: url(#{request.contextPath}/resources/imagens/add.png) no-repeat;  border:none; cursor:pointer; height:23px; width:37px;}
+#btnAdd2{background: url(#{request.contextPath}/resources/imagens/add.png) no-repeat;  border:none; cursor:pointer; height:23px; width:37px;}
+#btnAdd3{background: url(#{request.contextPath}/resources/imagens/add.png) no-repeat;  border:none; cursor:pointer; height:23px; width:37px;}
+#btnAddTodos{background: url(#{request.contextPath}/resources/imagens/adicionar_todos2.png) no-repeat;  border:none; cursor:pointer; height:23px; width:37px;  margin-top:5px;}
+#btnRemove1{ background: url(#{request.contextPath}/resources/imagens/remover.png) no-repeat; border:none; cursor:pointer; height:23px; width:37px; margin-bottom:10px; margin-top:60px;}
+#btnRemove2{ background: url(#{request.contextPath}/resources/imagens/remover.png) no-repeat; border:none; cursor:pointer; height:23px; width:37px; margin-bottom:10px; margin-top:0px;}
+#btnRemoveTodos{ background: url(#{request.contextPath}/resources/imagens/remover_todos2.png) no-repeat; border:none; cursor:pointer; height:23px; width:37px; margin-bottom:5px; margin-top:20px;}
+#origem, #destino{ float:left; width:335px;}
+#origem1, #destino1{ float:left; width:335px;}
+#wrapRodape {background:#0039ba; height:68px; width:100%; position: relative;}
+#rodape{width:944px; margin:0 auto; font:Arial, Helvetica, sans-serif; font-size:11px; font-weight:bold; color:#fff;}
+#rodape p{ margin-top:12px; float:left;}
+#rodape ul{ float:right; list-style-type:none; margin-top:12px; padding:0; overflow:hidden;}
+#rodape ul li{float:left;}
+#rodape ul li a{color:#fff; text-decoration:none; padding:0 7px 0 7px;}
+#rodape ul li a:hover{text-decoration:underline;}
+.sigilo{ font-weight:bold;}
+.hide{ display:none;}
+.show{}
+/*---------------------| Iconis |----------------------------------------------*/
+
+.imgExcluir{width:16px; height:16px; background:url(#{request.contextPath}/resources/imagens/iconis.png) no-repeat scroll -31px -27px; border:none;}
+.imgCheck{width:16px; height:16px; background:url(#{request.contextPath}/resources/imagens/iconis.png) no-repeat scroll -11px -27px; border:none;}
+.imgAlerta{width:16px; height:16px; background:url(#{request.contextPath}/resources/imagens/iconis.png) no-repeat scroll -136px -195px;}
+.bolaVermelha{border:none; width:16px; height:16px; background: url(#{request.contextPath}/resources/imagens/iconis.png) -160px -195px;}
+.bolaVerde{border:none; width:16px; height:16px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -184px -195px;}
+.bolaLaranja{width:16px; height:16px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -208px -195px; border:none;}
+.bolaCinza{width:16px; height:16px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -233px -195px; border:none;}
+.atencao{width:16px; height:16px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -136px -195px; border:none;}
+.erro{border:none; width:16px; height:16px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -112px -195px; }
+.erro2{width:24px; height:24px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -84px -48px; border:none;}
+.sucesso{border:none; width:16px; height:16px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -88px -195px; }
+.incluir{border:none; width:24px; height:24px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -48px -12px; }
+.excluir{width:24px; height:24px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -84px -12px; border:none;}
+.editar{width:24px; height:24px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -120px -12px; border:none;}
+.novo{width:24px; height:24px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -156px -12px; border:none;}
+.iconeFormulario{width:24px; height:24px; background:url(#{request.contextPath}/resources/imagens/iconeformulario.png); border:none;}
+.duplicar{width:24px; height:24px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -192px -12px; border:none;}
+.atualizar{width:24px; height:24px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -12px -48px; border:none;}
+.anexar{width:24px; height:24px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -48px -48px; border:none;}
+.graficoBarra{width:24px; height:24px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -120px -48px; border:none;}
+.graficoLinha{width:24px; height:24px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -156px -48px; border:none;}
+.graficoPizza{width:24px; height:24px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -192px -48px; border:none;}
+.organograma{width:24px; height:24px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -11px -84px; border:none;}
+.relogio{width:24px; height:24px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -48px -84px; border:none;}
+.comentario{width:24px; height:24px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -84px -84px; border:none;}
+.editarComentario{border:none; width:24px; height:24px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -120px -84px;}
+.calendario{width:24px; height:24px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -155px -84px; border:none;}
+.tabela{width:24px; height:24px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -192px -84px; border:none;}
+.salvar{width:24px; height:24px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -228px -84px; border:none;}
+.imprimir{width:24px; height:24px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -11px -120px; border:none;}
+.editar{width:24px; height:24px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -48px -120px; border:none;}
+.word{width:24px; height:24px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -84px -120px; border:none;}
+.excel{width:24px; height:24px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -120px -120px; border:none;}
+.pdf{border:none; width:24px; height:24px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -156px -120px;}
+.ampliar{width:24px; height:24px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -192px -120px; border:none;}
+.imagens{width:24px; height:24px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -228px -120px; border:none;}
+.desbloqueado{width:24px; height:24px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -12px -156px; border:none;}
+.bloqueado2{width:24px; height:24px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -48px -156px; border:none;}
+.informacoes{border:none; width:24px; height:24px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -84px -156px;}
+.atencao2{width:24px; height:24px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -120px -156px; border:none;}
+.like{width:24px; height:24px; background:url(#{request.contextPath}/resources/imagens/like.png) no-repeat; border:none;}
+.likeVerde{width:24px; height:24px; background:url(#{request.contextPath}/resources/imagens/likeGreen.png) no-repeat; border:none;}
+.dislike{width:24px; height:24px; background:url(#{request.contextPath}/resources/imagens/dislike.png) no-repeat; border:none;}
+
+.msgAberta{width:24px; height:24px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -156px -156px;}
+.encaminharMsg{border:none; width:24px; height:24px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -192px -156px;}
+.usuario{width:24px; height:24px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -227px -156px;}
+.addUsuario{width:24px; height:24px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -12px -192px;}
+.excluirUsuario{width:24px; height:24px; background:url(#{request.contextPath}/resources/imagens/iconis.png) -48px -192px;}
+
+.setaDireita{width:36px; height:24px; background:url(#{request.contextPath}/resources/imagens/btnSprite2.png) -12px -336px; border:none;}
+.setaEsquerda{width:36px; height:24px; background:url(#{request.contextPath}/resources/imagens/btnSprite2.png) -72px -336px; border:none;}
+.setaTopo{width:36px; height:24px; background:url(#{request.contextPath}/resources/imagens/btnSprite2.png) -252px -336px; border:none;}
+.setaRodape{width:36px; height:24px; background:url(#{request.contextPath}/resources/imagens/btnSprite2.png) -312px -336px; border:none;}
+.setaDuplaEq{width:36px; height:24px; background:url(#{request.contextPath}/resources/imagens/btnSprite2.png) -132px -336px; border:none;}
+.setaDuplaDt{width:36px; height:24px; background:url(#{request.contextPath}/resources/imagens/btnSprite2.png) -192px -336px; border:none;}
+
+
+
+/*-------------------------------------------------------------------------------------------------
+							|	Componentes	|
+--------------------------------------------------------------------------------------------------- */
+
+legend{ font-size:14px; font-weight:bold; color:#333; /*color:#002aa8;*/}
+fieldset{ border:none; /*background:#ebeffa;*/  position:relative; margin-bottom:5px;}
+fieldset.secaoFloat{ border:1px solid #ccc; float:left; margin-right:8px; padding:10px;}
+fieldset.secaoBorda{ border:1px solid #ccc; padding:10px;}
+fieldset.filtro{padding:10px; background:#EBEFFA; margin-bottom:10px;}
+
+input.check{ border:none; background:none; margin-right:5px;}
+/*input:focus{background-color:yellow;}*/
+
+fieldset fieldset{ border:solid;}
+label{cursor:pointer; font-weight:bold; font-size:12px; color: #333; float:left; margin-right:8px; margin-top:5px;}
+label span{ color:#F00;}
+input, textarea{padding:3px 2px; border:1px solid #ccc; color:#005689; background:#f4fcfe; font-size:12px;}
+select{padding:2px; border:1px solid #ccc; color:#005689; background:#f4fcfe; font-size:12px;}	
+
+/*----------------------------|	Formulário Desabilitato	|-----------------------------------------------*/
+
+/*input.desabilitado, textarea*/.desabilitado{/*padding:3px 2px;*/ border:1px solid #ccc; color:#787878; background:#e8e8e8; font-size:12px; cursor:default !important;}
+.nomeUnidade{border:1px solid #ccc; width:236px; color:#787878; background:#e8e8e8; font-size:12px; cursor:default !important;}
+option{background:#f4fcfe; color:#005689;}
+
+.msgLogin{ font: 11px Arial, Helvetica, sans-serif; color:#cc2626; font-style:italic; }
+.msgVerde{padding:4px 8px 16px 16px; color:#3d7726; border:1px solid #cbe9c2; background:#eaefe8;}
+.msgVerde a{  color:#299500; font-size:11px; text-decoration:none;  margin-bottom:5px; float:right; }
+.msgVerde div{ height:10px; }
+.msgErro p{padding:16px; color:#F00; border:1px solid #F00; font-size:11px; font-weight:bold; background:#fde1e1; display:none; }
+.msgErro2 p{padding:16px; color:#F00; border:1px solid #F00; font-size:11px; font-weight:bold; background:#fde1e1; display:none; }
+.msgSucesso p{padding:16px; color:#3d7726; border:1px solid #cbe9c2; font-size:12px; font-weight:bold; background:#eaefe8; display:none;}
+.msgSucesso1 p{padding:16px; color:#3d7726; border:1px solid #cbe9c2; font-size:12px; font-weight:bold; background:#eaefe8; display:none;}
+.msgSucesso2 p{padding:16px; color:#3d7726; border:1px solid #cbe9c2; font-size:12px; font-weight:bold; background:#eaefe8; display:none;}
+.msgSucesso3 p{padding:16px; color:#3d7726; border:1px solid #cbe9c2; font-size:12px; font-weight:bold; background:#eaefe8; display:none;}
+.requisicaoConcluidaSucesso p{padding:16px; color:#3d7726; border:1px solid #cbe9c2; font-size:12px; font-weight:bold; background:#eaefe8; display:none;}
+.requisicaoAprovada p{padding:16px; color:#3d7726; border:1px solid #cbe9c2; font-size:12px; font-weight:bold; background:#eaefe8; display:none;}
+.requisicaoDesaprovada p{padding:16px; color:#3d7726; border:1px solid #cbe9c2; font-size:12px; font-weight:bold; background:#eaefe8; display:none;}
+.msgInformacao p{padding:16px; color:#3366FF; border:1px solid #3366FF; font-size:12px; font-weight:bold; background:#EBEFFA; display:none;}
+
+.modalExcluir fieldset{ background:none; padding:0;}
+.modalExcluir p{padding:2px 2px 2px 25px; font-weight:bold;}
+.modalExcluir .atencao2{float:left; text-indent:-9000px; }
+.modalConfirmar fieldset{ background:none; padding:0;}
+.modalConfirmar p{padding:2px 2px 2px 25px; font-weight:bold;}
+.modalConfirmar .atencao2{float:left; text-indent:-9000px; }
+.modalExcluirDoc fieldset{ background:none; padding:0;}
+.modalExcluirDoc p{padding:2px 2px 2px 25px; font-weight:bold;}
+.modalExcluirDoc.atencao2{float:left; text-indent:-9000px; }
+.modalReabrir .atencao2{float:left; text-indent:-9000px; }
+
+.modalExcluirAtividade p{padding:2px 2px 2px 25px; background:url(#{request.contextPath}/resources/imagens/error.gif) no-repeat 5px center; font-weight:bold;}
+.divisao{  margin-top:20px; border-top:1px dotted #ccc; clear:both; padding-bottom:20px; }
+
+.div-input-falso{ margin-top:-38px;}
+#file-falso{ height: 17px; width: 420px;}
+.div-input-file{ background: url(#{request.contextPath}/resources/imagens/btnProcurarArquivo.png) no-repeat scroll 100% 3px transparent ;height:26px; margin-top:15px; width: 550px; cursor:pointer; position:relative; }
+.div-input-file label{ margin-top:0px;}
+
+.transparencia {-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)"; /* IE 8 */ filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=50); /* IE 7 */filter: alpha(opacity=0); /* IE 6 */ opacity: 0.0; /* Firefox novos e Opera */}
+
+/*--------------------------|	Botão	|------------------------------------------ */
+
+
+
+
+.btnLaranjaSeta{ background:url(#{request.contextPath}/resources/imagens/btnSprite2.png) no-repeat scroll 2px -208px; color:fff;	display:block; float:right; color:#FFF; font-size:12px; font-weight:bold; text-decoration:none; height:23px; padding-left:5px; cursor:pointer; margin-right:8px;}
+.btnLaranjaSeta span{ background:url(#{request.contextPath}/resources/imagens/btnSprite2.png) no-repeat 100% -185px; display:block; line-height:23px; padding:0px 25px 0px 5px; height:23px; float:left; color:#FFF;}
+
+.btnCinzaSeta{ 	background:url(#{request.contextPath}/resources/imagens/btnSprite2.png) no-repeat scroll 0 -302px; display:block; float:left; font-size:12px; font-weight:bold;	text-decoration:none; height:23px; 	padding-left:5px; margin-right:8px; cursor:default; }
+.btnCinzaSeta span{	background:url(#{request.contextPath}/resources/imagens/btnSprite2.png) no-repeat 100% -279px; display:block; line-height:23px; padding:0px 25px 0px 5px; height:23px; float:left; color:#999; }
+
+.btnAzulX{ background:url(#{request.contextPath}/resources/imagens/btnSprite2.png) no-repeat scroll 0 -162px; display:block; float:left; font-size:12px; font-weight:bold;	text-decoration:none; height:23px; padding-left:25px; cursor:pointer; margin-right:8px; }
+.btnAzulX span{ background:url(#{request.contextPath}/resources/imagens/btnSprite2.png) no-repeat 100% -139px; display:block; line-height:23px; padding:0px 10px 0px 5px; height:23px; float:left; color:#FFF; }
+
+.btnCinzaX{ background:url(#{request.contextPath}/resources/imagens/btnSprite2.png) no-repeat scroll 0 -254px; display:block; float:left; font-size:12px; font-weight:bold; text-decoration:none; height:23px; padding-left:25px; margin-right:8px; cursor:default;}
+.btnCinzaX span{ background:url(#{request.contextPath}/resources/imagens/btnSprite2.png) no-repeat 100% -231px; display:block; line-height:23px; padding:0px 10px 0px 5px; height:23px; float:left; color:#999;}
+
+.btnLaranja{ background:url(#{request.contextPath}/resources/imagens/btnSprite2.png) no-repeat scroll 0 -69px; display:block; 	float:left; font-size:12px; font-weight:bold; text-decoration:none; height:23px; padding-left:3px; cursor:pointer; margin-right:8px; }
+.btnLaranja span{ background:url(#{request.contextPath}/resources/imagens/btnSprite2.png) no-repeat 100% -46px; display:block; line-height:23px; padding:0px 10px 0px 5px; height:23px; float:left; color:#FFF; }
+
+.btnAzul{ background:url(#{request.contextPath}/resources/imagens/btnSprite2.png) no-repeat scroll 0px -23px; display:block; float:left; font-size:12px; font-weight:bold;	text-decoration:none; height:23px; padding-left:3px; cursor:pointer; margin-right:8px; }
+.btnAzul span{ 	background:url(#{request.contextPath}/resources/imagens/btnSprite2.png) no-repeat 100% 0; display:block; line-height:23px; padding:0px 10px 0px 5px; height:23px; float:left; color:#FFF; }
+
+.btnCinza{ background:url(#{request.contextPath}/resources/imagens/btnSprite2.png) no-repeat scroll 0px -115px; display:block; float:left; font-size:12px; font-weight:bold; text-decoration:none; height:23px; padding-left:3px; 	margin-right:8px; cursor:default; }
+.btnCinza span{ background:url(#{request.contextPath}/resources/imagens/btnSprite2.png) no-repeat 100% -92px; display:block; line-height:23px; padding:0px 10px 0px 5px; height:23px; float:left; color:#999; }
+
+
+ 
+.center{ text-align:center;}
+
+
+/*--------------------------|	Tabela	|------------------------------------------ */
+
+table.zebra{ clear:both; width:100%; border-collapse: collapse;}
+table.zebra thead{ background:#d5d5d5;}
+table.zebra td.cinza{background:#e9e9e9; font-weight:bold; border-bottom:1px dotted #666;}
+table.zebra thead tr th {text-align:left; color:#333;}
+table.zebra tr td, table.zebra tr th { padding:8px; font-size: 0.9em;}
+table.zebra .left{ text-align:left;} 
+table.zebra .right{text-align:right;}
+table.zebra .center{ text-align:center;}
+table.zebra tfoot{background:#d5d5d5 ;color:#333;}
+table.zebra tfoot tr{cursor:auto;}
+table.zebra .impar {background:#F4FCFE;}
+table.zebra .par {background:#d9e1f4;}
+table.zebra .borderLeft{ border-left:1px dotted #666;}
+table.zebra .borderRight{ border-right:1px dotted #666;}
+table.zebra .borderBottom{ border-bottom:1px dotted #666;}
+table.zebra input.checkbox{ border:none; background:none;}
+.tabelaFoot{ height:30px;}
+table tbody tr.impar:hover, table tbody tr.par:hover{background-color: #ffcc99;	cursor:pointer;}
+table.zebra .impar2 {background:#F4FCFE;}
+table.zebra .par2 {background:#d9e1f4;}
+/*------------------------------- gridColEstatistico ---------------------------------------------*/
+
+table.gridColEstatistico{ clear:both; width:100%; border-collapse: collapse;/* margin:0px auto;*/ /*margin-top:5px;*/ /*margin:10px 0px 10px;*/}
+table.gridColEstatistico thead{ background:#d5d5d5;}
+table.gridColEstatistico td.cinza{background:#e9e9e9; font-weight:bold; border-bottom:1px dotted #666;}
+table.gridColEstatistico thead tr th {text-align:left; color:#333;}
+table.gridColEstatistico tr td, table.gridColEstatistico tr th { padding:8px; font-size: 0.9em;}
+table.gridColEstatistico .left{ text-align:left;} 
+table.gridColEstatistico .right{text-align:right;}
+table.gridColEstatistico .center{ text-align:center;}
+table.gridColEstatistico tfoot{background:#d5d5d5 ;color:#333;}
+table.gridColEstatistico tfoot tr{cursor:auto;}
+table.gridColEstatistico .impar {background:#F4FCFE;}
+table.gridColEstatistico .par {background:#d9e1f4;}
+table.gridColEstatistico .borderLeft{ border-left:1px dotted #666;}
+table.gridColEstatistico .borderRight{ border-right:1px dotted #666;}
+table.gridColEstatistico input.checkbox{ border:none; background:none;}
+.tabelaFoot{ height:30px;}
+table.gridColEstatistico tbody tr.dois:hover, table.gridColEstatistico tbody tr.um:hover{background-color: #ffcc99;	cursor:default;}
+table.gridColEstatistico .um {background:#F4FCFE;}/*ebeffa*/
+table.gridColEstatistico .dois {background:#d9e1f4;}/*#E5EEFF*/
+
+.totalRecebidos{ background:#DDD !important;}
+.totalColetas{ background:#808080 !important; color:#FFF;}
+
+/*--------------------------|	Paginação	|------------------------------------------ */
+
+
+ul.pag{list-style-type:none; padding:0; overflow:hidden; float:right;}
+ul.pag li{float:left; background:url(#{request.contextPath}/resources/imagens/dividoriaMenuH.gif) no-repeat 0 3px;}
+ul.pag li a:link, ul.pag li a:visited{display:block;font-weight:bold; color:#333; background:none; text-align:center; padding:1px 6px; text-decoration:none;}
+ul.pag li a:active{/*background-color:#f60;*/ color:#0039ba; }
+ul.pag li a:hover{ text-decoration:underline;} 
+ul.pag li a#pagAtual{/*background-color:#f60;*/ color:#0039ba; text-decoration:none;}
+
+
+
+
+
+
+/*--------------------------| Campos |------------------------------------------ */
+.nome{width:530px;}
+.descricao{width:350px;}
+.pesquisaConsultar{ float:left; display:none; width:944px;}
+.login fieldset{ background:none; width:160px; margin:20px auto;}
+
+
+/*------------------------| DataTable |-----------------------------------------------------------*/
+
+.dataTables_length{ width:150px; display:block;  float:left; margin-bottom:5px; font-weight:bold;}
+.dataTables_length select{width:50px;}
+.dataTables_filter{ width:200px;  float:right; margin-bottom:8px; font-weight:bold;}
+.dataTables_filter input{width:130px; float:right !important;}
+.dataTables_info  { float: left;}
+.paging_full_numbers  { height: 22px; line-height: 22px;  width: 400px;}
+.dataTables_paginate { float:left; text-align: right; width: 44px;}
+.paging_full_numbers span.paginate_button, .paging_full_numbers span.paginate_active { cursor: pointer;}
+.paging_full_numbers  { line-height: 22px;}
+.dataTables_paginate { text-align: right;}
+.paging_full_numbers span.paginate_button:hover {text-decoration: underline;}
+.paging_full_numbers span.paginate_active {	color:#0039ba; font-weight:bold; font-size:13px; }
+.paginate_button{ text-decoration:underline; background:url(#{request.contextPath}/resources/imagens/pagDivisor.jpg) no-repeat 0 50%;}
+.previous, .next, .last{ text-decoration:none !important; font-weight:bold; background:url(#{request.contextPath}/resources/imagens/pagDivisor.jpg) no-repeat 0 50%;  color:#545454;}
+.previous{ margin-right:16px; font-weight:bold; color:#545454;}
+.last{ padding-right:0px !important;}
+.first{ text-decoration:none !important; font-weight:bold; background:none !important;  color:#545454;}
+.paginate_active{background:url(#{request.contextPath}/resources/imagens/pagDivisor.jpg) no-repeat 0 50%;}
+.next{ padding-left:25px !important;  }
+.dataTables_paginate, .paging_full_numbers{float:right; min-width:500px;}
+.sorting{background: url("#{request.contextPath}/resources/imagens/sort_both.gif") no-repeat scroll right center;}
+.sorting_asc{background: url("#{request.contextPath}/resources/imagens/sort_asc.gif") no-repeat scroll right center;}
+.sorting_desc{background: url("#{request.contextPath}/resources/imagens/sort_desc.gif") no-repeat scroll right center;}
+table.gridDocsAnexados tbody tr.par:hover{background-color:#d9e1f4 !important; cursor:default !important;}
+table.gridDocsAnexados tbody tr.impar:hover{background-color:#F4FCFE !important; cursor:default !important;}
+.paging_full_numbers span.paginate_button, .paging_full_numbers span.paginate_active {	padding: 0 10px; cursor: pointer; *cursor: hand; }
+#gridPesquisar_first{border:none;}
+#gridConsultarNormaNu{display:block;}
+.firstpaginate_button{ background:none;}
+.imagensInical{ background:url(#{request.contextPath}/resources/imagens/imagensInicial.jpg) no-repeat; width:680px; height:326px; margin:0 auto;}
+
+/*---------------------------------| Ementa |--------------------------------------------*/
+.sm, .fe {text-decoration:none;	color:#069;	margin-left:10px;}
+.fe {float:right; display:none;	/*margin-top:10px;*/}
+div.noticias {width:870px; background:#F4FCFE !important;	padding:8px 10px 5px 10px;  border:1px  solid #ccc; color:##005689;}
+h4{font-size: 12px;font-weight:bold; color:#333; clear:both;}
+h4 span{ padding-left:8px; color:#999; font-style:italic;}
+
+/*--------------------------------|	Tabs |-----------------------------------------------*/
+
+/*.topoTabs{ background:none !important; border-left:none !important; border-right:none !important; border-top: none !important; border-bottom:1px solid #ccc !important;}*/
+#tabs{border:none !important; -moz-border-radius:0 !important;}
+#tabs ul li{ font-style:normal;}
+#tabs div.tabsPaginas{ padding:10px; background:#f5f8f9; border-left:1px solid #ccc; border-right:1px solid #ccc; border-bottom:1px solid #ccc;}
+
+.topoTabs .ui-state-default/*,.topoTabs.ui-widget-content .ui-state-default */{ border: 1px solid #ccc; background: #ededed; font-weight: bold; /*color: #ccc !important; */}
+.topoTabs.ui-widget-content .ui-state-default{border: 1px solid #ccc;  background: #f60;}
+.topoTabs.ui-widget-header { border-left:none ; border-top: none; border-right:none;  border-bottom:1px solid #ccc; background:none;}
+.topoTabs .ui-state-active a, .topoTabs .ui-state-active a:link, .topoTabs .ui-state-active a:visited{color:#545454;}
+/*-----------------------------------------------------------------------------------------
+									|	Requisição	|
+-------------------------------------------------------------------------------------------*/
+.buscaDocumentos{ width:420px;}
+.modalInsereDocumento{display:none;}
+.modalInsereDocumentoSAtend{display:none;}
+.modalTratarRequisicao{display:none;}
+
+/*------------------------------|	Consulta Customizada	|---------------------------------*/
+
+.consultaPorUnidade{ min-width:220px;}
+.consultaUsuario{ width:50px;}
+.gridSub2{margin-left:10px;}
+.griConsultarColeta{display:none;}
+.btnVoltarConsulta{display:none;}
+.btnGerarConsulta{display:none;}
+.gridDocumento{ background:#808080 !important; color:#FFF;}
+.griReabreReq{display:none;}
+.Unid2{display:none;}
+.Unidade2{display:none;}
+.UnidBase2{display:none;}
+/*------------------------------|	Pesquisa de Formularios	|---------------------------------*/
+
+.combogrupo{ width:320px;}
+.nomedoformulario{ width:300px;}
+.digito{width:40px;}
+.operacao{width:60px;}
+.gridDetalhamento{display:none;}
+.gridDetalhamento2{display:none;}
+.gridRequisicao{display:none;}
+.numeroRequisicao{width:105px;}
+.numeroRequisicao2{width:200px;}
+.motivoInsatisfacao{display:none;}
+.autenticacao{display:none;}
+.numProcesso1{display:none;}
+.numProcesso2{display:none;}
+.baseSA{display:none;}
+.baseBH{display:none;}
+.baseCT{display:none;}
+.baseGO{display:none;}
+.baseSP{display:none;}
+.processo{width:120px;}
+.terminalfinanceiro{width:100px;}
+/*------------------------------|	Novo Formulário 	|---------------------------------*/
+
+.combogrupo,.tituloformulario{ width:350px;}
+.tituloNovoForm,.descricao{width:200px;}
+table.gridNovoFormulario tr td,table.gridNovoFormulario tr th { padding:2px 0px;}
+table.gridNovoFormulario tr th { text-transform:uppercase;}
+.obsDocSolicitado{width:570px; height:60px;}
+.obsDocSolicitadoAbertura{width:870px; height:111px;}
+.msgDocSolicitado{width:570px; height:30px;}
+.msgDocSolicitadoAbertura{width:870px; height:101px;}
+.obsDocSolicitado2{width:550px; height:90px;}
+.obsReabertura{width:450px; height:90px;}
+.comboHabilitado{width:110px;}
+.mensagemFormulario{width:430px; height:40px;}
+
+/*------------------------------|	Função 	|---------------------------------*/
+
+.numeroDaFuncao {width: 200px;}
+.descricaoDaFuncao{width: 500px;}
+
+/*------------------------------|	Funcionalidade 	|---------------------------------*/
+
+.funcionalidade{width:300px;}
+
+/*------------------------------|	Perfil 	|---------------------------------*/
+
+.perfil{width: 200px;}
+.descricaoDoPerfil{width: 500px;}
+
+/*------------------------------|	Empresa	|---------------------------------*/
+
+.noEmpresa{width: 250px;}
+.nomeDaEmpresa{width:200px;}
+.caixaPostal{width:200px;}
+.site{width:250px;}
+.ctda{width:200px;}
+.sigla{width:20px;}
+.numeroDoContrato{width: 180px;}
+
+/*------------------------------|	Abrangência 	|---------------------------------*/
+
+.codUnidade{width:200px;}
+
+/*------------------------------|	Avaliação 	|---------------------------------*/
+
+.avaliacao{width:350px;}
+
+/*------------------------------|	Área de Pesquisa	|---------------------------------*/
+
+.areaDePesquisa{width:350px;}
+
+/*------------------------------|	Área de Pesquisa	|---------------------------------*/
+
+.documento{width:350px;}
+.documento2{width:500px;}
+.documento3{width:68px;}
+.comboGrupoDocumento{width:230px;}
+.comboTipoDocumento{width:100px;}
+.tipoDoDocumento{width:100px;}
+
+/*------------------------------|	Área de Pesquisa	|---------------------------------*/
+
+.situacao{width:350px;}
+
+/*------------------------------|	Documento	|---------------------------------*/
+
+.campoGrupoModal{width:430px;}
+.prazoFragmentacao{width:35px;}
+
+/*------------------------------|	Base	|---------------------------------*/
+
+.base{width:100px;}
+.unidadeBase{width:100px;}
+.nomeDaUnidade{width:130px;}
+
+/*--------------------------|	 Tabela Atividade	|----------------------------------------------*/
+
+img.maismenos  { border: medium none;/* margin-right: 10px;*/  vertical-align: middle; }
+
+/*------------------------------|	Marca linha	|---------------------------------*/
+
+.apaga{cursor: default;}
+.acende{background-color: #ffcc99;}
+.marca{background-color: #ffcc99;}
+
+
+/*------------------------------| Barra de Progresso	|---------------------------------*/
+
+.ui-progressbar {
+    position: relative;
+  }
+  .progress-label {
+    position: absolute;
+    left: 50%;
+    top: 4px;
+    font-weight: bold;
+	color:#000 !important;
+  }
+#progressbar .ui-widget-header{
+	background:#F60 !important;
+	}
+	
+
+.Upload{display:none;}
+
+
+/*------------------------------| upload Arquivo	|---------------------------------*/
+
+.carga-completa,
+.carga-falha,
+.carga-processando{
+	 background:url(#{request.contextPath}/resources/imagens/carga.gif) no-repeat;
+	 width:25px;
+	 height:27px;
+	 border:0px;
+	 margin:0 auto;
+	 
+	 }
+
+.carga-completa{background-position: -34px -2px;}
+.carga-falha{background-position: -72px -2px;}
+.carga-processando{background-position: -2px 0px;}
+
+input[type=checkbox]{ border:none; background:none; cursor:pointer;}
+.Upload input[type=checkbox]
+input[type=checkbox]{}
+
+.insereCaixa{display:none;}
+.insereCaixa2{display:none;}
+fieldset.filtro2{padding:10px; background:#EBEFFA; margin-bottom:10px;}
+.h1Devolvida{display:none;}
+.correcaoRemessaDevolvida{display:none;}
+
+#gridAreaMeio{display: none;}
+#gridAreaMeioGitecsa{display: none;}
+.abreRequisicao{display:none;}
+.modalAprovaRequisicao{display:none;}
+#btnExportarConsulta{display:none;}
+
+
+/* =========== SIRED Refactor ===========*/
+
+/* =========== begin-of: datagrids =========== */
+
+.header-datagrid-requisicoes, .datagrid-requisicoes {
+	border-collapse: collapse;
+	border-spacing: 0px;
+	width: 100%;
+	position: relative;
+}
+
+.datagrid-requisicoes {
+	background-color: rgb(235, 235, 235);
+}
+
+.header-datagrid-requisicoes {
+	background-color: #d5d5d5;
+	text-align: center;
+	min-height: 35px;
+	font-size: 11px;
+	border-bottom: 0px;
+}
+
+.datagrid-requisicoes, .datagrid-requisicoes td {
+	border: 1px dotted #666;
+}
+
+.header-datagrid-requisicoes, .header-datagrid-requisicoes td {
+	border-left: 1px dotted #666;
+	border-top: 1px dotted #666;
+	border-right: 1px dotted #666;
+	border-bottom-style: none;
+}
+
+.accordion-inner.accordion-inner-footer {
+	background-color: #808080;
+	height: 20px;
+	border-style: none;
+}
+
+.accordion-inner.accordion-inner-header {
+	height: 20px;
+	background-color: #808080; 
+}
+
+th.accordion-inner.accordion-inner-header:not(:last-child) {
+	border-left: 1px dotted #666 !important;
+	border-right: 1px dotted #666 !important;
+}
+
+th.accordion-inner.accordion-inner-header span {
+	color: #ffffff;
+	text-align:center;
+}
+
+td.accordion-inner.accordion-inner-header:not(:last-child) {
+	border-left: 1px dotted #666 !important;
+	border-right: 1px dotted #666 !important;
+}
+
+td.accordion-inner.accordion-inner-header:last-child {
+	border-left: 1px dotted #666 !important;
+	border-top: 1px dotted #666 !important;
+}
+
+td.accordion-inner-link, .accordion-inner-link span {
+	color: #4f4f4f;
+	display:block;
+	margin:auto;
+	font-weight: bold;
+}
+
+.accordion-inner.accordion-inner-container table {
+	border-spacing: 0px;
+	border-collapse: collapse;
+}
+
+.header-datagrid-documentos {
+	text-align:center !important; 
+	width:100%; 
+	border-left: 1px dotted #666 !important; 
+	border-right: 1px dotted #666 !important;
+}
+
+/* =========== begin-of: Typography =========== */
+
+.text-white {
+	color: white
+}
+
+.text-center {
+	margin: auto;
+}
+
+/* =========== begin-of: icons =========== */
+
+.icon-atencao {
+	width: 24px;
+	height: 24px;
+	background: url(#{request.contextPath}/resources/imagens/iconis.png) -120px -156px;
+	display: block;
+	margin: auto;
+}
+
+.icon-informacoes {
+	width: 24px;
+	height: 24px;
+	background: url(#{request.contextPath}/resources/imagens/iconis.png) -84px -156px;
+	display:block;
+	margin:auto;
+}
+
+.icon-bola-cinza {
+	width: 16px;
+	height: 16px;
+	background: url(#{request.contextPath}/resources/imagens/iconis.png) -232px -194px;
+	display:block;
+	margin: auto;
+}
+
+.icon-bola-vermelha {
+	width: 16px;
+	height: 16px;
+	background: url(#{request.contextPath}/resources/imagens/iconis.png) -158px -194px;
+	display:block;
+	margin: auto;
+}
+
+.icon-bola-verde {
+	width: 16px;
+	height: 16px;
+	background: url(#{request.contextPath}/resources/imagens/iconis.png) -182px -194px;
+	display:block;
+	margin: auto;
+}
+
+.icon-bola-laranja {
+	width: 16px;
+	height: 16px;
+	background: url(#{request.contextPath}/resources/imagens/iconis.png) -208px -194px;
+	display:block;
+	margin: auto;
+}
+
+.icon-download {
+	width:24px; 
+	height:24px; 
+	background: url(#{request.contextPath}/resources/imagens/icone-download.png);
+	display:block;
+	margin: auto;
+}
+
+/* =========== begin-of: Components =========== */
+
+fieldset.float-message {
+	left: 0.2%; 
+	width: 99.8%; 
+	border: 1px solid #3366ff;
+	color: #3366ff; 
+	font-weight: bold;
+}
+
+input::-ms-clear {
+    display: none;
+}
+
+.clear-fix{ clear:both;}

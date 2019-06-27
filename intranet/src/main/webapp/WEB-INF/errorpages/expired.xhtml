@@ -1,0 +1,9 @@
+<ui:composition template="/WEB-INF/templates/errorpage.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+        
+        <ui:define name="titulo-pagina"><h1>Desculpe-nos, a sessão expirou.</h1></ui:define>
+        <ui:define name="errorContent">
+                <h3><a href="#{requestScope['javax.servlet.error.request_uri']}">Volte para a página anterior</a></h3>
+        </ui:define>
+</ui:composition>

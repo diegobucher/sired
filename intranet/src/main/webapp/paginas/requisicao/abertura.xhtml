@@ -1,0 +1,174 @@
+<ui:composition template="/WEB-INF/templates/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+	<ui:define name="html-head"></ui:define>
+
+	<ui:param name="breadcrumbs"
+		value="#{bundle['geral.breadcrumb.requisicao']},#{bundle['tituloPagina.abertura']}" />
+
+	<ui:define name="content-main-page">
+
+		<h:form id="formAbertura">
+			<p:focus id="focusConsulta" />
+
+			<p:messages id="messagesAbertura" showDetail="false" />
+
+			<h3 class="titlePage">#{bundle['requisicao.tituloPagina.abertura.descricao']}</h3>
+			<fieldset class="filtro">
+
+				<!-- begin-of: Informativo -->
+				<h:panelGrid columns="1" id="painelAbertura">
+					<h:outputLabel styleClass="label-button"
+						value="#{bundle['MA059']}">
+						<h:outputText styleClass="pesquisaDireta" />
+					</h:outputLabel>
+				</h:panelGrid>
+				<!-- end-of: Informativo -->
+
+				<h:panelGrid columns="3" id="painelAbertura02">
+
+					<!-- begin-of: Filtro Documento -->
+					<p:outputPanel>
+						<h:inputText id="textNome"
+							value="#{aberturaRequisicaoController.documento.nome}"
+							style="margin-right:8px; width:530px;" maxlength="60"
+							onchange="$(this).val($(this).val().replace(/[^a-zA-Z 0-9]+/g,''));"
+							onkeypress="return executaEnterCampo(event, this, 'formAbertura:btnLocalizar')"
+							styleClass="letras-maiusculas semClear" />
+					</p:outputPanel>
+					<!-- end-of: Filtro Documento -->
+
+					<!-- begin-of: Localizar -->
+					<p:outputPanel>
+						<p:commandLink id="btnLocalizar"
+							title="#{bundle['MH001']}"
+							styleClass="btnAzul marginTop buttonSelected"
+							action="#{aberturaRequisicaoController.localizar}"
+							style="margin-top:0px !important;"
+							process="@form"
+							update="pnlListaDocumentos messagesAbertura">
+							<span>#{bundle['geral.button.localizar']}</span>
+						</p:commandLink>
+					</p:outputPanel>
+					<!-- end-of: Localizar -->
+					
+					<!-- begin-of: Abertura em Lote -->
+					<p:outputPanel>
+						<p:commandLink
+							title="Clique aqui para abrir requisições em lote"
+							styleClass="btnLaranja marginTop buttonSelected"
+							action="#{aberturaRequisicaoController.navegarParaAberturaRequisicaoEmLote()}"
+							style="margin-top:0px !important;"
+							process="@this">
+							<span>Abertura em Lote</span>
+						</p:commandLink>
+					</p:outputPanel>
+					<!-- end-of: Abertura em Lote -->
+
+				</h:panelGrid>
+			</fieldset>
+
+			<p:outputPanel id="pnlListaDocumentos">
+
+				<p:outputPanel
+					rendered="#{aberturaRequisicaoController.listDocumentoModel != null and (aberturaRequisicaoController.listDocumentoModel.rowCount > 0)}">
+
+					<p:dataTable
+						value="#{aberturaRequisicaoController.listDocumentoModel}"
+						var="documento" widgetVar="documentos" id="dataTableCrud"
+						rows="10" emptyMessage="#{bundle['MA008']}"
+						paginator="true" lazy="true"
+						styleClass="estilo-border-dotted zebr" paginatorPosition="bottom"
+						tableStyleClass="tablefixa" rowStyleClass="#{empty rowIx or rowIx mod 2 ne 0 ? 'even-row' : 'odd-row'}" rowIndexVar="rowIx"
+						style="border-top: 1px dotted #666 !important;"
+						paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+						currentPageReportTemplate="#{bundle['geral.crud.exibindo']} {startRecord} #{bundle['geral.crud.ate']} {endRecord}  #{bundle['geral.crud.de']} {totalRecords}  #{bundle['geral.crud.registros']} "
+						rowsPerPageTemplate="5,10,25,50">
+						
+						<p:columnGroup type="header">
+							<p:row>
+								<!-- begin-of: documento -->
+								<p:column headerText="#{bundle['geral.label.documento.maiusculas']}"
+									style="text-align:center !important; width:80%; border-left: 1px dotted #666 !important;"
+									styleClass="gri-alfanumericos noBackGroundImage">
+								</p:column>
+								
+								<!-- begin-of: ações -->
+								<p:column headerText="#{bundle['geral.label.acoes.maiusculas']}"
+									style="text-align:center !important; width:20%; border-left: 1px dotted #666 !important; border-right: 1px dotted #666 !important;"
+									styleClass="gri-alfanumericos noBackGroundImage">
+								</p:column>
+							</p:row>
+						</p:columnGroup>
+						
+						<p:column
+							style="text-align:center !important; width:80%; border-left: 1px dotted #666 !important;"
+							styleClass="gri-alfanumericos noBackGroundImage">
+							<div align="left">
+								<p:commandLink id="linkDocumento"
+									value="#{documento.nome} - VERSÃO #{documento.grupo.versaoFormulario}" title="#{bundle['MH002']}"
+									action="#{aberturaRequisicaoController.navegarParaAberturaRequisicao(documento)}">
+								</p:commandLink>
+							</div>
+						</p:column>
+						
+						<!-- begin-of: download -->
+						<p:column
+							style="text-align:center !important; width:10%; border-left: 1px dotted #666 !important; border-right: 1px dotted #666 !important;"
+							styleClass="noBackGroundImage">
+							<p:commandLink title="Clique aqui para Baixar o modelo do documento para Requisições em Lote" 
+								styleClass="image-link" onclick="PrimeFaces.monitorDownload(showStatus, hideStatus);" ajax="false">
+								<p:fileDownload value="#{aberturaRequisicaoController.downloadModeloExcel(documento)}" />
+								<img class="icon-download" src="#{request.contextPath}/resources/imagens/img_trans.gif" width="1" height="1" />
+							</p:commandLink>
+						</p:column>
+
+						<p:columnGroup type="footer">
+							<p:row>
+								<p:column colspan="2" styleClass="footerAccordion"
+									style="height: 27px !important; background: #d7d7d7 !important; border-left: 1px dotted #666 !important; border-right: 1px dotted #666 !important; border-bottom: 1px dotted #666 !important;" />
+							</p:row>
+						</p:columnGroup>
+
+					</p:dataTable>
+				</p:outputPanel>
+
+			</p:outputPanel>
+		</h:form>
+		
+		<!-- begin-of: modals -->
+		
+		<!-- begin-of: Documento não habilitado -->
+		<p:dialog widgetVar="mdlDocNaoHabilitado" styleClass="modalDocNaoHabilitado" header="#{bundle['requisicao.label.aviso']}"
+				modal="true" width="480" height="90" resizable="false" draggable="true">
+			<table>
+				<tr>
+					<td class="icon-atencao" style="padding-right:10px;" ></td>
+					<td><b>#{bundle['MA037']}</b></td>
+				</tr>
+			</table>
+		</p:dialog>
+		<!-- end-of: Documento não habilitado -->
+		
+		<!-- begin-of: Permissão negada para a unidade -->
+		<p:dialog widgetVar="mdlPermissaoNegadaUnidade" header="#{bundle['requisicao.label.aviso']}"
+				modal="true" width="480" height="90" resizable="false" draggable="true">
+			<table>
+				<tr>
+					<td class="icon-atencao" style="padding-right:10px;" ></td>
+					<td><b>#{bundle['MA041']}</b></td>
+				</tr>
+			</table>
+		</p:dialog>
+		<!-- end-of: Permissão negada para a unidade -->
+		
+		<!-- end-of: modals -->
+		
+	</ui:define>
+
+</ui:composition>

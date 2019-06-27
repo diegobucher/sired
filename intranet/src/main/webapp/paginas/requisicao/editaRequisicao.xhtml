@@ -1,0 +1,263 @@
+<ui:composition template="/WEB-INF/templates/template.xhtml" xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:o="http://omnifaces.org/ui" xmlns:th="http://xmlns.jcp.org/jsf/passthrough">
+
+	<ui:define name="html-head">
+		<h:outputStylesheet library="css" name="estilo-v2.css" />
+		<h:outputScript library="js" name="jquery.pesquisa-unidade.js" />
+	</ui:define>
+
+	<ui:param name="breadcrumbs" value="#{bundle['geral.breadcrumb.requisicao']},#{bundle['tituloPagina.abertura']}" />
+
+	<ui:define name="content-main-page">
+
+		<!-- begin-of: form -->
+		<o:form id="formAbertura" prependId="false" enctype="multipart/form-data">
+
+			<p:messages id="messages" showDetail="false" />
+
+			<h1>
+				Rascunho
+				<h:outputText rendered="#{!empty aberturaRequisicaoController.requisicao &amp;&amp; !empty aberturaRequisicaoController.requisicao.codigoRequisicao}"
+					value=" - Código Requisição #{aberturaRequisicaoController.requisicao.codigoRequisicao}" />
+			</h1>
+			<div class="filtro">
+				<div>
+					<h2>
+						Documento: <u>#{aberturaRequisicaoController.documento.nome}</u>
+					</h2>
+
+					<!-- begin-of: botões -->
+					<p:outputPanel id="pnlBotoes">
+						<h:commandLink id="btnConcluir" styleClass="btnAzul marginTop marginBottom btnModalConfirmar btn-dep-cgc-unidade"
+							onclick="mdlConfirmar.show(); return false;" title="#{bundle['MH040']}" rendered="#{!empty aberturaRequisicaoController.requisicao.codigoRequisicao}">
+							<span>Concluir Requisição</span>
+						</h:commandLink>
+
+						<h:commandLink id="btnGravar" styleClass="btnAzul marginRight marginTop btnFecharModal2 btnInsDoc btn-dep-cgc-unidade" title="#{bundle['MH011']}"
+							action="#{aberturaRequisicaoController.gravar()}">
+							<span>Gravar</span>
+						</h:commandLink>
+
+						<h:commandLink styleClass="btnLaranja marginRight marginTop" title="#{bundle['MH012']}"
+							rendered="#{empty aberturaRequisicaoController.requisicao.codigoRequisicao}" actionListener="#{aberturaRequisicaoController.limparCampos()}"
+							update="@form">
+							<span>Limpar</span>
+						</h:commandLink>
+					</p:outputPanel>
+					<!-- end-of: botões -->
+
+					<div class="clear-fix"></div>
+					<br />
+					<div>
+
+						<!-- begin-of: fieldset -->
+						<fieldset class="secaoBorda">
+
+							<p:panel id="campos">
+
+								<h:panelGrid columns="1">
+
+									<!-- begin-of: unidade geradora -->
+									<h:outputLabel styleClass="label-button" value="Unidade Geradora" title="Unidade Geradora">
+										<h:outputText styleClass="obrigatorio" />
+										<br />
+
+										<h:inputText id="cgcUnidade" styleClass="filtro-opcional input-cgc-unidade"
+											value="#{aberturaRequisicaoController.requisicao.requisicaoDocumento.unidadeGeradora.id}" maxlength="4" style="width:30px; margin-right: 3px;"
+											onkeypress="return somenteNumero(event)" onchange="overSomenteNumeros(this);">
+											<f:converter converterId="javax.faces.Long" />
+											<p:ajax event="blur" listener="#{aberturaRequisicaoController.pesquisarUnidadeGeradora()}" update="nomeUnidade messages" process="cgcUnidade" />
+										</h:inputText>
+
+										<h:inputText id="nomeUnidade" value="#{aberturaRequisicaoController.requisicao.requisicaoDocumento.unidadeGeradora.nome}"
+											styleClass="input-disabled filtro-opcional" maxlength="100" style="width:245px;" disabled="true">
+										</h:inputText>
+									</h:outputLabel>
+									<!-- end-of: unidade geradora -->
+
+								</h:panelGrid>
+
+								<!-- begin-of: campos dinamicos -->
+								<p:dataList var="grupoCampo" value="#{aberturaRequisicaoController.listGrupoCampos.toArray()}" styleClass="list-style-none" emptyMessage="">
+
+									<!-- begin-of: label campo -->
+									<h:outputLabel styleClass="label-button grupo-campo" title="#{grupoCampo.mensagem}"
+										value="#{!empty grupoCampo.legenda ? grupoCampo.legenda : grupoCampo.campo.descricao}">
+										<h:outputText styleClass="#{grupoCampo.campoObrigatorio.id == '1' ? 'obrigatorio' : ''}" />
+										<br />
+
+										<!-- begin-of: InputMask -->
+										<p:inputText styleClass="mask-custom" title="#{grupoCampo.mensagem}" rendered="#{aberturaRequisicaoController.isCampoInputMask(grupoCampo.campo)}"
+											maxlength="#{grupoCampo.campo.tamanho}" value="#{grupoCampo.valor}">
+										</p:inputText>
+										<h:inputHidden rendered="#{aberturaRequisicaoController.isCampoInputMask(grupoCampo.campo)}" value="#{grupoCampo.campo.mascara}">
+										</h:inputHidden>
+										<!-- end-of: InputMask -->
+
+										<!-- begin-of: InputText (money) -->
+										<h:inputText styleClass="mask-money gri-numericos" title="#{grupoCampo.mensagem}"
+											rendered="#{aberturaRequisicaoController.isCampoInputMoney(grupoCampo.campo)}" maxlength="#{grupoCampo.campo.tamanho}" value="#{grupoCampo.valor}">
+										</h:inputText>
+										<!-- end-of: InputText (money) -->
+
+										<!-- begin-of: InputText -->
+										<h:inputText styleClass="mask-alpha" title="#{grupoCampo.mensagem}" rendered="#{aberturaRequisicaoController.isCampoInputText(grupoCampo.campo)}"
+											maxlength="#{grupoCampo.campo.tamanho}" value="#{grupoCampo.valor}">
+										</h:inputText>
+										<!-- end-of: InputText -->
+
+										<!-- bagin-of: Calendar -->
+										<p:calendar styleClass="mask-date" title="#{grupoCampo.mensagem}" rendered="#{aberturaRequisicaoController.isCampoData(grupoCampo.campo)}"
+											value="#{grupoCampo.valorData}" requiredMessage="Campo #{!empty grupoCampo.legenda ? grupoCampo.legenda : grupoCampo.campo.descricao} inválido."
+											pattern="dd/MM/yyyy" mask="true" locale="pt_BR" size="8" maxlength="10" onkeyup="maskIt(this, event, '##/##/#####', false, false)"
+											validator="dateValidator">
+											<f:attribute name="field" value="Data Início" />
+											<f:converter converterId="br.gov.caixa.gitecsa.DateConverter" />
+										</p:calendar>
+										<!-- end-of: Calendar -->
+
+										<!-- begin-of: operações -->
+
+										<h:selectOneMenu styleClass="focus-cgc-unidade" converter="omnifaces.SelectItemsConverter"
+											rendered="#{grupoCampo.campo.nome.equals('NU_OPERACAO_A11')}" value="#{aberturaRequisicaoController.requisicao.requisicaoDocumento.operacao}">
+											<f:selectItem itemLabel="#{bundle['geral.select.label.selecione']}" noSelectionOption="true" />
+											<f:selectItems value="#{aberturaRequisicaoController.listOperacao}" var="item" itemLabel="#{item.descricaoCompleta}" itemValue="#{item}" />
+										</h:selectOneMenu>
+										<!-- end-of: operações -->
+
+									</h:outputLabel>
+									<!-- end-of: label campo -->
+
+								</p:dataList>
+								<!-- end-of: campos dinamicos -->
+
+								<!-- begin-of: formato -->
+								<h:outputLabel styleClass="label-button" value="Formato" title="Formato do documento">
+									<h:outputText styleClass="obrigatorio" />
+									<br />
+
+									<h:selectOneMenu id="SelFormato" styleClass="SelFormato" value="#{aberturaRequisicaoController.requisicao.formato}">
+										<f:selectItems value="#{aberturaRequisicaoController.listFormato}" var="item" itemLabel="#{item.descricao}" itemValue="#{item}" />
+										<p:ajax event="change" process="@this" update="pnlArquivoJustificativa" />
+									</h:selectOneMenu>
+								</h:outputLabel>
+								<!-- end-of: formato -->
+								
+								<!-- begin-of: demanda -->
+								<h:outputLabel styleClass="label-button" value="Demanda" title="Demanda">
+									<h:outputText styleClass="obrigatorio" />
+									<br />
+
+									<h:selectOneMenu id="selDemanda1" styleClass="SelDemanda1" converter="omnifaces.SelectItemsConverter"
+										value="#{aberturaRequisicaoController.requisicao.requisicaoDocumento.tipoDemanda}">
+										<f:selectItem itemLabel="#{bundle['geral.select.label.selecione']}" noSelectionOption="true" />
+										<f:selectItems value="#{aberturaRequisicaoController.listTipoDemanda}" var="item" itemLabel="#{item.nome}" itemValue="#{item}" />
+										<p:ajax event="change" process="@this" update="pnlNumeroProcesso" />
+									</h:selectOneMenu>
+								</h:outputLabel>
+								<!-- end-of: demanda -->
+
+								<!-- begin-of: número do processo -->
+								<h:panelGroup id="pnlNumeroProcesso">
+									<h:outputText value="#{TipoDemandaEnum.NORMAL}" />
+									<!-- rendered="#{!empty aberturaRequisicaoController.requisicao.requisicaoDocumento.tipoDemanda and !aberturaRequisicaoController.requisicao.requisicaoDocumento.tipoDemanda.nome.equalsIgnoreCase('NORMAL')}"> -->
+									<h:outputLabel styleClass="label-button" value="Número do Processo" title="Número do Processo"
+										rendered="#{aberturaRequisicaoController.exibirNumeroProcesso()}">
+										<h:outputText styleClass="obrigatorio" />
+										<br />
+
+										<h:inputText styleClass="processo" maxlength="30" value="#{aberturaRequisicaoController.requisicao.requisicaoDocumento.nuDocumentoExigido}" />
+									</h:outputLabel>
+								</h:panelGroup>
+								<!-- end-of: número do processo -->
+
+								<!-- begin-of: número da ocorrência -->
+								<h:outputLabel styleClass="label-button" value="Número da Ocorrência" title="Número da Ocorrência" rendered="false">
+									<h:outputText styleClass="obrigatorio" />
+									<br />
+
+									<h:inputText styleClass="processo" />
+								</h:outputLabel>
+								<!-- end-of: número da ocorrência -->
+								
+								<h:panelGrid id="pnlArquivoJustificativa" columns="1">
+									<!-- begin-of: justificativa -->
+									<h:outputLabel styleClass="label-button" value="Arquivo"
+										rendered="#{aberturaRequisicaoController.exibirArquivoJustificativa()}">
+										<h:outputText styleClass="obrigatorio" /><br/>
+										<p:fileUpload id="arquivo" allowTypes="/(\.|\/)(zip|pdf)/" mode="simple" 
+											styleClass="fileDemanda" value="#{aberturaRequisicaoController.file}" skinSimple="false">
+										</p:fileUpload>
+										
+										<h:inputText styleClass="disabled nomeAquivo" title="Arquivo salvo atualmente na requisição."  
+											value="#{aberturaRequisicaoController.requisicao.arquivoJustificativa}" disabled="true">
+										</h:inputText>
+									</h:outputLabel>
+									<!-- end-of: justificativa -->
+								</h:panelGrid>
+
+								<h:panelGrid columns="1">
+									<!-- begin-of: observação -->
+									<h:outputLabel styleClass="label-button" value="Observação">
+										<br />
+										<h:inputTextarea value="#{aberturaRequisicaoController.requisicao.requisicaoDocumento.observacao}"
+											cols="150" rows="5" style="text-align: left; white-space: pre-wrap;"
+											onchange="limitarTextArea(this,500)" onmouseout="limitarTextArea(this,500)" onkeyup="limitarTextArea(this,500)" maxlength="500" />
+									</h:outputLabel>
+									<!-- end-of: observação -->
+								</h:panelGrid>
+
+								<h:panelGrid columns="1" rendered="#{!empty aberturaRequisicaoController.documento.mensagem}">
+									<!-- begin-of: aviso -->
+									<h:outputLabel styleClass="label-button">
+										<h:outputText value="AVISO" style="width:100%; display:block;" styleClass="center" />
+										<br />
+										<h:inputTextarea style="text-align: left; white-space: pre-wrap;" styleClass="msgDocSolicitadoAbertura" value="#{aberturaRequisicaoController.documento.mensagem}" disabled="true" />
+									</h:outputLabel>
+									<!-- end-of: aviso -->
+								</h:panelGrid>
+
+							</p:panel>
+
+						</fieldset>
+						<!-- end-of: fieldset -->
+
+					</div>
+				</div>
+			</div>
+			<div class="clear"></div>
+
+			<!-- begin-of: modals -->
+
+			<!-- begin-of: concluir requisicao -->
+			<p:dialog widgetVar="mdlConfirmar" header="Confirma a conclusão da Requisição?" modal="true" width="480" resizable="false">
+				<table>
+					<tr>
+						<td class="icon-atencao" style="padding-right: 10px;"></td>
+						<td><b>#{bundle['MI001']}</b></td>
+					</tr>
+				</table>
+				<div class="wrap" align="center">
+					<h:commandLink styleClass="btnAzul marginTop btnFecharModal btnConcluirRequisicao" action="#{aberturaRequisicaoController.concluir()}"
+						title="#{bundle['MH040']}">
+						<span>Sim</span>
+					</h:commandLink>
+					<h:commandLink styleClass="btnLaranja marginTop btnFecharModalN" onclick="mdlConfirmar.hide(); return false;" title="#{bundle['MH013']}">
+						<span>Não</span>
+					</h:commandLink>
+				</div>
+			</p:dialog>
+			<!-- end-of: concluir requisição -->
+
+			<!-- end-of: modals -->
+
+		</o:form>
+		<!-- end-of: form -->
+
+		<!-- Forçando a criação da máscara nos input -->
+		<h:outputScript library="js" name="requisicao.js" />
+
+	</ui:define>
+
+</ui:composition>

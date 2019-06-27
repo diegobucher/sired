@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:of="http://omnifaces.org/functions">
+<h:head>
+	<f:facet name="first">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta content="text/html; charset=UTF-8" http-equiv="content-type" />
+	</f:facet>
+
+	<title>#{bundle['geral.nomesistema']}</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+	<h:outputStylesheet library="css" name="barra.css" />
+	<h:outputStylesheet library="css" name="datatable.css" />
+	<h:outputStylesheet library="css" name="estilo.css" />
+	<h:outputStylesheet library="css" name="datepicker.css" />
+	<h:outputStylesheet library="js" name="jquery.growl/stylesheets/jquery.growl.css" />
+
+	<h:outputScript library="js" name="prime-customizations.js" />
+	<h:outputScript library="js" name="jquery.price_format.1.3.js" />
+	<h:outputScript library="js" name="jquery.blockUI.js" />
+	<h:outputScript library="js" name="inputmask.js" />
+	<h:outputScript library="js" name="startup.js" />
+	<h:outputScript library="js" name="sired.js" />
+	<h:outputScript library="js" name="renderAjax.js" />
+	<h:outputScript library="js" name="jquery.growl/javascripts/jquery.growl.js" />
+	
+	<ui:insert name="html-head" />
+
+	<style type="text/css">
+body {
+	background: #FFF;
+	background-repeat: repeat-x;
+	background-position: top;
+	width: 100%;
+}
+</style>
+
+</h:head>
+<h:body>
+	<div id="page" class="container-principal">
+		<div id="wrap-topo">
+			<h:form id="formTop">
+				<div id="topo">
+					<div id="logo-caixa">CAIXA</div>
+					<div id="nome-sistema">#{bundle['geral.nomesistema']}</div>
+					<div id="subnome-sistema">#{bundle['geral.subnomesistema']}</div>
+					<div id="wrap-identificacao">
+						<div id="identificacao">
+							<p>
+								<span>Olá <h:outputText
+										value="#{controleAcesso.usuario.primeiroNomeUsuario}" />,
+									seja bem-vindo.
+								</span> <br />
+								<h:outputText value="#{dataDiaExtenso}" />
+							</p>
+
+							<a href="#" id="btnInfos" class="btnAzulCab marginTop" onfocus="$(this).addClass('btnSelected');"
+						onblur="$(this).removeClass('btnSelected');"><span>Infos</span></a>
+							<h:commandLink value="" action="#{controleAcesso.logout()}"
+								styleClass="btnLaranjaCab marginTop"
+								onfocus="$(this).addClass('btnSelected');"
+								onblur="$(this).removeClass('btnSelected');"
+								title="Clique aqui para sair">
+								<span>Sair</span>
+							</h:commandLink>
+
+							<div id="dropIdentif" style="overflow:visible;">
+								<span />
+								<div id="usuarioIdentificacao" style="width:150px; overflow:visible;">
+									<p>
+										<span>Responsável</span> <br />
+										<h:outputText value="#{controleAcesso.usuario.nomeUsuario}" />
+										<br /> 
+									</p>
+								</div>
+								
+							</div>
+							<div id="dropIdentif" style="display: none;">#{bundle['geral.versao']}</div>
+
+						</div>
+					</div>
+				</div>
+			</h:form>
+		</div>
+		<div id="menu-superior">
+			<h:form id="formMenuHorizontal">
+				<div id="wrap-menu-horiz">
+					<div id="menu-horizontal" >
+						<!-- <p:menu model="#{controleAcesso.menuBarraHorizontal}" styleClass="menu-horizontal-float" /> -->
+						<p:menubar model="#{controleAcesso.menuBarraHorizontal}"
+						styleClass="menu-horizontal-float"/>
+					</div>
+				</div>
+			</h:form>
+			<h:form id="remoteForm">
+				<p:remoteCommand name="guardarIdComponente" actionListener="#{contextoController.guardarIdComponente()}"/>
+				<p:remoteCommand name="giveFocusRemote" actionListener="#{contextoController.giveFocus()}"/>
+			</h:form>
+			<div id="idBreadcrumb" style="width: 1280px; margin-left: 195px; margin: 0 auto;">
+				<ui:insert name="breadcrumb" />
+			</div>
+		</div>
+		<div class="conteudo">
+				
+			<div id="barra-content-right-sem-menu">
+				<ui:insert name="content-main-page">
+					<br></br>
+				</ui:insert>
+				<div id="idLoad" class="carregando">
+					<span>Carregando</span>
+				</div>					
+				<p:ajaxStatus id="ajaxStatusPanel" onstart="showStatus();" oncomplete="hideStatus();">				    
+				</p:ajaxStatus>
+				<div class="clear"></div>		
+			</div>
+		</div>
+		
+		<div id="wrapRodape">
+			<div id="rodape">
+				<div id="rodape-caixa">#{bundle['geral.rodape']}</div>
+			</div>
+		</div>
+	</div>
+</h:body>
+
+<script type="text/javascript">
+	var DURATION = 60000;
+	
+	var showInfoMessage = function (m) {
+		$.growl({ duration: DURATION, message: m});
+	};
+
+	var showErrorMessage = function (m) {
+		$.growl.error({ title: false, duration: DURATION, message: m});
+	}
+
+	var closeAllMessages = function () {
+		$('.growl-close').click();
+	}
+</script>
+
+</html>

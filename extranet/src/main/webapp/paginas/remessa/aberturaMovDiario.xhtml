@@ -1,0 +1,246 @@
+<ui:composition template="/WEB-INF/templates/template_sem_menu.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+	<ui:define name="html-head">
+		<h:outputScript library="js" name="abertura-mov-diario.js" />
+		<h:outputStylesheet library="css" name="abertura-mov-diario.css" />
+	</ui:define>
+
+		<ui:define name="breadcrumb">
+		<h:form id="formBreadcrumb">
+			<div id="wrapAuxiliar">
+				<ul class="breadcrumb-sistema">
+					<li>#{bundle['geral.breadcrumb.voce.esta.em']}</li>
+					<li><h:commandLink value="#{bundle['geral.breadcrumb.remessa']}" styleClass="buttonSelected"
+							action="/paginas/remessa/consulta.xhtml?faces-redirect=true" /></li>
+					<li>#{bundle['remessa.tituloPagina.edicao']}</li>
+				</ul>
+			</div>
+		</h:form>
+	</ui:define>
+
+	<ui:define name="content-main-page">
+		<h:form id="formRemessaDocumentoMovDiario" prependId="false">
+			<p:messages id="messages" showDetail="false" />
+			<ui:fragment rendered="#{!(remessaMovimentoDiarioController.modoEdicao or remessaMovimentoDiarioController.modoIncluirNovoMovDiario) }">
+				<div>
+					<h3 class="titlePage">#{bundle['remessa.tituloPagina.abertura.descricao']}</h3>
+					<h2>
+						<h:outputLabel value="Documento: " />
+						<h:outputLabel style="text-decoration: underline" value="#{bundle['remessa.tituloPagina.abertura.movDiario']}" />
+					</h2>
+				</div>
+			</ui:fragment>
+			<ui:fragment rendered="#{(remessaMovimentoDiarioController.modoEdicao or remessaMovimentoDiarioController.modoIncluirNovoMovDiario)}">
+				<h3 class="titlePage">
+					<h:outputLabel style="text-decoration: underline" value="Correção de remessa - Nº #{remessaMovimentoDiarioController.remessa.id}" />
+				</h3>
+			</ui:fragment>
+			
+			<div class="clearMov" />
+			
+			<fieldset class="filtro">
+				<h:outputLabel value="#{bundle['geral.label.unidadeGeradora']}"
+					styleClass="label-button" title="#{bundle['MH003']}">
+					<h:outputText value="" styleClass="pesquisaDireta" />
+					<br />
+					<h:inputText maxlength="4"
+						value="#{remessaMovimentoDiarioController.codigoUnidadeFiltro}"
+						id="idCodigoUnidadeFiltro" style="width: 35px; margin-right: 3px; "
+						onkeypress="return somenteNumero(event)">
+						<p:ajax event="change"
+							listener="#{remessaMovimentoDiarioController.pesquisarUnidadeGeradora()}"
+							update="idNomeUnidadeGeradora messages" process="idCodigoUnidadeFiltro" />
+					</h:inputText>
+					<h:inputText maxlength="4" id="idNomeUnidadeGeradora"
+						value="#{remessaMovimentoDiarioController.nomeUnidadeFiltro}"
+						style="width: 400px; margin-right: 8px;" disabled="true"
+						styleClass="input-disabled">
+					</h:inputText>
+				</h:outputLabel>
+				
+				<!-- DATA INICIO -->
+				<h:outputLabel value="#{bundle['remessa.filtro.dataGeracao']}"
+					styleClass="label-button" title="#{bundle['MH091']}">
+					<h:outputText styleClass="pesquisaDireta" />
+					<br />
+					<p:calendar id="idDataInicio"
+									styleClass="mask-date" 
+									value="#{remessaMovimentoDiarioController.dataMovimento}"
+									pattern="dd/MM/yyyy" 
+									mask="true"
+									locale="pt_BR"
+									size="12" 
+									maxlength="10"
+									onkeyup="maskIt(this,event,'##/##/#####',false,false)"
+									style="margin-right: 0px;"
+									validator="dateValidator"
+									converter="br.gov.caixa.gitecsa.DateConverter"
+									converterMessage="#{bundle['remessa.mensagemErro.dataInvalida']}">
+						<p:ajax event="change"	update="messages" listener="#{remessaMovimentoDiarioController.validarDataMovimentoExiste()}" />
+						<p:ajax event="dateSelect" update="messages" listener="#{remessaMovimentoDiarioController.validarDataMovimentoExiste()}" />
+					</p:calendar>
+				</h:outputLabel>
+				
+			</fieldset>
+
+			<div class="wrap_grid_remessa">
+				<p:outputPanel id="pnlTable">
+					<table id="grid_remessa" class="zebra grid_bertura_remessa table-bordered table-striped" width="100%" border="0">
+						<thead>
+							<tr>
+								<th style="text-align: center;" title="Terminal da Estação Financeira ou do Lotérico">Terminal <span class="pesquisaDireta" /></th>
+								<th style="text-align: center;" title="#{bundle['MH150']}">Número TF/LOT <span class="pesquisaDireta" /></th>
+								<th style="text-align: center;" title="#{bundle['MH151']}">Qtd Envelopes Grupo 1 <span class="pesquisaDireta" /></th>
+								<th style="text-align: center;" title="#{bundle['MH151']}">Qtd Envelopes Grupo 2 <span class="pesquisaDireta" /></th>
+								<th style="text-align: center;" title="#{bundle['MH151']}">Qtd Envelopes Grupo 3 <span class="pesquisaDireta" /></th>
+							</tr>
+						</thead>
+						<tbody>
+							<ui:repeat var="itemDiario" value="#{remessaMovimentoDiarioController.itensMovimentoDiarioList}" varStatus="row">
+								<tr class="rowGrid" data-row="#{row.index}">
+									<td align="center" style="padding: 5px !important;">
+										<h:selectOneRadio value="#{itemDiario.icLoterico}" converter="omnifaces.SelectItemsConverter" styleClass="itemCheckLista" 
+															style="width: 120px; text-align: center; font-weight: 600; border: none !important;">
+											<f:selectItems value="#{remessaMovimentoDiarioController.tipoLotericoList}" var="ic" 
+															itemLabel="#{ic.descricao}" itemValue="#{ic}" />
+											
+											<f:ajax execute="@this" event="change" listener="#{remessaMovimentoDiarioController.prepareToResult}" />
+										</h:selectOneRadio>
+									</td>
+									<td align="center"> 
+										<h:inputText id="txtTerminal" styleClass="itemLista numeroTerminal" value="#{itemDiario.nuTerminal}" maxlength="11" 
+											onchange="alterarNumeroTerminal(this, #{row.index})" >
+										</h:inputText>
+									</td>
+									<td align="center">
+										<h:inputText id="txtGrupo1" styleClass="itemLista" value="#{itemDiario.grupo1}" maxlength="6"  
+											onchange="alterarGrupo1(this, #{row.index})">
+										</h:inputText>
+									</td>
+									<td align="center">
+										<h:inputText id="txtGrupo2" styleClass="itemLista" value="#{itemDiario.grupo2}" maxlength="6"  
+										    onchange="alterarGrupo2(this, #{row.index})">
+										</h:inputText>
+									</td>
+									<td align="center">
+										<h:inputText id="txtGrupo3" styleClass="itemLista" value="#{itemDiario.grupo3}" maxlength="6" onselect="event.onPaste()"
+											onchange="alterarGrupo3(this, #{row.index})">
+										</h:inputText>
+									</td>
+								</tr>						
+							</ui:repeat>
+						</tbody>
+					</table>
+				</p:outputPanel>
+				
+				<p:commandLink id="btnSalvar" styleClass="btnAzul marginTop marginRight" update="messages" action="#{remessaMovimentoDiarioController.salvar()}">
+					<span><h:outputText value="Gravar" /></span>
+				</p:commandLink>
+				
+				<p:commandLink id="btnCancelar" styleClass="btnLaranja marginRight marginTop" update="messages" target="_blank" action="#{remessaMovimentoDiarioController.cancelar()}">
+					<span><h:outputText value="Cancelar" /></span>
+				</p:commandLink>
+				
+				<p:commandLink id="btnAdicionarTerminal" styleClass="btnAzul marginTop marginRight"	
+						process="@all" global="false" 
+				    	update=":formRemessaDocumentoMovDiario"
+				    	actionListener="#{remessaMovimentoDiarioController.adicionarTerminal()}"
+				    	oncomplete="btnAdicionarTerminal_onClick()">
+					<span><h:outputText style="width: 1; height: 1;" value="+ Adicionar Terminais" /></span>
+				</p:commandLink>
+			</div>
+		</h:form>
+		
+		
+		<!-- Remote Comands -->
+
+		<h:form id="frmRmc" prependId="false">
+
+			<!-- 	ALTERAR NUMERO DE TERMINAL DA TABELA  -->
+			<p:remoteCommand name="rmcNumeroTerminal"
+				action="#{remessaMovimentoDiarioController.alterarNumeroTerminal()}"
+				update=":formRemessaDocumentoMovDiario">
+			</p:remoteCommand>
+			<!-- 	ALTERAR GRUPO 1 -->
+			<p:remoteCommand name="rmcAlterarGrupo1"
+				action="#{remessaMovimentoDiarioController.rmcAlterarGrupo1()}"
+				update=":formRemessaDocumentoMovDiario">
+			</p:remoteCommand>
+			<!-- 	ALTERAR GRUPO 2 -->
+			<p:remoteCommand name="rmcAlterarGrupo2"
+				action="#{remessaMovimentoDiarioController.rmcAlterarGrupo2()}"
+				update=":formRemessaDocumentoMovDiario">
+			</p:remoteCommand>
+			<!-- 	ALTERAR GRUPO 3 -->
+			<p:remoteCommand name="rmcAlterarGrupo3"
+				action="#{remessaMovimentoDiarioController.rmcAlterarGrupo3()}"
+				update=":formRemessaDocumentoMovDiario">
+			</p:remoteCommand>
+		</h:form>
+		
+		<script type="text/javascript">
+			
+			var MessageHint = {
+				MH146: "#{bundle['MH146']}",
+				MH147: "#{bundle['MH147']}",
+				MH148: "#{bundle['MH148']}",
+				MH149: "#{bundle['MH149']}"
+			}
+
+			var TerminalType = { LOTERICA: 'LOT', TERMINAL_FINANCEIRO: 'TF' };
+
+			$(document).ready(function () {
+				$(document).on('change', '[data-row] input[type=radio]', function () {
+					definirHintCamposDinamicos($(this))					
+				})
+
+				refreshHintCamposDinamicos();
+			});
+
+		   /**
+			* Define os hints dos campos dinâmicos ao clicar no botão "+ Adicionar Terminais".
+			*/
+			function btnAdicionarTerminal_onClick() {
+				refreshHintCamposDinamicos();
+			}
+
+			/**
+			* Recarrega os hints dos campos dinâmicos com base nas pre-seleções feitas no campo "Terminal".
+			*/
+			function refreshHintCamposDinamicos() {
+				$('[data-row] input[type=radio]:checked').each(function () {
+					definirHintCamposDinamicos($(this))
+				})
+			}
+
+		   /**
+			* Define a mensagem de hint para os campos dinâmicos do formulário com base no seleção 
+			* feita no campo "Terminal".
+			*
+			* @param htmlElement 
+			*            Radio button Terminal   
+			*/
+			function definirHintCamposDinamicos(htmlElement) {
+				
+				let label  = htmlElement.next()
+				let parent = htmlElement.closest('[data-row]')
+									
+				let hint = (label.text().trim() == TerminalType.LOTERICA) ? MessageHint.MH147 : MessageHint.MH146
+				
+				//-- nº terminal
+				parent.find('input[type=text]:eq(0)').prop('title', hint)
+				
+				//-- grupos 1, 2 e 3
+				hint = (label.text().trim() == TerminalType.LOTERICA) ? MessageHint.MH149 : MessageHint.MH148
+				parent.find('input[type=text]:gt(0)').prop('title', hint)
+			}
+
+		</script>
+	</ui:define>
+</ui:composition>

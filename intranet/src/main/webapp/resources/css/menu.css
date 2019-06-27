@@ -1,0 +1,42 @@
+/*-----------------|	Menu Horizontal	|-----------------------------*/
+
+#wrapMenuHor{ background:#FFF url(#{request.contextPath}/resources/imagens/bkMenuH.gif) repeat-x 0 100%; min-height:57px; max-height:114px;}
+#wrapMenuHor #menuHorizontal{ margin:0 auto; width:944px; }
+#wrapMenuHor #menuHorizontal ul{ padding:0; list-style-type:none; overflow:hidden; background:url(#{request.contextPath}/resources/imagens/dividorDuplo.png) repeat-x 0 100%;}
+#wrapMenuHor #menuHorizontal ul li{ float:left; padding:16px 0}
+#wrapMenuHor #menuHorizontal ul li a{ color:#0039ba; font-size:14px; font-weight:bold; text-decoration:none; padding:0 16px 0 16px;  background:url(#{request.contextPath}/resources/imagens/dividoriaMenuH.gif) no-repeat 0 100%;}
+#wrapMenuHor #menuHorizontal ul li:first-child a{padding-left:0; background:none;}
+#wrapMenuHor #menuHorizontal ul li a:hover{ text-decoration:underline;}
+#wrapMenuHor #menuHorizontal ul li a:active{ color:#f60;}
+
+#wrapMenuHor #menuHorizontal ul li ul.dropdown{width: 165px; /* Set width of the dropdown */ background: #f2f2f2; display: none; position: absolute; z-index: 999; border:1px solid #ccc;}
+#wrapMenuHor #menuHorizontal ul li:hover ul.dropdown{display: block;/* Display the dropdown */}
+#wrapMenuHor #menuHorizontal ul li ul.dropdown li{width: 165px; display: block; padding:0 !important;}
+#wrapMenuHor #menuHorizontal ul li ul.dropdown a:hover{color: #fff;/* text-decoration:underline;*/ background: #0039ba;}
+#wrapMenuHor #menuHorizontal ul li ul.dropdown a{display: block; padding: 8px 10px !important; color: #333; text-decoration: none;}
+
+#wrapAuxiliar ul.breadCrumb{ padding:20px 0 ; list-style-type: none; width:100%; overflow:hidden; }
+#wrapAuxiliar ul.breadCrumb li{ float:left; padding:0 7px 0 7px;}
+#wrapAuxiliar ul.breadCrumb li a, ul.breadCrumb li a:active { color:#0039ba; font-size:12px; padding:0 15px 0 0; background:url(#{request.contextPath}/resources/imagens/seta.jpg) no-repeat 100% 7px;}
+#wrapAuxiliar ul.breadCrumb li:first-child{ padding-left:0; color:333; font-size:12px; font-weight:bold; }
+#wrapAuxiliar ul.breadCrumb li:last-child{ color:#333;}
+
+#wrapConteudo{padding-bottom:78px;}
+#wrapConteudo .conteudo{ margin:0 auto; width:944px;}
+#wrapConteudo .conteudo #wrapAuxiliar{display:block;}
+#wrapConteudo .conteudo #wrapMenuVertical{ float:left; width:160px; margin-right:10px; display:block;}
+#wrapConteudo .conteudo #util{ float:right; width:752PX;}
+
+/*-----------------|	Menu Vertical	|-----------------------------*/
+
+#wrapMenuVertical ul#menuVertical{ list-style-type:none; overflow:hidden;}
+#wrapMenuVertical ul#menuVertical li{ border-bottom:1px solid #CCC; padding:6px 10px; background:url(#{request.contextPath}/resources/imagens/seta.jpg) no-repeat 0 18px;}
+#wrapMenuVertical ul#menuVertical li a{ text-decoration:none; color:#333; font-size:13px; font-weight:bold; display:block; padding:6px 10px}
+#wrapMenuVertical ul#menuVertical li a:hover{ background:#002aa8; color:#FFF; display:block;}	
+
+ul#menuVertical li ul{ list-style-type:none !important; }
+ul#menuVertical li ul li{ border-bottom:none!important; padding:0!important; background:url(#{request.contextPath}/resources/imagens/ponto.png) no-repeat 02px 14px!important; }
+ul#menuVertical li ul li a{text-docoration:none!important; font-size:12px !important; font-weight:normal !important;/* text-indent:15px !important;*/}
+ul#menuVertical li ul li a:hover{ text-decoration:underline !important; background:none !important; color:#333!important;/* font-weight:bold !important;*/ }
+.sub{ cursor:default; background:none !important; color:#333 !important;}
+/*ul#menuVertical li ul li a*/.atual{ text-decoration:underline !important; /*background:none !important; color:#333!important; font-weight:bold !important;*/ cursor:default!important; }

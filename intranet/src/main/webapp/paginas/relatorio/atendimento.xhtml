@@ -1,0 +1,214 @@
+<ui:composition template="/WEB-INF/templates/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+	<ui:define name="html-head">
+		<h:outputScript library="js" name="jquery.price_format.1.3.js" />
+		<script type="text/javascript">
+			function exportarJS(){
+				limparFiltro();
+				PrimeFaces.monitorDownload(showStatus, hideStatus);
+				atualizarFiltro();
+			}
+			function limparFiltro(){
+				var valor = $('.globalFilterClass').val();
+				$('.globalFilterClass').val('');
+				listaAtendimentos.filter();
+				$('#hiddenPesquisar').val(valor);
+			}
+			function atualizarFiltro(){
+				var valor = $('#hiddenPesquisar').val(); 
+				$('.globalFilterClass').val(valor);
+				listaAtendimentos.filter();
+				$('#hiddenPesquisar').val('');
+			}
+		</script>
+	</ui:define>
+	
+	<ui:param name="breadcrumbs" value="#{bundle['geral.breadcrumb.relatorio']},#{bundle['relatorio.atendimento.tituloPagina']}" />
+
+	<ui:define name="content-main-page">
+
+		<h:form id="formConsulta">
+			<input type="hidden" id="hiddenPesquisar"/>
+			<p:focus id="focusConsulta" context="formConsulta" />
+			<p:messages id="messages" showDetail="false" />
+			<h3 class="titlePage">#{bundle['relatorio.atendimento.tituloPagina.descricao']}</h3>
+
+			<fieldset class="filtro">
+			
+				<h:outputLabel value="#{bundle['geral.label.dataInicio']}" styleClass="label-button">
+					<h:outputText value="" styleClass="pesquisaDireta" />
+					<br/>
+					<p:calendar id="idDataInicio" size="10"
+						value="#{relatorioAtendimentoController.relatorioAtendimento.dataInicio}"
+						pattern="dd/MM/yyyy" locale="pt_BR"
+						converter="converter.DataConverterSIRED" maxlength="10"
+						onkeyup="maskIt(this,event,'##/##/#####',false,false)" >
+					</p:calendar>
+				</h:outputLabel>
+				
+				<h:outputLabel value="#{bundle['geral.label.dataFim']}" styleClass="label-button">
+					<br/>
+					<p:calendar id="idDataFim" size="10"
+						value="#{relatorioAtendimentoController.relatorioAtendimento.dataFim}"
+						pattern="dd/MM/yyyy" locale="pt_BR"
+						converter="converter.DataConverterSIRED" maxlength="10"
+						onkeyup="maskIt(this,event,'##/##/#####',false,false)" >
+					</p:calendar>
+				</h:outputLabel>
+				
+				<h:outputLabel value="#{bundle['base.label.base']}" styleClass="label-button"
+						rendered="#{relatorioAtendimentoController.perfilAcessoBase}" >
+					<br/>
+					<h:selectOneMenu id="selectBase"
+						style="margin-right:8px;"
+						value="#{relatorioAtendimentoController.relatorioAtendimento.base}"
+						converter="omnifaces.SelectItemsConverter"
+						rendered="#{relatorioAtendimentoController.perfilAcessoBase}">
+						<f:selectItem itemLabel="TODAS" noSelectionOption="true" />
+						<f:selectItems value="#{relatorioAtendimentoController.listaBases}"
+							var="base" itemValue="#{base}" itemLabel="#{base.nome}" />
+					</h:selectOneMenu>
+				</h:outputLabel>
+
+				<p:commandLink
+					title="#{bundle['MH008']}"
+					styleClass="btnLaranja marginTop buttonSelected"
+					style="margin-top:24px !important; margin-right: 8px;"
+					actionListener="#{relatorioAtendimentoController.localizar}"
+					id="btnLocalizar" update="painelConsultaItens messages btnExportar">
+					<span>#{bundle['geral.button.consultar']}</span>
+				</p:commandLink>
+				
+				<p:commandLink styleClass="btnAzul marginTop buttonSelected"
+					onclick="exportarJS();"
+					title="#{bundle['MH010']}" ajax="false"
+					disabled="#{relatorioAtendimentoController.listaFiltro.size()==0}"
+					id="btnExportar" style="margin-top:24px !important; margin-right: 8px;">
+					<span>#{bundle['geral.button.exportar']}</span>
+					<p:dataExporter type="xls" target="dataTableCrud"
+						fileName="#{bundle['relatorio.atendimento.nome.relatorio']}"
+						postProcessor="#{relatorioAtendimentoController.preExportar}" />
+				</p:commandLink>				
+			</fieldset>
+		
+
+		<h:panelGrid id="painelConsultaItens">
+		
+			<h:panelGrid id="painelConsultaNoItens" 
+				rendered="#{relatorioAtendimentoController.pesquisaRealizada &amp;&amp; relatorioAtendimentoController.listaAtendimento.size() == 0}">
+				#{bundle['MI017']}
+			</h:panelGrid>
+			
+			<h:panelGrid id="painelConsulta" 
+				rendered="#{relatorioAtendimentoController.pesquisaRealizada &amp;&amp; relatorioAtendimentoController.listaAtendimento.size() > 0}" >				
+				<p:dataTable
+					value="#{relatorioAtendimentoController.listaAtendimento}"
+					var="atendimento" widgetVar="listaAtendimentos" id="dataTableCrud"
+					rows="10" emptyMessage="#{bundle['MI017']}"
+					rendered="#{relatorioAtendimentoController.listaAtendimento.size() > 0 }"
+					paginator="true" filteredValue="#{relatorioAtendimentoController.listaFiltro}"
+					sortBy="base" sortFunction="#{relatorioAtendimentoController.sortByString}"
+					styleClass="estilo-border-dotted zebr" paginatorPosition="bottom"
+					tableStyleClass="tablefixa"
+					rowStyleClass="#{empty rowIx or rowIx mod 2 ne 0 ? 'even-row' : 'odd-row'}" rowIndexVar="rowIx"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					currentPageReportTemplate="#{bundle['geral.crud.exibindo']} {startRecord} #{bundle['geral.crud.ate']} {endRecord}  #{bundle['geral.crud.de']} {totalRecords}  #{bundle['geral.crud.registros']} "
+					rowsPerPageTemplate="5,10,25,50">
+
+					<f:facet name="header">
+						<p:outputPanel style="text-align:right; margin-right:-10px" styleClass="ui-widget-auxiliar">
+							<h:outputText value="#{bundle['geral.label.pesquisar']}" escape="false" />
+							<h:inputText id="globalFilter" value="#{relatorioAtendimentoController.filtroPesquisar}" 
+								onkeyup="listaAtendimentos.filter();" style="width:150px;"
+								maxlength="255" styleClass="semClear globalFilterClass">
+								<p:ajax event="keyup" update=":#{p:component('btnExportar')}" global="false" />
+							</h:inputText>
+						</p:outputPanel>
+					</f:facet>
+
+					<p:column
+						filterBy="base"
+						filterStyle="display:none; visibility:hidden;" sortBy="base"
+						sortFunction="#{relatorioAtendimentoController.sortByString}"
+						style="width:13%" styleClass="gri-alfanumericos noBackGroundImage">
+						<h:outputText value="#{atendimento.base}" />
+						<f:facet name="header">
+							<h:outputText value="#{bundle['base.label.baseMaiusculas']}" />
+						</f:facet>
+					</p:column>
+
+					<p:column filterBy="dataAtendimentoFormatada"
+						filterStyle="display:none; visibility:hidden;" sortBy="dataAtendimentoFormatada"
+						sortFunction="#{relatorioAtendimentoController.sortByString}"
+						style="width:16%" styleClass="gri-codigos noBackGroundImage">
+						<h:outputText value="#{atendimento.dataAtendimentoFormatada}" />
+						<f:facet name="header">
+							<h:outputText value="#{bundle['relatorio.atendimento.atendimento']}" />
+						</f:facet>
+					</p:column>
+
+					<p:column filterBy="documento"
+						filterStyle="display:none; visibility:hidden;" sortBy="documento"
+						sortFunction="#{relatorioAtendimentoController.sortByString}"
+						style="width:30%" styleClass="gri-alfanumericos noBackGroundImage">
+						<h:outputText
+							value="#{atendimento.documento}" />
+						<f:facet name="header">
+							<h:outputText value="#{bundle['geral.label.documento.maiusculas']}" />
+						</f:facet>
+					</p:column>
+
+					<p:column filterBy="qtdSolicitada"
+						filterStyle="display:none; visibility:hidden;" sortBy="qtdSolicitada"
+						style="width:14%" styleClass="gri-numericos noBackGroundImage">
+						<h:outputText
+							value="#{atendimento.qtdSolicitada}" />
+						<f:facet name="header">
+							<h:outputText
+								value="#{bundle['geral.title.qtdSolicitada']}" title="#{bundle['MH044']}" />
+						</f:facet>
+					</p:column>
+
+					<p:column filterBy="qtdDisponibilizada"
+						filterStyle="display:none; visibility:hidden;" sortBy="qtdDisponibilizada"
+						style="width:13%" styleClass="gri-numericos noBackGroundImage">
+						<h:outputText value="#{atendimento.qtdDisponibilizada}" />
+						<f:facet name="header">
+							<h:outputText
+								value="#{bundle['geral.title.qtdDisponivel']}" title="#{bundle['MH045']}" />
+						</f:facet>
+					</p:column>
+
+					<p:column filterBy="qtdNaoLocalizada"
+						filterStyle="display:none; visibility:hidden;" sortBy="qtdNaoLocalizada"
+						style="width:14%" styleClass="gri-numericos noBackGroundImage">
+						<h:outputText value="#{atendimento.qtdNaoLocalizada}" />
+						<f:facet name="header">
+							<h:outputText
+								value="#{bundle['geral.title.qtdNaoLocalizada']}" title="#{bundle['MH046']}" />
+						</f:facet>
+					</p:column>
+					
+					<p:columnGroup type="footer">
+						<p:row>
+							<p:column style="height: 25px; border: none;" colspan="6" styleClass="noBackGroundImage" />
+						</p:row>
+					</p:columnGroup>
+
+				</p:dataTable>
+
+
+			</h:panelGrid>
+</h:panelGrid>
+		
+</h:form>
+
+	</ui:define>
+
+</ui:composition>

@@ -1,0 +1,204 @@
+<ui:composition template="/WEB-INF/templates/template_sem_menu.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+	<ui:define name="html-head">
+		<h:outputScript library="js" name="resumo-movimento-diario.js" />
+		<h:outputStylesheet library="css" name="resumo-movimento-diario.css" />
+	</ui:define>
+
+	<ui:define name="breadcrumb">
+		<h:form id="formBreadcrumb">
+			<div id="wrapAuxiliar">
+				<ul class="breadcrumb-sistema">
+					<li>#{bundle['geral.breadcrumb.voce.esta.em']}</li>
+					<li><h:commandLink value="#{bundle['geral.breadcrumb.remessa']}" styleClass="buttonSelected"
+							action="/paginas/remessa/consulta.xhtml?faces-redirect=true" /></li>
+					<li>#{bundle['remessa.tituloPagina.edicao']}</li>
+				</ul>
+			</div>
+		</h:form>
+	</ui:define>
+
+	<ui:define name="content-main-page">
+		<h:form id="formRascunhoTipoAB" prependId="false">
+
+			<p:messages id="messages" showDetail="false" />
+
+			<div>
+					<h3 class="title-page">#{bundle['remessa.tituloPagina.abertura.alteracaoRemessa']}	#{rascunhoRemessaABController.remessa.id}</h3>
+
+				<p:focus id="focusCadastro" for="formRascunhoTipoAB" />
+			</div>
+
+			<p:commandLink id="btnCorrigirRem" style="margin-top: 5px !important;" 
+							rendered="#{rascunhoRemessaABController.exibeBotaoAlterarRemessa()}"
+							action="#{rascunhoRemessaABController.prepareAlterarRemessa()}"
+							styleClass="btnLaranja marginTop marginBottom" update="messages">
+				<span><h:outputText value="Concluir Alterações" /></span>
+			</p:commandLink>
+			
+			<p:commandLink id="btnCancelarCorrecao" style="margin-top: 5px !important;" 
+							action="#{rascunhoRemessaABController.prepareCancelarCorrecaoRemessa()}"
+							styleClass="btnAzul marginTop marginBottom">
+				<span><h:outputText value="Cancelar Alterações" /></span>
+			</p:commandLink>			
+
+			<p:outputPanel id="pnlDatatableDocumentos">
+				<p:dataTable id="dtDocumentos" paginator="true" rows="10" paginatorPosition="bottom" 
+								paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" 
+								currentPageReportTemplate="#{bundle['geral.crud.exibindo']} {startRecord} #{bundle['geral.crud.ate']} {endRecord}  #{bundle['geral.crud.de']} {totalRecords}  #{bundle['geral.crud.registros']} "
+								rowsPerPageTemplate="5,10,25,50,100" var="doc" sortBy="codigoRemessa"
+								style="margin-right: -4px !important;" 
+								widgetVar="remessaDocumento"
+								rowIndexVar="rowIx" 
+								value="#{rascunhoRemessaABController.exibeListaDocumentosTratados()}"
+								styleClass="estilo-border-dotted" 
+								rowSelectMode="single"
+								emptyMessage="Nenhum registro correspondente encontrado"
+								rowStyleClass="#{empty rowIx or rowIx mod 2 ne 0 ? 'even-row' : 'odd-row'}">
+	
+					<!-- Codigo de remesssa -->
+					<p:column  style="text-align:center; border: 1px dotted #666 !important; width: 40px !important; padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 0px !important; padding-right: 0px !important;" styleClass="totalColetas">
+						<f:facet name="header">
+							<h:outputLabel	value="#{bundle['remessa.mantemremessa.acordion.codigoRemessa']}" style="color: white;" />
+						</f:facet>
+						<span><h:outputText value="#{doc.codigoRemessa}" style="font-weight: bold !important;" /></span>
+					</p:column>
+					
+					<!-- Unidade geradora -->
+					<p:column style="text-align:center; border: 1px dotted #666 !important; width: 120px !important; padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 0px !important; padding-right: 0px !important;" styleClass="totalColetas">
+						<f:facet name="header">
+							<h:outputLabel	value="#{bundle['geral.label.unidadeGeradora.maiusculas']}" style="color: white;" />
+						</f:facet>
+						<span><h:outputText value="#{doc.unidadeGeradora.descricaoCompleta}" style="font-weight: bold !important;" /></span>
+					</p:column>
+					
+					<!-- DOCUMENTO -->
+					<p:column style="text-align:center; border: 1px dotted #666 !important; width: 100px !important; padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 0px !important; padding-right: 0px !important;" styleClass="totalColetas">
+						<f:facet name="header">
+							<h:outputLabel	value="#{bundle['geral.label.documento.maiusculas']}" style="color: white;" />
+						</f:facet>
+						<span><h:outputText value="#{doc.documento.nome}" style="font-weight: bold !important;" /></span>
+					</p:column>
+					
+					<!-- DATA HORA -->
+					<p:column style="text-align:center; border: 1px dotted #666 !important; width: 40px !important; padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 0px !important; padding-right: 0px !important;" styleClass="totalColetas">
+						<f:facet name="header">
+							<h:outputLabel	value="#{bundle['geral.label.dataHora.maiusculas']}" style="color: white;" />
+						</f:facet>
+						<h:outputText value="#{doc.dataUltimaAlteracao}" style="font-weight: bold !important;" >
+							<f:convertDateTime pattern="dd/MM/yyyy HH:mm" locale="pt_BR" />
+						</h:outputText>
+					</p:column>
+					
+					<!-- AÇÕES -->
+					<p:column style="text-align:center; border: 1px dotted #666 !important; width: 60px !important; padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 0px !important; padding-right: 0px !important;" styleClass="totalColetas">
+						<f:facet name="header">
+							<h:outputLabel	value="#{bundle['geral.label.acoes.maiusculas']}" style="color: white;" />
+						</f:facet>
+						<h:panelGroup id="pnlAcoes" >
+							<h:commandLink id="idEditarRemessa"	styleClass="editar"	title="#{bundle['MH075']}" style="margin-left: -30px !important;"
+											rendered="#{rascunhoRemessaABController.exibeBotaoEditar(doc)}"
+											action="#{rascunhoRemessaABController.editarDocumentoRemessa(doc)}">
+							</h:commandLink>
+							
+							<h:commandLink id="idExcluir" styleClass="excluir" title="#{bundle['MH104']}" style="margin-left: 1% !important;" rendered="#{rascunhoRemessaABController.exibeBotaoExcluir(doc)}">
+								<p:ajax update=":formRascunhoTipoAB" process="@this" oncomplete="modalExcluir.show()"
+										listener="#{rascunhoRemessaABController.excluirDocumentoRemessa(doc)}"/>			
+							</h:commandLink>
+						</h:panelGroup>
+					</p:column>
+				</p:dataTable>
+			</p:outputPanel>
+			
+			
+		</h:form>
+
+
+		<!-- MODAL CONCLUIR REMESSA  -->
+		<p:dialog header="#{bundle['remessa.conclusao.modal.header']}" id="modalConfirmarId" widgetVar="modalConfirmar" width="500" 
+					styleClass="ui-dialog-background" modal="true" dynamic="true" resizable="false" position="center" onShow="giveFocus('confirmarForm:btnConfirmar')">
+			<h:form id="confirmarForm">
+				<span class="atencao2" style="margin-top: -2px !important;" />
+
+				<h:outputLabel style="margin-left: 40px; max-width: 60px; font-weight: bold !important;" escape="false"
+								value="#{bundle['remessa.mensagem.concluir']}" />
+				<br></br>
+				<p:commandLink id="btnConfirmar" oncomplete="modalConfirmar.hide()" styleClass="btnAzul marginTop buttonSelected" update=":formRascunhoTipoAB"
+					action="#{rascunhoRemessaABController.concluirRemessa()}">
+					<span><h:outputText style="width: 1; height: 1;" value="Sim" /></span>
+				</p:commandLink>
+				<p:commandLink id="btnNaoConfirmar" styleClass="btnLaranja marginTop buttonSelected" oncomplete="modalConfirmar.hide()">
+					<span><h:outputText style="width: 1; height: 1;" value="Não" /></span>
+				</p:commandLink>
+				<p:spacer height="30px" />
+			</h:form>
+		</p:dialog>		
+		
+		<!-- MODAL ALTERAR REMESSA  -->
+		<p:dialog header="#{bundle['remessa.alteracao.modal.header']}" id="modalAlterarId" widgetVar="modalAlterar" width="500" 
+					styleClass="ui-dialog-background" modal="true" dynamic="true" resizable="false" position="center" onShow="giveFocus('corrigirForm:btnConfirmar')">
+			<h:form id="corrigirForm">
+				<span class="atencao2" style="margin-top: -2px !important;" />
+
+				<h:outputLabel style="margin-left: 40px; max-width: 60px; font-weight: bold !important;" escape="false"
+								value="#{bundle['remessa.mensagem.alterar']}" />
+				<br></br>
+				<p:commandLink id="btnConfirmar" oncomplete="modalAlterar.hide()" styleClass="btnAzul marginTop buttonSelected" update=":formRascunhoTipoAB"
+					action="#{rascunhoRemessaABController.alterarRemessa()}">
+					<span><h:outputText style="width: 1; height: 1;" value="Sim" /></span>
+				</p:commandLink>
+				<p:commandLink id="btnNaoConfirmar" styleClass="btnLaranja marginTop buttonSelected" oncomplete="modalAlterar.hide()">
+					<span><h:outputText style="width: 1; height: 1;" value="Não" /></span>
+				</p:commandLink>
+				<p:spacer height="30px" />
+			</h:form>
+		</p:dialog>
+		
+		<!-- MODAL CANCELAR REMESSA  -->
+		<p:dialog header="#{bundle['remessa.cancelamento.alteracao.modal.header']}" id="modalCancelarId" widgetVar="modalCancelar" width="500" 
+					styleClass="ui-dialog-background" modal="true" dynamic="true" resizable="false" position="center" onShow="giveFocus('corrigirForm:btnConfirmar')">
+			<h:form id="cancelarForm">
+				<span class="atencao2" style="margin-top: -2px !important;" />
+
+				<h:outputLabel style="margin-left: 40px; max-width: 60px; font-weight: bold !important;" escape="false"
+								value="#{bundle['remessa.mensagem.cancelamento.alteracao']}" />
+				<br></br>
+				<p:commandLink id="btnConfirmar" oncomplete="modalAlterar.hide()" styleClass="btnAzul marginTop buttonSelected" update=":formRascunhoTipoAB"
+					action="#{rascunhoRemessaABController.cancelarAlteracoesRemessa()}">
+					<span><h:outputText style="width: 1; height: 1;" value="Sim" /></span>
+				</p:commandLink>
+				<p:commandLink id="btnNaoConfirmar" styleClass="btnLaranja marginTop buttonSelected" oncomplete="modalCancelar.hide()">
+					<span><h:outputText style="width: 1; height: 1;" value="Não" /></span>
+				</p:commandLink>
+				<p:spacer height="30px" />
+			</h:form>
+		</p:dialog>
+	
+		<!-- MODAL CONFIRMA EXCLUSAO  -->
+		<h:form id="excluirForm" prependId="false">
+			<p:dialog header="#{bundle['remessa.tipoC.exclusao.modal.header']}" id="modalExcluirId" widgetVar="modalExcluir" onHide="giveFocusRemote();"
+				styleClass="ui-dialog-background" modal="true" dynamic="true" resizable="false" position="center" onShow="giveFocus('excluirForm:btnExcluir')" >
+				<br />
+				<span id="atencaoId" class="atencao2" style="margin-top: -2px !important;" />
+				<h:outputFormat style="margin-left: 40px; margin-right: 40px; font-weight: bold !important;" value="#{bundle['remessa.tipoAB.exclusao.mensagem']}" />
+				<br></br>
+				<p:commandLink id="btnExcluir" styleClass="btnAzul marginTop buttonSelected" update=":formRascunhoTipoAB:messages, :formRascunhoTipoAB:pnlDatatableDocumentos, :formRascunhoTipoAB"
+					actionListener="#{rascunhoRemessaABController.confirmarExclusaoItemRemessa()}" oncomplete="modalExcluir.hide()">
+					<span><h:outputText style="width: 1; height: 1;" value="Sim" /></span>
+				</p:commandLink>
+				<p:commandLink id="btnNaoExcluir" styleClass="btnLaranja marginTop buttonSelected" oncomplete="modalExcluir.hide()"
+					actionListener="#{rascunhoRemessaABController.cancelarExclusaoItemRemessa()}">
+					<span><h:outputText style="width: 1; height: 1;" value="Não" /></span>
+				</p:commandLink>
+				<p:spacer height="30px" />
+			</p:dialog>
+		</h:form>
+		
+	</ui:define>
+</ui:composition>

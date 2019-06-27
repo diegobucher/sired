@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Capa_lote" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="30" rightMargin="30" topMargin="20" bottomMargin="20" uuid="24dd030f-9834-4610-a2c1-b16a37a2f6da">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="62"/>
+	<property name="ireport.scriptlethandling" value="0"/>
+	<property name="ireport.encoding" value="UTF-8"/>
+	<import value="net.sf.jasperreports.engine.*"/>
+	<import value="java.util.*"/>
+	<import value="net.sf.jasperreports.engine.data.*"/>
+	<parameter name="IMAGE_DIR" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="NUMERO_ITEM" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="NUMERO_REMESSA" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="NOME_UF" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="NOME_UF_UNIDADE" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="SG_UF_UNIDADE" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="NU_UNIDADE" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="DE_ITEM" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="CAMPOS_CONTA" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="NU_CONTA_FIM" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="NU_QUANTIDADE_TFS" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="CAMPOS_DATA" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="DT_FIM" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="DT_FRAGMENTACAO" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="DT_ATUAL" class="java.lang.String" isForPrompting="false"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="566" splitType="Stretch">
+			<line>
+				<reportElement key="line-1" x="1" y="8" width="1" height="545" uuid="167ab256-e9a3-4c7f-a51f-84565279e4d5"/>
+			</line>
+			<line>
+				<reportElement key="line-2" x="108" y="8" width="1" height="544" uuid="5f2433ba-2090-4012-ad2d-0da79d776c7a"/>
+			</line>
+			<line>
+				<reportElement key="line-3" x="527" y="7" width="1" height="546" uuid="4218536c-3d86-4e54-bac2-933269aca7f4"/>
+			</line>
+			<line direction="BottomUp">
+				<reportElement key="line-4" x="1" y="7" width="527" height="1" uuid="16c5f422-8d26-41ac-bf71-c45f7f91373d"/>
+			</line>
+			<staticText>
+				<reportElement key="staticText-1" x="118" y="8" width="172" height="65" uuid="af7d4450-c076-4a4f-ba82-00432293bf1f"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="48" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[CAIXA ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-2" x="118" y="69" width="172" height="21" uuid="67eb3de7-f5ea-4387-bbaa-4a59d785e9ac"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="11" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[CAIXA ECONÔMICA FEDERAL]]></text>
+			</staticText>
+			<line>
+				<reportElement key="line-5" x="382" y="48" width="1" height="79" uuid="43ef6a6c-663e-4d4e-94fe-a1d46f8276d5"/>
+			</line>
+			<line>
+				<reportElement key="line-6" x="521" y="49" width="1" height="77" uuid="88ac166f-f7f3-46e5-a4de-6609f3757b73"/>
+			</line>
+			<line>
+				<reportElement key="line-7" x="382" y="48" width="140" height="1" uuid="0e54814f-bfe7-429f-a564-46dc4d255f56"/>
+			</line>
+			<line>
+				<reportElement key="line-8" x="382" y="75" width="140" height="1" uuid="7852e804-29eb-4848-9098-2d4203b0300e"/>
+			</line>
+			<line>
+				<reportElement key="line-9" x="383" y="126" width="139" height="1" uuid="245d78ba-e411-4f87-8f21-a34f71e5a670"/>
+			</line>
+			<staticText>
+				<reportElement key="staticText-3" x="407" y="52" width="95" height="21" uuid="b36d91f4-b04e-4b95-87e0-7e4b9706b6ab"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[INDEXAÇÃO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-4" x="382" y="32" width="138" height="14" uuid="c05099e9-9f5b-4b79-b773-c3f2a7fb6906"/>
+				<textElement>
+					<font size="8" isItalic="true" pdfFontName="Helvetica-Oblique"/>
+				</textElement>
+				<text><![CDATA[Uso exclusivo da unidade de arquivo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-5" x="112" y="115" width="149" height="16" uuid="70c1138d-be29-46dd-9f2a-763e207f309b"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[ETIQUETA CAIXA - ARQUIVO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-6" x="120" y="158" width="209" height="16" uuid="fbd326fe-8a27-4120-b57f-009da7ecaf4d"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[SUPERINTENDÊNCIA DE VINCULAÇÃO/UF]]></text>
+			</staticText>
+			<line direction="BottomUp">
+				<reportElement key="line-10" x="117" y="154" width="403" height="1" uuid="87c436ed-629c-4f34-9004-3f883d5e50df"/>
+			</line>
+			<line direction="BottomUp">
+				<reportElement key="line-11" x="117" y="178" width="403" height="1" uuid="6df89dac-f04e-4534-9c2e-af172f9a2c99"/>
+			</line>
+			<line>
+				<reportElement key="line-12" x="334" y="155" width="1" height="24" uuid="6234aaa1-7463-496a-834a-bc02e05c6504"/>
+			</line>
+			<line>
+				<reportElement key="line-13" x="117" y="155" width="1" height="24" uuid="c568f238-72d5-4429-9bb4-1cf1d6bb59b3"/>
+			</line>
+			<line>
+				<reportElement key="line-14" x="519" y="154" width="1" height="24" uuid="4a4036e6-b8e2-49f1-be0d-cc9a07704ac8"/>
+			</line>
+			<line>
+				<reportElement key="line-15" x="117" y="190" width="1" height="76" uuid="30880a57-96d5-46e4-90d2-28669c7cf7ed"/>
+			</line>
+			<line direction="BottomUp">
+				<reportElement key="line-16" x="117" y="189" width="403" height="1" uuid="56f1e2ed-21b1-4b65-bc18-5192177697db"/>
+			</line>
+			<line>
+				<reportElement key="line-17" x="519" y="190" width="1" height="76" uuid="ec7084a6-0887-48d0-94c2-683d6a1be160"/>
+			</line>
+			<line direction="BottomUp">
+				<reportElement key="line-18" x="117" y="216" width="403" height="1" uuid="b1b39ac0-b244-4983-85e7-69e1f46fe480"/>
+			</line>
+			<staticText>
+				<reportElement key="staticText-7" x="121" y="195" width="116" height="15" uuid="c837075b-69f4-4012-88bc-c3be4f03446a"/>
+				<textElement>
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Nome da Unidade/UF]]></text>
+			</staticText>
+			<line>
+				<reportElement key="line-19" x="418" y="190" width="1" height="26" uuid="653b7e12-6e2e-445c-9017-9f363cdef91c"/>
+			</line>
+			<line direction="BottomUp">
+				<reportElement key="line-20" x="117" y="265" width="403" height="1" uuid="22cfc473-822f-4a10-9c2d-868784678a64"/>
+			</line>
+			<line>
+				<reportElement key="line-21" x="418" y="216" width="1" height="50" uuid="78cfa8f8-a26a-4dbd-91f1-efa6ce2dad12"/>
+			</line>
+			<staticText>
+				<reportElement key="staticText-8" x="423" y="195" width="78" height="14" uuid="7109741e-38c2-4487-adbc-aebab7dbbe22"/>
+				<textElement>
+					<font size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[CGC]]></text>
+			</staticText>
+			<line>
+				<reportElement key="line-22" x="117" y="277" width="1" height="93" uuid="6c6650ca-7b98-45dc-a304-71fb305937ea"/>
+			</line>
+			<line direction="BottomUp">
+				<reportElement key="line-23" x="117" y="276" width="403" height="1" uuid="ad5c18c2-8d9d-43ce-9c68-f2cb6523ef18"/>
+			</line>
+			<line>
+				<reportElement key="line-24" x="519" y="277" width="1" height="92" uuid="f4b1c094-17a1-46e4-b2b2-8701c570355d"/>
+			</line>
+			<line direction="BottomUp">
+				<reportElement key="line-25" x="117" y="303" width="403" height="1" uuid="40f76576-6bf4-4fb2-ab01-a92c53021dfb"/>
+			</line>
+			<line direction="BottomUp">
+				<reportElement key="line-27" x="117" y="369" width="403" height="1" uuid="b8e66ba3-d90a-4555-a59f-092474239b2a"/>
+			</line>
+			<line direction="BottomUp">
+				<reportElement key="line-28" x="117" y="374" width="403" height="1" uuid="e9a9ea43-0597-42aa-af6d-4a7c4c895663"/>
+			</line>
+			<line direction="BottomUp">
+				<reportElement key="line-29" x="117" y="409" width="403" height="1" uuid="7e6ac420-afe3-4f5f-8c69-ed4efde367b7"/>
+			</line>
+			<line>
+				<reportElement key="line-30" x="281" y="375" width="1" height="34" uuid="1be615b8-097d-4593-993c-f41dc08bc27e"/>
+			</line>
+			<line>
+				<reportElement key="line-31" x="117" y="375" width="1" height="35" uuid="7911b25e-ae0d-46a2-8853-7f866ba0a46b"/>
+			</line>
+			<line>
+				<reportElement key="line-32" x="519" y="374" width="1" height="35" uuid="c1fc23c6-26d1-4eff-bff1-0b5f1b8a58e5"/>
+			</line>
+			<staticText>
+				<reportElement key="staticText-9" x="121" y="378" width="155" height="30" uuid="32e6020c-0f63-4875-8a7f-391485d19bbd"/>
+				<textElement>
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Período/
+Data do Movimento:]]></text>
+			</staticText>
+			<line>
+				<reportElement key="line-33" x="118" y="419" width="1" height="61" uuid="bd983353-1e51-4113-8932-a795c73fbb71"/>
+			</line>
+			<line direction="BottomUp">
+				<reportElement key="line-34" x="118" y="418" width="403" height="1" uuid="d5f75d62-34de-4747-86b0-33193ba92c26"/>
+			</line>
+			<line>
+				<reportElement key="line-35" x="520" y="419" width="1" height="60" uuid="686d10a4-9920-4fd4-91a5-8ee2ac73264d"/>
+			</line>
+			<line direction="BottomUp">
+				<reportElement key="line-36" x="118" y="445" width="403" height="1" uuid="3202faae-37ce-49f6-90cd-cca661bf8aaf"/>
+			</line>
+			<staticText>
+				<reportElement key="staticText-10" x="125" y="424" width="89" height="15" uuid="a77bbe92-521b-42fd-bb70-cf460a5bb1b4"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Nº da Caixa]]></text>
+			</staticText>
+			<line>
+				<reportElement key="line-37" x="221" y="419" width="1" height="60" uuid="779abdaf-3978-436b-8fd6-e73582759330"/>
+			</line>
+			<line direction="BottomUp">
+				<reportElement key="line-38" x="118" y="478" width="403" height="1" uuid="f6ef3191-cbe8-4f61-acee-b6fad201b31b"/>
+			</line>
+			<line>
+				<reportElement key="line-39" x="368" y="419" width="1" height="60" uuid="30beb336-458c-474b-b72a-7f434493c908"/>
+			</line>
+			<staticText>
+				<reportElement key="staticText-11" x="229" y="425" width="130" height="14" uuid="ce2a9071-3358-4901-b206-138c30135bbe"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Fragmentar em:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-12" x="380" y="426" width="130" height="14" uuid="cbd06d4f-d81c-480a-aa33-8bb011ee87c9"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[DATA]]></text>
+			</staticText>
+			<line>
+				<reportElement key="line-40" x="214" y="528" width="232" height="1" uuid="2eda8dd4-2572-4bee-905e-eb1f322f857b"/>
+			</line>
+			<staticText>
+				<reportElement key="staticText-13" x="281" y="531" width="111" height="13" uuid="1d90a653-af4e-4b06-9be8-6b2321d8faed"/>
+				<textElement>
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Assinatura e carimbo]]></text>
+			</staticText>
+			<line direction="BottomUp">
+				<reportElement key="line-41" x="1" y="552" width="526" height="1" uuid="99f0e609-ec58-4697-9db0-54dee5a41d88"/>
+			</line>
+			<staticText>
+				<reportElement key="staticText-14" stretchType="RelativeToTallestObject" x="4" y="115" width="49" height="435" uuid="fcebed6c-c77f-4e90-8bca-c43b41a22e55"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="Left">
+					<font size="30"/>
+				</textElement>
+				<text><![CDATA[Nº do item/ Nº da Remessa ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-15" x="121" y="283" width="160" height="14" uuid="dcfe2595-0ddb-41c3-af9b-f65ca9d3a264"/>
+				<textElement>
+					<font isBold="true" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<text><![CDATA[Espécie de Documento]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
+				<reportElement key="textField" x="405" y="83" width="97" height="32" uuid="947a19d9-da8e-49c2-ba2b-5ec00c137b1f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="24"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{NUMERO_ITEM} + "/" + $P{NUMERO_REMESSA}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement key="textField" x="344" y="156" width="174" height="21" uuid="33b68e33-89e5-45cc-8857-63f9c0927e17"/>
+				<textElement verticalAlignment="Middle">
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{NOME_UF}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
+				<reportElement key="textField" x="121" y="229" width="289" height="23" uuid="e28e340b-b275-4607-841f-66704c16b0ae"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{NOME_UF_UNIDADE} + "/" + $P{SG_UF_UNIDADE}.trim()]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement key="textField" x="423" y="229" width="92" height="23" uuid="efed4524-1208-4294-b7ff-dc4652e20645"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{NU_UNIDADE}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
+				<reportElement key="textField" x="121" y="307" width="381" height="17" uuid="1f1e3a1a-95be-4843-a390-2b00f11e653b"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{DE_ITEM}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement key="textField" x="285" y="379" width="231" height="27" uuid="fe16ca46-dadc-4e00-af84-42a663bb593e"/>
+				<textElement verticalAlignment="Middle">
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{CAMPOS_DATA}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement key="textField" x="125" y="454" width="89" height="18" uuid="3f1c3dfd-a1f5-4c57-9842-db49a89c634e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="false" pdfFontName="Helvetica-Bold"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{NUMERO_ITEM}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement key="textField" x="229" y="454" width="130" height="18" uuid="080fddc0-3217-4a3a-bdb0-b3093f1b40fe"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{DT_FRAGMENTACAO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement key="textField" x="380" y="454" width="130" height="18" uuid="e3a6488d-0757-492f-8977-e80b6b6085b3"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{DT_ATUAL}.trim()]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
+				<reportElement key="textField" x="53" y="115" width="54" height="433" uuid="fe698785-3efa-48e3-ad5d-f986a585527b"/>
+				<textElement textAlignment="Center" rotation="Left">
+					<font size="36" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{NUMERO_ITEM} + "/" + $P{NUMERO_REMESSA}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement key="textField" x="121" y="328" width="396" height="38" uuid="3743f025-abf9-4a5a-a0b0-0ddfb364612b">
+					<printWhenExpression><![CDATA[new Boolean($P{CAMPOS_CONTA} != null ? $P{CAMPOS_CONTA} : "")]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{CAMPOS_CONTA}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="8" splitType="Stretch"/>
+	</summary>
+</jasperReport>
