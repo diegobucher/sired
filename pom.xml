@@ -113,7 +113,7 @@
 		<maven.compiler.source>1.7</maven.compiler.source>
 		
 		<!--TESTES-->
-		<junit.version>4.9</junit.version>
+		<junit.version>4.13.1</junit.version>
 		<mockito.version>1.9.5</mockito.version>
 	</properties>
 	<build>
